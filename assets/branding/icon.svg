@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Vacuum Image Optimizer">
+  <defs>
+    <linearGradient id="vioTile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22C55E"/>
+      <stop offset="1" stop-color="#3B82F6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded image tile -->
+  <rect x="6" y="6" width="52" height="52" rx="16" fill="url(#vioTile)"/>
+
+  <!-- Compression ring (vacuum) -->
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.35"/>
+
+  <!-- Image glyph: sun + mountains -->
+  <circle cx="24" cy="25" r="4.5" fill="#FFFFFF"/>
+  <path d="M15 45 L27 31 L34 39 L43 28 L50 45 Z" fill="#FFFFFF"/>
+
+  <!-- Tertiary optimization spark -->
+  <circle cx="46" cy="18" r="3" fill="#A855F7"/>
+</svg>

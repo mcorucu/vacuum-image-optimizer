@@ -1,0 +1,782 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Vacuum Image Optimizer 0.9.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr_TR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: vacuum-image-optimizer\n"
+
+msgid "Scanning library…"
+msgstr "Kütüphane taranıyor…"
+
+msgid "Processing queue…"
+msgstr "Kuyruk işleniyor…"
+
+msgid "The queue request could not be completed."
+msgstr "Kuyruk isteği tamamlanamadı."
+
+msgid "Vacuum Image Optimizer"
+msgstr "Vacuum Image Optimizer"
+
+msgid "Vacuum Optimizer"
+msgstr "Vacuum Optimizer"
+
+msgid "Sorry, you are not allowed to access this page."
+msgstr "Üzgünüz, bu sayfaya erişim izniniz yok."
+
+msgid "Modern image optimization for WordPress — WebP &amp; AVIF generation, bulk tools, and clean delivery."
+msgstr "WordPress için modern görsel optimizasyonu — WebP &amp; AVIF üretimi, toplu araçlar ve temiz sunum."
+
+msgid "Vacuum Optimizer Sections"
+msgstr "Vacuum Optimizer Bölümleri"
+
+msgid "Dashboard"
+msgstr "Kontrol Paneli"
+
+msgid "Bulk Optimize"
+msgstr "Toplu Optimizasyon"
+
+msgid "WebP & AVIF"
+msgstr "WebP & AVIF"
+
+msgid "Compression"
+msgstr "Sıkıştırma"
+
+msgid "Lazy Load"
+msgstr "Tembel Yükleme"
+
+msgid "Backup & Restore"
+msgstr "Yedekleme ve Geri Yükleme"
+
+msgid "Exclusions"
+msgstr "Hariç Tutmalar"
+
+msgid "Reports"
+msgstr "Raporlar"
+
+msgid "System Status"
+msgstr "Sistem Durumu"
+
+msgid "This feature is coming soon."
+msgstr "Bu özellik yakında geliyor."
+
+msgid "Sorry, you are not allowed to manage these settings."
+msgstr "Üzgünüz, bu ayarları yönetme izniniz yok."
+
+msgid "Backups are disabled. New optimizations will not create restore points, and restore actions for images without an existing backup will be unavailable. Existing backups remain untouched."
+msgstr "Yedekler devre dışı. Yeni optimizasyonlar geri yükleme noktası oluşturmaz ve mevcut yedeği olmayan görseller için geri yükleme işlemleri kullanılamaz. Mevcut yedekler korunur."
+
+msgid "Enable Backups"
+msgstr "Yedeklemeyi Etkinleştir"
+
+msgid "Keep a copy of each original image before generating optimized formats so it can be restored later."
+msgstr "Optimize edilmiş formatları üretmeden önce her orijinal görselin bir kopyasını saklayın; böylece daha sonra geri yüklenebilir."
+
+msgid "Backup Location"
+msgstr "Yedek Konumu"
+
+msgid "Uploads directory unavailable"
+msgstr "Yüklemeler dizini kullanılamıyor"
+
+msgid "Save Settings"
+msgstr "Ayarları Kaydet"
+
+msgid "Bulk Optimization"
+msgstr "Toplu Optimizasyon"
+
+msgid "Scan eligible JPEG and PNG images, then process the queue in safe WordPress AJAX batches."
+msgstr "Uygun JPEG ve PNG görselleri tarayın, ardından kuyruğu güvenli WordPress AJAX gruplarıyla işleyin."
+
+msgid "Scan Library"
+msgstr "Kütüphaneyi Tara"
+
+msgid "Start Queue"
+msgstr "Kuyruğu Başlat"
+
+msgid "Pause Queue"
+msgstr "Kuyruğu Duraklat"
+
+msgid "Resume Queue"
+msgstr "Kuyruğa Devam Et"
+
+msgid "Queue Progress"
+msgstr "Kuyruk İlerlemesi"
+
+msgid "Total"
+msgstr "Toplam"
+
+msgid "Pending"
+msgstr "Bekliyor"
+
+msgid "Processing"
+msgstr "İşleniyor"
+
+msgid "Completed"
+msgstr "Tamamlandı"
+
+msgid "Failed"
+msgstr "Başarısız"
+
+msgid "Failed Jobs"
+msgstr "Başarısız İşler"
+
+msgid "Attachment"
+msgstr "Ek"
+
+msgid "Error"
+msgstr "Hata"
+
+msgid "Attempts"
+msgstr "Deneme"
+
+msgid "Retry"
+msgstr "Yeniden Dene"
+
+msgid "No failed jobs."
+msgstr "Başarısız iş yok."
+
+msgid "Unknown attachment"
+msgstr "Bilinmeyen ek"
+
+msgid "Sorry, you are not allowed to manage compression settings."
+msgstr "Üzgünüz, sıkıştırma ayarlarını yönetme izniniz yok."
+
+msgid "Compression Settings"
+msgstr "Sıkıştırma Ayarları"
+
+msgid "Choose the compression profile and WebP quality used for manual WebP generation and regeneration."
+msgstr "Manuel WebP üretimi ve yeniden üretimi için kullanılan sıkıştırma profilini ve WebP kalitesini seçin."
+
+msgid "Compression Profile"
+msgstr "Sıkıştırma Profili"
+
+msgid "Quality"
+msgstr "Kalite"
+
+msgid "Higher values preserve more visual detail. Lower values usually reduce file size more aggressively."
+msgstr "Yüksek değerler daha fazla görsel ayrıntıyı korur. Düşük değerler genellikle dosya boyutunu daha agresif şekilde küçültür."
+
+msgid "Upload Automation"
+msgstr "Yükleme Otomasyonu"
+
+msgid "Enable auto optimization for new uploads"
+msgstr "Yeni yüklemeler için otomatik optimizasyonu etkinleştir"
+
+msgid "Automatically optimize new JPEG and PNG uploads."
+msgstr "Yeni JPEG ve PNG yüklemelerini otomatik olarak optimize eder."
+
+msgid "Auto optimization mode"
+msgstr "Otomatik optimizasyon modu"
+
+msgid "Queue new uploads"
+msgstr "Yeni yüklemeleri kuyruğa al"
+
+msgid "New uploads are added to the optimization queue. You can process them from Bulk Optimize."
+msgstr "Yeni yüklemeler optimizasyon kuyruğuna eklenir. Bunları Toplu Optimizasyon’dan işleyebilirsiniz."
+
+msgid "Optimize immediately"
+msgstr "Hemen optimize et"
+
+msgid "New uploads are optimized immediately after upload. Large uploads may take longer."
+msgstr "Yeni yüklemeler yüklemeden hemen sonra optimize edilir. Büyük yüklemeler daha uzun sürebilir."
+
+msgid "AVIF Generation"
+msgstr "AVIF Üretimi"
+
+msgid "Enable AVIF Generation"
+msgstr "AVIF Üretimini Etkinleştir"
+
+msgid "AVIF typically provides smaller file sizes than WebP but may require more processing time."
+msgstr "AVIF genellikle WebP’den daha küçük dosya boyutları sağlar ancak daha fazla işlem süresi gerektirebilir."
+
+msgid "AVIF Quality"
+msgstr "AVIF Kalitesi"
+
+msgid "Lower AVIF quality values usually reduce file size further. Range: 0–100."
+msgstr "Daha düşük AVIF kalite değerleri genellikle dosya boyutunu daha da küçültür. Aralık: 0–100."
+
+msgid "Frontend Delivery"
+msgstr "Ön Yüz Sunumu"
+
+msgid "Enable Frontend Delivery"
+msgstr "Ön Yüz Sunumunu Etkinleştir"
+
+msgid "Serve generated WebP/AVIF images on the frontend. Original media files are never modified and the browser always falls back to the original when a derivative is unavailable."
+msgstr "Üretilen WebP/AVIF görsellerini ön yüzde sunar. Orijinal medya dosyaları asla değiştirilmez ve türev kullanılamadığında tarayıcı her zaman orijinale geri döner."
+
+msgid "Preferred Format"
+msgstr "Tercih Edilen Format"
+
+msgid "Auto"
+msgstr "Otomatik"
+
+msgid "AVIF"
+msgstr "AVIF"
+
+msgid "WebP"
+msgstr "WebP"
+
+msgid "Auto: Serve AVIF when available, otherwise WebP, otherwise the original image."
+msgstr "Otomatik: Varsa AVIF, yoksa WebP, o da yoksa orijinal görseli sunar."
+
+msgid "AVIF: Prefer AVIF and fall back to the original image."
+msgstr "AVIF: AVIF’i tercih eder ve orijinal görsele geri döner."
+
+msgid "WebP: Prefer WebP and fall back to the original image."
+msgstr "WebP: WebP’yi tercih eder ve orijinal görsele geri döner."
+
+msgid "Interface Language"
+msgstr "Arayüz Dili"
+
+msgid "Use WordPress Language (default)"
+msgstr "WordPress Dilini Kullan (varsayılan)"
+
+msgid "English"
+msgstr "İngilizce"
+
+msgid "Turkish"
+msgstr "Türkçe"
+
+msgid "German"
+msgstr "Almanca"
+
+msgid "French"
+msgstr "Fransızca"
+
+msgid "Spanish"
+msgstr "İspanyolca"
+
+msgid "Italian"
+msgstr "İtalyanca"
+
+msgid "Portuguese"
+msgstr "Portekizce"
+
+msgid "Russian"
+msgstr "Rusça"
+
+msgid "Dutch"
+msgstr "Felemenkçe"
+
+msgid "Polish"
+msgstr "Lehçe"
+
+msgid "Choose the admin interface language for Vacuum Image Optimizer. Missing translations fall back to English."
+msgstr "Vacuum Image Optimizer için yönetim arayüzü dilini seçin. Eksik çeviriler İngilizceye döner."
+
+msgid "Maximum quality, minimal compression."
+msgstr "En yüksek kalite, en az sıkıştırma."
+
+msgid "Best speed to size ratio."
+msgstr "En iyi hız/boyut dengesi."
+
+msgid "Stronger size reduction for most images."
+msgstr "Çoğu görsel için daha güçlü boyut azaltma."
+
+msgid "Smallest files with the most compression."
+msgstr "En fazla sıkıştırmayla en küçük dosyalar."
+
+msgid "%1$s Default: %2$d%% quality."
+msgstr "%1$s Varsayılan: %%%2$d kalite."
+
+msgid "Vacuum Image Optimizer logo"
+msgstr "Vacuum Image Optimizer logosu"
+
+msgid "Optimize smarter. Deliver faster. Keep your WordPress media library clean, lightweight, and future-ready."
+msgstr "Daha akıllı optimize edin. Daha hızlı sunun. WordPress medya kütüphanenizi temiz, hafif ve geleceğe hazır tutun."
+
+msgid "Profile"
+msgstr "Profil"
+
+msgid "Language"
+msgstr "Dil"
+
+msgid "Overview"
+msgstr "Genel Bakış"
+
+msgid "A quick snapshot of your media library and savings."
+msgstr "Medya kütüphanenizin ve kazanımlarınızın hızlı bir özeti."
+
+msgid "Total Images"
+msgstr "Toplam Görsel"
+
+msgid "Optimized Images"
+msgstr "Optimize Edilen Görseller"
+
+msgid "Pending Images"
+msgstr "Bekleyen Görseller"
+
+msgid "Space Saved"
+msgstr "Kazanılan Alan"
+
+msgid "Optimization & Queue"
+msgstr "Optimizasyon ve Kuyruk"
+
+msgid "Optimization Impact"
+msgstr "Optimizasyon Etkisi"
+
+msgid "Total Original Size"
+msgstr "Toplam Orijinal Boyut"
+
+msgid "Total WebP Size"
+msgstr "Toplam WebP Boyutu"
+
+msgid "Total Saved Space"
+msgstr "Toplam Kazanılan Alan"
+
+msgid "Average Savings %"
+msgstr "Ortalama Kazanım %"
+
+msgid "Queue Overview"
+msgstr "Kuyruk Genel Bakışı"
+
+msgid "State"
+msgstr "Durum"
+
+msgid "Queue completion"
+msgstr "Kuyruk tamamlanması"
+
+msgid "%1$d%% complete (%2$s of %3$s)"
+msgstr "%%%1$d tamamlandı (%3$s içinden %2$s)"
+
+msgid "No queue activity yet."
+msgstr "Henüz kuyruk etkinliği yok."
+
+msgid "Format Generation"
+msgstr "Format Üretimi"
+
+msgid "WebP Generated"
+msgstr "Üretilen WebP"
+
+msgid "AVIF Generated"
+msgstr "Üretilen AVIF"
+
+msgid "AVIF Files Generated"
+msgstr "Üretilen AVIF Dosyaları"
+
+msgid "Generated WebP Attachments"
+msgstr "Üretilen WebP Ekleri"
+
+msgid "Generated AVIF Attachments"
+msgstr "Üretilen AVIF Ekleri"
+
+msgid "Total AVIF Savings"
+msgstr "Toplam AVIF Kazanımı"
+
+msgid "Automation & Delivery"
+msgstr "Otomasyon ve Sunum"
+
+msgid "Auto Optimization"
+msgstr "Otomatik Optimizasyon"
+
+msgid "Status"
+msgstr "Durum"
+
+msgid "Enabled"
+msgstr "Etkin"
+
+msgid "Disabled"
+msgstr "Devre Dışı"
+
+msgid "Upload Mode"
+msgstr "Yükleme Modu"
+
+msgid "Immediate"
+msgstr "Anında"
+
+msgid "Queue"
+msgstr "Kuyruk"
+
+msgid "Processed Today"
+msgstr "Bugün İşlenen"
+
+msgid "Last Auto Processed"
+msgstr "Son Otomatik İşlenen"
+
+msgid "Serving generated WebP/AVIF images with safe fallback to originals."
+msgstr "Üretilen WebP/AVIF görselleri, orijinallere güvenli geri dönüşle sunuluyor."
+
+msgid "Frontend delivery is currently disabled."
+msgstr "Ön yüz sunumu şu anda devre dışı."
+
+msgid "Estimated Optimized Images Available"
+msgstr "Tahmini Kullanılabilir Optimize Görsel"
+
+msgid "Feature Status"
+msgstr "Özellik Durumu"
+
+msgid "Backups"
+msgstr "Yedekler"
+
+msgid "Lazy Loading"
+msgstr "Tembel Yükleme"
+
+msgid "GIF Exclusion"
+msgstr "GIF Hariç Tutma"
+
+msgid "SVG Exclusion"
+msgstr "SVG Hariç Tutma"
+
+msgid "Recent Activity"
+msgstr "Son Etkinlikler"
+
+msgid "Activity Log"
+msgstr "Etkinlik Günlüğü"
+
+msgid "Last Optimized Images"
+msgstr "Son Optimize Edilen Görseller"
+
+msgid "Recent Queue Activity"
+msgstr "Son Kuyruk Etkinliği"
+
+msgid "System Health"
+msgstr "Sistem Sağlığı"
+
+msgid "GD Available"
+msgstr "GD Kullanılabilir"
+
+msgid "Imagick Available"
+msgstr "Imagick Kullanılabilir"
+
+msgid "WebP via Imagick"
+msgstr "Imagick ile WebP"
+
+msgid "WebP via GD"
+msgstr "GD ile WebP"
+
+msgid "WebP Generation Available"
+msgstr "WebP Üretimi Kullanılabilir"
+
+msgid "AVIF Supported"
+msgstr "AVIF Destekleniyor"
+
+msgid "Uploads Writable"
+msgstr "Yüklemeler Yazılabilir"
+
+msgid "Quick Actions"
+msgstr "Hızlı İşlemler"
+
+msgid "Quote of the Day"
+msgstr "Günün Sözü"
+
+msgid "No optimized images yet. Run a bulk optimization to get started."
+msgstr "Henüz optimize edilmiş görsel yok. Başlamak için toplu optimizasyon çalıştırın."
+
+msgid "Exclusion Rules"
+msgstr "Hariç Tutma Kuralları"
+
+msgid "Exclude GIF Animations"
+msgstr "GIF Animasyonlarını Hariç Tut"
+
+msgid "When enabled, GIF images are ignored by eligibility detection."
+msgstr "Etkinleştirildiğinde, GIF görselleri uygunluk tespitinde yok sayılır."
+
+msgid "Exclude SVG Files"
+msgstr "SVG Dosyalarını Hariç Tut"
+
+msgid "When enabled, SVG files are ignored by eligibility detection."
+msgstr "Etkinleştirildiğinde, SVG dosyaları uygunluk tespitinde yok sayılır."
+
+msgid "WebP & AVIF Settings"
+msgstr "WebP & AVIF Ayarları"
+
+msgid "Configure next-generation image format generation."
+msgstr "Yeni nesil görsel formatı üretimini yapılandırın."
+
+msgid "Generate WebP"
+msgstr "WebP Üret"
+
+msgid "Enable WebP generation for all optimized images."
+msgstr "Tüm optimize edilen görseller için WebP üretimini etkinleştir."
+
+msgid "Generate AVIF"
+msgstr "AVIF Üret"
+
+msgid "Enable AVIF generation. Requires server support."
+msgstr "AVIF üretimini etkinleştir. Sunucu desteği gerektirir."
+
+msgid "Fallback Chain"
+msgstr "Geri Dönüş Zinciri"
+
+msgid "Browsers will use the first supported format."
+msgstr "Tarayıcılar desteklenen ilk formatı kullanır."
+
+msgid "Enable Lazy Loading"
+msgstr "Tembel Yüklemeyi Etkinleştir"
+
+msgid "Add native browser loading=\"lazy\" to frontend images. No JavaScript is used."
+msgstr "Ön yüz görsellerine yerel tarayıcı loading=\"lazy\" ekler. JavaScript kullanılmaz."
+
+msgid "Optimization history and statistics will appear here once you start optimizing images."
+msgstr "Görselleri optimize etmeye başladığınızda optimizasyon geçmişi ve istatistikleri burada görünecek."
+
+msgid "Server Environment"
+msgstr "Sunucu Ortamı"
+
+msgid "PHP Version"
+msgstr "PHP Sürümü"
+
+msgid "WordPress Version"
+msgstr "WordPress Sürümü"
+
+msgid "Memory Limit"
+msgstr "Bellek Sınırı"
+
+msgid "Upload Max Filesize"
+msgstr "Maks. Yükleme Boyutu"
+
+msgid "Post Max Size"
+msgstr "Maks. Gönderi Boyutu"
+
+msgid "Image Engines"
+msgstr "Görsel Motorları"
+
+msgid "GD Extension"
+msgstr "GD Eklentisi"
+
+msgid "Imagick Extension"
+msgstr "Imagick Eklentisi"
+
+msgid "WebP Support"
+msgstr "WebP Desteği"
+
+msgid "AVIF via Imagick"
+msgstr "Imagick ile AVIF"
+
+msgid "AVIF via GD"
+msgstr "GD ile AVIF"
+
+msgid "AVIF Support"
+msgstr "AVIF Desteği"
+
+msgid "Production Readiness"
+msgstr "Yayına Hazırlık"
+
+msgid "Queue Table"
+msgstr "Kuyruk Tablosu"
+
+msgid "Backups Writable"
+msgstr "Yedekler Yazılabilir"
+
+msgid "WebP Available"
+msgstr "WebP Kullanılabilir"
+
+msgid "AVIF Available"
+msgstr "AVIF Kullanılabilir"
+
+msgid "Auto (AVIF → WebP → Original)"
+msgstr "Otomatik (AVIF → WebP → Orijinal)"
+
+msgid "Configuration"
+msgstr "Yapılandırma"
+
+msgid "Localization Status"
+msgstr "Yerelleştirme Durumu"
+
+msgid "Override"
+msgstr "Geçersiz Kıl"
+
+msgid "WordPress"
+msgstr "WordPress"
+
+msgid "Text Domain Loaded"
+msgstr "Metin Alanı Yüklendi"
+
+msgid "Current Locale"
+msgstr "Geçerli Yerel Ayar"
+
+msgid "Language Source"
+msgstr "Dil Kaynağı"
+
+msgid "Debug Info"
+msgstr "Hata Ayıklama Bilgisi"
+
+msgid "Copy to Clipboard"
+msgstr "Panoya Kopyala"
+
+msgid "Available"
+msgstr "Kullanılabilir"
+
+msgid "Not Available"
+msgstr "Kullanılamıyor"
+
+msgid "Vacuum Image Optimizer requires PHP 8.1 or higher."
+msgstr "Vacuum Image Optimizer, PHP 8.1 veya üzerini gerektirir."
+
+msgid "Plugin Activation Error"
+msgstr "Eklenti Etkinleştirme Hatası"
+
+msgid "Invalid attachment ID."
+msgstr "Geçersiz ek kimliği."
+
+msgid "Attachment could not be found."
+msgstr "Ek bulunamadı."
+
+msgid "This attachment format is not supported for AVIF generation."
+msgstr "Bu ek formatı AVIF üretimi için desteklenmiyor."
+
+msgid "AVIF generation is not available on this server."
+msgstr "Bu sunucuda AVIF üretimi kullanılamıyor."
+
+msgid "The original image path could not be resolved."
+msgstr "Orijinal görsel yolu çözümlenemedi."
+
+msgid "The original image file is missing or unreadable."
+msgstr "Orijinal görsel dosyası eksik veya okunamıyor."
+
+msgid "The original image file size could not be read."
+msgstr "Orijinal görsel dosyası boyutu okunamadı."
+
+msgid "The AVIF output path could not be created."
+msgstr "AVIF çıktı yolu oluşturulamadı."
+
+msgid "Existing AVIF file found. Metadata was refreshed."
+msgstr "Mevcut AVIF dosyası bulundu. Üst veriler yenilendi."
+
+msgid "No available image engine can generate AVIF on this server."
+msgstr "Bu sunucuda AVIF üretebilen kullanılabilir bir görsel motoru yok."
+
+msgid "AVIF generation failed with the available image engines."
+msgstr "Mevcut görsel motorlarıyla AVIF üretimi başarısız oldu."
+
+msgid "The generated AVIF file size could not be read."
+msgstr "Üretilen AVIF dosyası boyutu okunamadı."
+
+msgid "AVIF image generated successfully."
+msgstr "AVIF görseli başarıyla üretildi."
+
+msgid "The original backup file is missing or unreadable."
+msgstr "Orijinal yedek dosyası eksik veya okunamıyor."
+
+msgid "The attachment original path could not be resolved."
+msgstr "Ekin orijinal yolu çözümlenemedi."
+
+msgid "The original image directory could not be created."
+msgstr "Orijinal görsel dizini oluşturulamadı."
+
+msgid "The original image could not be restored from backup."
+msgstr "Orijinal görsel yedekten geri yüklenemedi."
+
+msgid "Original image restored successfully."
+msgstr "Orijinal görsel başarıyla geri yüklendi."
+
+msgid "This attachment format is not supported for WebP generation."
+msgstr "Bu ek formatı WebP üretimi için desteklenmiyor."
+
+msgid "The WebP output path could not be created."
+msgstr "WebP çıktı yolu oluşturulamadı."
+
+msgid "The original image backup could not be created."
+msgstr "Orijinal görsel yedeği oluşturulamadı."
+
+msgid "Existing WebP file found. Metadata was refreshed."
+msgstr "Mevcut WebP dosyası bulundu. Üst veriler yenilendi."
+
+msgid "No available image engine can generate WebP on this server."
+msgstr "Bu sunucuda WebP üretebilen kullanılabilir bir görsel motoru yok."
+
+msgid "WebP generation failed with the available image engines."
+msgstr "Mevcut görsel motorlarıyla WebP üretimi başarısız oldu."
+
+msgid "The generated WebP file size could not be read."
+msgstr "Üretilen WebP dosyası boyutu okunamadı."
+
+msgid "WebP image generated successfully."
+msgstr "WebP görseli başarıyla üretildi."
+
+msgid "Sorry, you are not allowed to manage this attachment."
+msgstr "Üzgünüz, bu eki yönetme izniniz yok."
+
+msgid "Backups are disabled, so no backup is available to restore this image. Enable backups before optimizing to allow restores."
+msgstr "Yedekler devre dışı olduğundan bu görseli geri yüklemek için yedek yok. Geri yüklemeye izin vermek için optimizasyondan önce yedeklemeyi etkinleştirin."
+
+msgid "Existing WebP file could not be deleted before regeneration."
+msgstr "Yeniden üretimden önce mevcut WebP dosyası silinemedi."
+
+msgid "WebP generation could not be completed."
+msgstr "WebP üretimi tamamlanamadı."
+
+msgid "AVIF generation could not be completed."
+msgstr "AVIF üretimi tamamlanamadı."
+
+msgid "WebP regeneration could not be completed."
+msgstr "WebP yeniden üretimi tamamlanamadı."
+
+msgid "Original image restore could not be completed."
+msgstr "Orijinal görsel geri yükleme tamamlanamadı."
+
+msgid "The requested attachment action is invalid."
+msgstr "İstenen ek işlemi geçersiz."
+
+msgid "Vacuum Image Optimizer actions are available for image attachments only."
+msgstr "Vacuum Image Optimizer işlemleri yalnızca görsel ekleri için kullanılabilir."
+
+msgid "%1$s (%2$s)"
+msgstr "%1$s (%2$s)"
+
+msgid "Vacuum"
+msgstr "Vacuum"
+
+msgid "Original"
+msgstr "Orijinal"
+
+msgid "Saved %"
+msgstr "Kazanım %"
+
+msgid "Saved KB"
+msgstr "Kazanım KB"
+
+msgid "Generated by"
+msgstr "Üreten"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Source"
+msgstr "Kaynak"
+
+msgid "Not optimized"
+msgstr "Optimize edilmedi"
+
+msgid "Optimized"
+msgstr "Optimize edildi"
+
+msgid "Excluded"
+msgstr "Hariç tutuldu"
+
+msgid "Unsupported"
+msgstr "Desteklenmiyor"
+
+msgid "%d image added to queue."
+msgid_plural "%d images added to queue."
+msgstr[0] "%d görsel kuyruğa eklendi."
+msgstr[1] "%d görsel kuyruğa eklendi."
+
+msgid "The failed queue job could not be retried."
+msgstr "Başarısız kuyruk işi yeniden denenemedi."
+
+msgid "You are not allowed to manage the optimization queue."
+msgstr "Optimizasyon kuyruğunu yönetme izniniz yok."
+
+msgid "WebP generation failed."
+msgstr "WebP üretimi başarısız oldu."
+
+msgid "WordPress Default"
+msgstr "WordPress Varsayılanı"
+
+msgid "Lossless"
+msgstr "Kayıpsız"
+
+msgid "Balanced"
+msgstr "Dengeli"
+
+msgid "Aggressive"
+msgstr "Agresif"
+
+msgid "Ultra"
+msgstr "Ultra"
+
+msgid "Automatic WebP generation failed."
+msgstr "Otomatik WebP üretimi başarısız oldu."

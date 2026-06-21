@@ -1,0 +1,150 @@
+<?php
+/**
+ * Bulk Optimize tab view.
+ *
+ * @package VacuumImageOptimizer\Admin\Views
+ */
+
+namespace VacuumImageOptimizer\Admin\Views;
+
+use VacuumImageOptimizer\Queue\QueueManager;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Bulk Optimize view.
+ */
+class BulkOptimize {
+
+	/**
+	 * Render the bulk optimize content.
+	 *
+	 * @return void
+	 */
+	public function render(): void {
+		$queue_manager = new QueueManager();
+		$stats         = $queue_manager->get_statistics();
+		$failed_jobs   = $queue_manager->get_failed_jobs( 20 );
+		$percent       = $this->get_progress_percent( $stats );
+		?>
+		<div class="vio-bulk" data-vio-queue>
+			<div class="vio-notice" data-vio-queue-notice hidden></div>
+
+			<div class="vio-card">
+				<h2><?php esc_html_e( 'Bulk Optimization', 'vacuum-image-optimizer' ); ?></h2>
+				<p><?php esc_html_e( 'Scan eligible JPEG and PNG images, then process the queue in safe WordPress AJAX batches.', 'vacuum-image-optimizer' ); ?></p>
+				<div class="vio-button-row">
+					<button type="button" class="vio-button vio-button--secondary" data-vio-queue-action="scan"><?php esc_html_e( 'Scan Library', 'vacuum-image-optimizer' ); ?></button>
+					<button type="button" class="vio-button vio-button--primary" data-vio-queue-action="start"><?php esc_html_e( 'Start Queue', 'vacuum-image-optimizer' ); ?></button>
+					<button type="button" class="vio-button vio-button--secondary" data-vio-queue-action="pause"><?php esc_html_e( 'Pause Queue', 'vacuum-image-optimizer' ); ?></button>
+					<button type="button" class="vio-button vio-button--secondary" data-vio-queue-action="resume"><?php esc_html_e( 'Resume Queue', 'vacuum-image-optimizer' ); ?></button>
+				</div>
+			</div>
+
+			<div class="vio-card">
+				<div class="vio-card-header-inline">
+					<h2><?php esc_html_e( 'Queue Progress', 'vacuum-image-optimizer' ); ?></h2>
+					<span class="vio-badge" data-vio-queue-state><?php echo esc_html( ucfirst( (string) $stats['state'] ) ); ?></span>
+				</div>
+				<div class="vio-queue-stats">
+					<?php $this->render_stat( 'total', __( 'Total', 'vacuum-image-optimizer' ), $stats['total'] ); ?>
+					<?php $this->render_stat( 'pending', __( 'Pending', 'vacuum-image-optimizer' ), $stats['pending'] ); ?>
+					<?php $this->render_stat( 'processing', __( 'Processing', 'vacuum-image-optimizer' ), $stats['processing'] ); ?>
+					<?php $this->render_stat( 'completed', __( 'Completed', 'vacuum-image-optimizer' ), $stats['completed'] ); ?>
+					<?php $this->render_stat( 'failed', __( 'Failed', 'vacuum-image-optimizer' ), $stats['failed'] ); ?>
+				</div>
+				<div class="vio-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( (string) $percent ); ?>">
+					<div class="vio-progress__bar" data-vio-progress-bar style="width: <?php echo esc_attr( (string) $percent ); ?>%;"></div>
+				</div>
+				<p class="vio-progress-label"><strong data-vio-progress-percent><?php echo esc_html( (string) $percent ); ?>%</strong></p>
+			</div>
+
+			<div class="vio-card">
+				<h2><?php esc_html_e( 'Failed Jobs', 'vacuum-image-optimizer' ); ?></h2>
+				<div class="vio-table-wrap">
+					<table class="widefat striped vio-failed-jobs">
+						<thead>
+							<tr>
+								<th><?php esc_html_e( 'Attachment', 'vacuum-image-optimizer' ); ?></th>
+								<th><?php esc_html_e( 'Error', 'vacuum-image-optimizer' ); ?></th>
+								<th><?php esc_html_e( 'Attempts', 'vacuum-image-optimizer' ); ?></th>
+								<th><?php esc_html_e( 'Retry', 'vacuum-image-optimizer' ); ?></th>
+							</tr>
+						</thead>
+						<tbody data-vio-failed-jobs>
+							<?php $this->render_failed_rows( $failed_jobs ); ?>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render a queue stat box.
+	 *
+	 * @param string     $key Stat key.
+	 * @param string     $label Stat label.
+	 * @param int|string $value Stat value.
+	 * @return void
+	 */
+	private function render_stat( string $key, string $label, int|string $value ): void {
+		?>
+		<div class="vio-queue-stat">
+			<span class="vio-queue-stat__number" data-vio-stat="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( number_format_i18n( absint( $value ) ) ); ?></span>
+			<span class="vio-queue-stat__label"><?php echo esc_html( $label ); ?></span>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render failed queue rows.
+	 *
+	 * @param array<int, object> $jobs Failed jobs.
+	 * @return void
+	 */
+	private function render_failed_rows( array $jobs ): void {
+		if ( empty( $jobs ) ) {
+			?>
+			<tr class="vio-empty-row"><td colspan="4"><?php esc_html_e( 'No failed jobs.', 'vacuum-image-optimizer' ); ?></td></tr>
+			<?php
+			return;
+		}
+
+		foreach ( $jobs as $job ) {
+			$attachment_id = absint( $job->attachment_id ?? 0 );
+			$title         = $attachment_id > 0 ? get_the_title( $attachment_id ) : __( 'Unknown attachment', 'vacuum-image-optimizer' );
+			$edit_link     = $attachment_id > 0 ? get_edit_post_link( $attachment_id ) : '';
+			?>
+			<tr>
+				<td>
+					<?php if ( $edit_link ) : ?>
+						<a href="<?php echo esc_url( $edit_link ); ?>"><?php echo esc_html( $title ); ?></a>
+					<?php else : ?>
+						<?php echo esc_html( $title ); ?>
+					<?php endif; ?>
+				</td>
+				<td><?php echo esc_html( wp_html_excerpt( (string) ( $job->error_message ?? '' ), 140, '…' ) ); ?></td>
+				<td><?php echo esc_html( number_format_i18n( absint( $job->attempts ?? 0 ) ) ); ?></td>
+				<td><button type="button" class="vio-button vio-button--secondary vio-button--small" data-vio-retry-job="<?php echo esc_attr( (string) absint( $job->id ?? 0 ) ); ?>"><?php esc_html_e( 'Retry', 'vacuum-image-optimizer' ); ?></button></td>
+			</tr>
+			<?php
+		}
+	}
+
+	/**
+	 * Calculate progress percentage.
+	 *
+	 * @param array<string, int|string> $stats Queue stats.
+	 * @return int
+	 */
+	private function get_progress_percent( array $stats ): int {
+		$total = absint( $stats['total'] ?? 0 );
+		if ( 0 === $total ) {
+			return 0;
+		}
+
+		return min( 100, (int) round( ( absint( $stats['completed'] ?? 0 ) / $total ) * 100 ) );
+	}
+}

@@ -1,0 +1,37 @@
+# macOS / Windows artifacts
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# IDE / editor state
+.idea/
+.vscode/
+.history/
+
+# Local development caches
+.cache/
+.tmp/
+.env
+.env.*
+!.env.example
+*.tmp
+*.temp
+*.bak
+*.orig
+*.log
+
+# Dependency and build output directories
+vendor/
+node_modules/
+dist/
+build/
+coverage/
+
+# Release archives and local exports
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+exports/
+reports/

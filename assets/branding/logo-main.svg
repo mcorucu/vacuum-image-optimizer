@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 88" width="360" height="88" role="img" aria-label="Vacuum Image Optimizer">
+  <defs>
+    <linearGradient id="vioLogoTile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22C55E"/>
+      <stop offset="1" stop-color="#3B82F6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Symbol: rounded image tile -->
+  <rect x="8" y="12" width="64" height="64" rx="18" fill="url(#vioLogoTile)"/>
+
+  <!-- Compression ring (vacuum) -->
+  <circle cx="40" cy="44" r="24" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.35"/>
+
+  <!-- Image glyph: sun + mountains -->
+  <circle cx="31" cy="36" r="5.5" fill="#FFFFFF"/>
+  <path d="M19 58 L33 41 L41 50 L51 38 L60 58 Z" fill="#FFFFFF"/>
+
+  <!-- Tertiary optimization spark -->
+  <circle cx="56" cy="26" r="3.5" fill="#A855F7"/>
+
+  <!-- Wordmark (system font stack, no remote fonts) -->
+  <text x="90" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700" letter-spacing="-0.3" fill="#111827">Vacuum</text>
+  <text x="90" y="66" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="600" letter-spacing="0.2" fill="#6B7280">Image Optimizer</text>
+</svg>

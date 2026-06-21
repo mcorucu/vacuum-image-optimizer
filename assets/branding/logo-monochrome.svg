@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Monochrome version for print, single-color applications, and accessibility -->
+
+  <circle cx="256" cy="256" r="220" fill="#FFFFFF" stroke="#1F2937" stroke-width="2"/>
+
+  <!-- Outer vacuum ring -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#1F2937" stroke-width="12" opacity="0.3"/>
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#1F2937" stroke-width="8" opacity="0.5"/>
+
+  <!-- Speed lines -->
+  <g stroke="#1F2937" stroke-width="6" stroke-linecap="round" opacity="0.6">
+    <line x1="256" y1="40" x2="256" y2="80"/>
+    <line x1="256" y1="432" x2="256" y2="472"/>
+    <line x1="40" y1="256" x2="80" y2="256"/>
+    <line x1="432" y1="256" x2="472" y2="256"/>
+    <line x1="110" y1="110" x2="138" y2="138"/>
+    <line x1="374" y1="374" x2="402" y2="402"/>
+    <line x1="402" y1="110" x2="374" y2="138"/>
+    <line x1="138" y1="374" x2="110" y2="402"/>
+  </g>
+
+  <!-- Central image frame -->
+  <rect x="156" y="156" width="200" height="200" rx="24" fill="#1F2937"/>
+
+  <!-- Pixel grid inside frame -->
+  <g fill="#FFFFFF" opacity="0.9">
+    <rect x="176" y="176" width="36" height="36" rx="4"/>
+    <rect x="220" y="176" width="36" height="36" rx="4"/>
+    <rect x="264" y="176" width="36" height="36" rx="4"/>
+    <rect x="308" y="176" width="36" height="36" rx="4"/>
+    <rect x="176" y="220" width="36" height="36" rx="4"/>
+    <rect x="220" y="220" width="36" height="36" rx="4" opacity="0.6"/>
+    <rect x="264" y="220" width="36" height="36" rx="4" opacity="0.6"/>
+    <rect x="308" y="220" width="36" height="36" rx="4"/>
+    <rect x="176" y="264" width="36" height="36" rx="4"/>
+    <rect x="220" y="264" width="36" height="36" rx="4" opacity="0.6"/>
+    <rect x="264" y="264" width="36" height="36" rx="4" opacity="0.6"/>
+    <rect x="308" y="264" width="36" height="36" rx="4"/>
+    <rect x="176" y="308" width="36" height="36" rx="4"/>
+    <rect x="220" y="308" width="36" height="36" rx="4"/>
+    <rect x="264" y="308" width="36" height="36" rx="4"/>
+    <rect x="308" y="308" width="36" height="36" rx="4"/>
+  </g>
+
+  <!-- Compression arrow -->
+  <path d="M 340 172 L 360 172 L 340 192 Z" fill="#FFFFFF" opacity="0.9"/>
+  <path d="M 172 340 L 172 360 L 192 340 Z" fill="#FFFFFF" opacity="0.9"/>
+</svg>

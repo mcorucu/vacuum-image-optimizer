@@ -1,0 +1,783 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Vacuum Image Optimizer 0.9.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Domain: vacuum-image-optimizer\n"
+
+msgid "Scanning library…"
+msgstr "Сканирование библиотеки…"
+
+msgid "Processing queue…"
+msgstr "Обработка очереди…"
+
+msgid "The queue request could not be completed."
+msgstr "Не удалось выполнить запрос очереди."
+
+msgid "Vacuum Image Optimizer"
+msgstr "Vacuum Image Optimizer"
+
+msgid "Vacuum Optimizer"
+msgstr "Vacuum Optimizer"
+
+msgid "Sorry, you are not allowed to access this page."
+msgstr "Извините, у вас нет прав для доступа к этой странице."
+
+msgid "Modern image optimization for WordPress — WebP &amp; AVIF generation, bulk tools, and clean delivery."
+msgstr "Современная оптимизация изображений для WordPress — создание WebP &amp; AVIF, массовые инструменты и аккуратная доставка."
+
+msgid "Vacuum Optimizer Sections"
+msgstr "Разделы Vacuum Optimizer"
+
+msgid "Dashboard"
+msgstr "Панель"
+
+msgid "Bulk Optimize"
+msgstr "Массовая оптимизация"
+
+msgid "WebP & AVIF"
+msgstr "WebP и AVIF"
+
+msgid "Compression"
+msgstr "Сжатие"
+
+msgid "Lazy Load"
+msgstr "Отложенная загрузка"
+
+msgid "Backup & Restore"
+msgstr "Резервная копия и восстановление"
+
+msgid "Exclusions"
+msgstr "Исключения"
+
+msgid "Reports"
+msgstr "Отчёты"
+
+msgid "System Status"
+msgstr "Состояние системы"
+
+msgid "This feature is coming soon."
+msgstr "Эта функция появится в ближайшее время."
+
+msgid "Sorry, you are not allowed to manage these settings."
+msgstr "Извините, у вас нет прав для управления этими настройками."
+
+msgid "Backups are disabled. New optimizations will not create restore points, and restore actions for images without an existing backup will be unavailable. Existing backups remain untouched."
+msgstr "Резервные копии отключены. Новые оптимизации не будут создавать точки восстановления, а восстановление изображений без существующей копии будет недоступно. Существующие копии остаются нетронутыми."
+
+msgid "Enable Backups"
+msgstr "Включить резервные копии"
+
+msgid "Keep a copy of each original image before generating optimized formats so it can be restored later."
+msgstr "Сохраняйте копию каждого оригинального изображения перед созданием оптимизированных форматов, чтобы его можно было восстановить позже."
+
+msgid "Backup Location"
+msgstr "Расположение резервной копии"
+
+msgid "Uploads directory unavailable"
+msgstr "Каталог загрузок недоступен"
+
+msgid "Save Settings"
+msgstr "Сохранить настройки"
+
+msgid "Bulk Optimization"
+msgstr "Массовая оптимизация"
+
+msgid "Scan eligible JPEG and PNG images, then process the queue in safe WordPress AJAX batches."
+msgstr "Просканируйте подходящие изображения JPEG и PNG, затем обработайте очередь безопасными AJAX-пакетами WordPress."
+
+msgid "Scan Library"
+msgstr "Сканировать библиотеку"
+
+msgid "Start Queue"
+msgstr "Запустить очередь"
+
+msgid "Pause Queue"
+msgstr "Приостановить очередь"
+
+msgid "Resume Queue"
+msgstr "Возобновить очередь"
+
+msgid "Queue Progress"
+msgstr "Ход выполнения очереди"
+
+msgid "Total"
+msgstr "Всего"
+
+msgid "Pending"
+msgstr "В очереди"
+
+msgid "Processing"
+msgstr "Обработка"
+
+msgid "Completed"
+msgstr "Завершено"
+
+msgid "Failed"
+msgstr "Ошибка"
+
+msgid "Failed Jobs"
+msgstr "Неудавшиеся задачи"
+
+msgid "Attachment"
+msgstr "Вложение"
+
+msgid "Error"
+msgstr "Ошибка"
+
+msgid "Attempts"
+msgstr "Попытки"
+
+msgid "Retry"
+msgstr "Повторить"
+
+msgid "No failed jobs."
+msgstr "Нет неудавшихся задач."
+
+msgid "Unknown attachment"
+msgstr "Неизвестное вложение"
+
+msgid "Sorry, you are not allowed to manage compression settings."
+msgstr "Извините, у вас нет прав для управления настройками сжатия."
+
+msgid "Compression Settings"
+msgstr "Настройки сжатия"
+
+msgid "Choose the compression profile and WebP quality used for manual WebP generation and regeneration."
+msgstr "Выберите профиль сжатия и качество WebP, используемые при ручном создании и пересоздании WebP."
+
+msgid "Compression Profile"
+msgstr "Профиль сжатия"
+
+msgid "Quality"
+msgstr "Качество"
+
+msgid "Higher values preserve more visual detail. Lower values usually reduce file size more aggressively."
+msgstr "Более высокие значения сохраняют больше визуальных деталей. Более низкие значения обычно сильнее уменьшают размер файла."
+
+msgid "Upload Automation"
+msgstr "Автоматизация загрузок"
+
+msgid "Enable auto optimization for new uploads"
+msgstr "Включить автоматическую оптимизацию новых загрузок"
+
+msgid "Automatically optimize new JPEG and PNG uploads."
+msgstr "Автоматически оптимизировать новые загрузки JPEG и PNG."
+
+msgid "Auto optimization mode"
+msgstr "Режим автоматической оптимизации"
+
+msgid "Queue new uploads"
+msgstr "Добавлять новые загрузки в очередь"
+
+msgid "New uploads are added to the optimization queue. You can process them from Bulk Optimize."
+msgstr "Новые загрузки добавляются в очередь оптимизации. Вы можете обработать их в разделе «Массовая оптимизация»."
+
+msgid "Optimize immediately"
+msgstr "Оптимизировать сразу"
+
+msgid "New uploads are optimized immediately after upload. Large uploads may take longer."
+msgstr "Новые загрузки оптимизируются сразу после загрузки. Большие файлы могут обрабатываться дольше."
+
+msgid "AVIF Generation"
+msgstr "Создание AVIF"
+
+msgid "Enable AVIF Generation"
+msgstr "Включить создание AVIF"
+
+msgid "AVIF typically provides smaller file sizes than WebP but may require more processing time."
+msgstr "AVIF обычно даёт меньший размер файлов, чем WebP, но может требовать больше времени на обработку."
+
+msgid "AVIF Quality"
+msgstr "Качество AVIF"
+
+msgid "Lower AVIF quality values usually reduce file size further. Range: 0–100."
+msgstr "Более низкие значения качества AVIF обычно ещё больше уменьшают размер файла. Диапазон: 0–100."
+
+msgid "Frontend Delivery"
+msgstr "Доставка на сайте"
+
+msgid "Enable Frontend Delivery"
+msgstr "Включить доставку на сайте"
+
+msgid "Serve generated WebP/AVIF images on the frontend. Original media files are never modified and the browser always falls back to the original when a derivative is unavailable."
+msgstr "Показывайте созданные изображения WebP/AVIF на сайте. Оригинальные медиафайлы никогда не изменяются, и браузер всегда возвращается к оригиналу, когда производный файл недоступен."
+
+msgid "Preferred Format"
+msgstr "Предпочтительный формат"
+
+msgid "Auto"
+msgstr "Авто"
+
+msgid "AVIF"
+msgstr "AVIF"
+
+msgid "WebP"
+msgstr "WebP"
+
+msgid "Auto: Serve AVIF when available, otherwise WebP, otherwise the original image."
+msgstr "Авто: показывает AVIF при наличии, иначе WebP, иначе оригинальное изображение."
+
+msgid "AVIF: Prefer AVIF and fall back to the original image."
+msgstr "AVIF: отдаёт предпочтение AVIF и возвращается к оригинальному изображению."
+
+msgid "WebP: Prefer WebP and fall back to the original image."
+msgstr "WebP: отдаёт предпочтение WebP и возвращается к оригинальному изображению."
+
+msgid "Interface Language"
+msgstr "Язык интерфейса"
+
+msgid "Use WordPress Language (default)"
+msgstr "Использовать язык WordPress (по умолчанию)"
+
+msgid "English"
+msgstr "Английский"
+
+msgid "Turkish"
+msgstr "Турецкий"
+
+msgid "German"
+msgstr "Немецкий"
+
+msgid "French"
+msgstr "Французский"
+
+msgid "Spanish"
+msgstr "Испанский"
+
+msgid "Italian"
+msgstr "Итальянский"
+
+msgid "Portuguese"
+msgstr "Португальский"
+
+msgid "Russian"
+msgstr "Русский"
+
+msgid "Dutch"
+msgstr "Нидерландский"
+
+msgid "Polish"
+msgstr "Польский"
+
+msgid "Choose the admin interface language for Vacuum Image Optimizer. Missing translations fall back to English."
+msgstr "Выберите язык интерфейса администрирования Vacuum Image Optimizer. Недостающие переводы заменяются английским."
+
+msgid "Maximum quality, minimal compression."
+msgstr "Максимальное качество, минимальное сжатие."
+
+msgid "Best speed to size ratio."
+msgstr "Оптимальное соотношение скорости и размера."
+
+msgid "Stronger size reduction for most images."
+msgstr "Более сильное уменьшение размера для большинства изображений."
+
+msgid "Smallest files with the most compression."
+msgstr "Наименьшие файлы с максимальным сжатием."
+
+msgid "%1$s Default: %2$d%% quality."
+msgstr "%1$s По умолчанию: качество %2$d%%."
+
+msgid "Vacuum Image Optimizer logo"
+msgstr "Логотип Vacuum Image Optimizer"
+
+msgid "Optimize smarter. Deliver faster. Keep your WordPress media library clean, lightweight, and future-ready."
+msgstr "Оптимизируйте умнее. Доставляйте быстрее. Держите медиабиблиотеку WordPress чистой, лёгкой и готовой к будущему."
+
+msgid "Profile"
+msgstr "Профиль"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Overview"
+msgstr "Обзор"
+
+msgid "A quick snapshot of your media library and savings."
+msgstr "Краткий обзор вашей медиабиблиотеки и экономии."
+
+msgid "Total Images"
+msgstr "Всего изображений"
+
+msgid "Optimized Images"
+msgstr "Оптимизированные изображения"
+
+msgid "Pending Images"
+msgstr "Изображения в очереди"
+
+msgid "Space Saved"
+msgstr "Сэкономлено места"
+
+msgid "Optimization & Queue"
+msgstr "Оптимизация и очередь"
+
+msgid "Optimization Impact"
+msgstr "Эффект оптимизации"
+
+msgid "Total Original Size"
+msgstr "Общий исходный размер"
+
+msgid "Total WebP Size"
+msgstr "Общий размер WebP"
+
+msgid "Total Saved Space"
+msgstr "Всего сэкономлено места"
+
+msgid "Average Savings %"
+msgstr "Средняя экономия %"
+
+msgid "Queue Overview"
+msgstr "Обзор очереди"
+
+msgid "State"
+msgstr "Состояние"
+
+msgid "Queue completion"
+msgstr "Завершение очереди"
+
+msgid "%1$d%% complete (%2$s of %3$s)"
+msgstr "%1$d%% завершено (%2$s из %3$s)"
+
+msgid "No queue activity yet."
+msgstr "Пока нет активности в очереди."
+
+msgid "Format Generation"
+msgstr "Создание форматов"
+
+msgid "WebP Generated"
+msgstr "Создано WebP"
+
+msgid "AVIF Generated"
+msgstr "Создано AVIF"
+
+msgid "AVIF Files Generated"
+msgstr "Создано файлов AVIF"
+
+msgid "Generated WebP Attachments"
+msgstr "Созданные вложения WebP"
+
+msgid "Generated AVIF Attachments"
+msgstr "Созданные вложения AVIF"
+
+msgid "Total AVIF Savings"
+msgstr "Общая экономия AVIF"
+
+msgid "Automation & Delivery"
+msgstr "Автоматизация и доставка"
+
+msgid "Auto Optimization"
+msgstr "Автооптимизация"
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Disabled"
+msgstr "Отключено"
+
+msgid "Upload Mode"
+msgstr "Режим загрузки"
+
+msgid "Immediate"
+msgstr "Немедленно"
+
+msgid "Queue"
+msgstr "Очередь"
+
+msgid "Processed Today"
+msgstr "Обработано сегодня"
+
+msgid "Last Auto Processed"
+msgstr "Последняя автообработка"
+
+msgid "Serving generated WebP/AVIF images with safe fallback to originals."
+msgstr "Показ созданных изображений WebP/AVIF с безопасным возвратом к оригиналам."
+
+msgid "Frontend delivery is currently disabled."
+msgstr "Доставка на сайте сейчас отключена."
+
+msgid "Estimated Optimized Images Available"
+msgstr "Доступно оптимизированных изображений (оценка)"
+
+msgid "Feature Status"
+msgstr "Состояние функций"
+
+msgid "Backups"
+msgstr "Резервные копии"
+
+msgid "Lazy Loading"
+msgstr "Отложенная загрузка"
+
+msgid "GIF Exclusion"
+msgstr "Исключение GIF"
+
+msgid "SVG Exclusion"
+msgstr "Исключение SVG"
+
+msgid "Recent Activity"
+msgstr "Недавняя активность"
+
+msgid "Activity Log"
+msgstr "Журнал активности"
+
+msgid "Last Optimized Images"
+msgstr "Последние оптимизированные изображения"
+
+msgid "Recent Queue Activity"
+msgstr "Недавняя активность очереди"
+
+msgid "System Health"
+msgstr "Работоспособность системы"
+
+msgid "GD Available"
+msgstr "GD доступен"
+
+msgid "Imagick Available"
+msgstr "Imagick доступен"
+
+msgid "WebP via Imagick"
+msgstr "WebP через Imagick"
+
+msgid "WebP via GD"
+msgstr "WebP через GD"
+
+msgid "WebP Generation Available"
+msgstr "Создание WebP доступно"
+
+msgid "AVIF Supported"
+msgstr "AVIF поддерживается"
+
+msgid "Uploads Writable"
+msgstr "Загрузки доступны для записи"
+
+msgid "Quick Actions"
+msgstr "Быстрые действия"
+
+msgid "Quote of the Day"
+msgstr "Цитата дня"
+
+msgid "No optimized images yet. Run a bulk optimization to get started."
+msgstr "Пока нет оптимизированных изображений. Запустите массовую оптимизацию, чтобы начать."
+
+msgid "Exclusion Rules"
+msgstr "Правила исключения"
+
+msgid "Exclude GIF Animations"
+msgstr "Исключить анимации GIF"
+
+msgid "When enabled, GIF images are ignored by eligibility detection."
+msgstr "Если включено, изображения GIF игнорируются при определении пригодности."
+
+msgid "Exclude SVG Files"
+msgstr "Исключить файлы SVG"
+
+msgid "When enabled, SVG files are ignored by eligibility detection."
+msgstr "Если включено, файлы SVG игнорируются при определении пригодности."
+
+msgid "WebP & AVIF Settings"
+msgstr "Настройки WebP и AVIF"
+
+msgid "Configure next-generation image format generation."
+msgstr "Настройте создание изображений в форматах нового поколения."
+
+msgid "Generate WebP"
+msgstr "Создавать WebP"
+
+msgid "Enable WebP generation for all optimized images."
+msgstr "Включить создание WebP для всех оптимизированных изображений."
+
+msgid "Generate AVIF"
+msgstr "Создавать AVIF"
+
+msgid "Enable AVIF generation. Requires server support."
+msgstr "Включить создание AVIF. Требуется поддержка сервера."
+
+msgid "Fallback Chain"
+msgstr "Цепочка возврата"
+
+msgid "Browsers will use the first supported format."
+msgstr "Браузеры будут использовать первый поддерживаемый формат."
+
+msgid "Enable Lazy Loading"
+msgstr "Включить отложенную загрузку"
+
+msgid "Add native browser loading=\"lazy\" to frontend images. No JavaScript is used."
+msgstr "Добавляет встроенный атрибут браузера loading=\"lazy\" к изображениям на сайте. JavaScript не используется."
+
+msgid "Optimization history and statistics will appear here once you start optimizing images."
+msgstr "История оптимизации и статистика появятся здесь, как только вы начнёте оптимизировать изображения."
+
+msgid "Server Environment"
+msgstr "Серверное окружение"
+
+msgid "PHP Version"
+msgstr "Версия PHP"
+
+msgid "WordPress Version"
+msgstr "Версия WordPress"
+
+msgid "Memory Limit"
+msgstr "Ограничение памяти"
+
+msgid "Upload Max Filesize"
+msgstr "Макс. размер загружаемого файла"
+
+msgid "Post Max Size"
+msgstr "Макс. размер POST"
+
+msgid "Image Engines"
+msgstr "Графические движки"
+
+msgid "GD Extension"
+msgstr "Расширение GD"
+
+msgid "Imagick Extension"
+msgstr "Расширение Imagick"
+
+msgid "WebP Support"
+msgstr "Поддержка WebP"
+
+msgid "AVIF via Imagick"
+msgstr "AVIF через Imagick"
+
+msgid "AVIF via GD"
+msgstr "AVIF через GD"
+
+msgid "AVIF Support"
+msgstr "Поддержка AVIF"
+
+msgid "Production Readiness"
+msgstr "Готовность к эксплуатации"
+
+msgid "Queue Table"
+msgstr "Таблица очереди"
+
+msgid "Backups Writable"
+msgstr "Резервные копии доступны для записи"
+
+msgid "WebP Available"
+msgstr "WebP доступен"
+
+msgid "AVIF Available"
+msgstr "AVIF доступен"
+
+msgid "Auto (AVIF → WebP → Original)"
+msgstr "Авто (AVIF → WebP → Оригинал)"
+
+msgid "Configuration"
+msgstr "Конфигурация"
+
+msgid "Localization Status"
+msgstr "Состояние локализации"
+
+msgid "Override"
+msgstr "Переопределение"
+
+msgid "WordPress"
+msgstr "WordPress"
+
+msgid "Text Domain Loaded"
+msgstr "Текстовый домен загружен"
+
+msgid "Current Locale"
+msgstr "Текущая локаль"
+
+msgid "Language Source"
+msgstr "Источник языка"
+
+msgid "Debug Info"
+msgstr "Отладочная информация"
+
+msgid "Copy to Clipboard"
+msgstr "Копировать в буфер обмена"
+
+msgid "Available"
+msgstr "Доступно"
+
+msgid "Not Available"
+msgstr "Недоступно"
+
+msgid "Vacuum Image Optimizer requires PHP 8.1 or higher."
+msgstr "Для Vacuum Image Optimizer требуется PHP 8.1 или выше."
+
+msgid "Plugin Activation Error"
+msgstr "Ошибка активации плагина"
+
+msgid "Invalid attachment ID."
+msgstr "Неверный идентификатор вложения."
+
+msgid "Attachment could not be found."
+msgstr "Не удалось найти вложение."
+
+msgid "This attachment format is not supported for AVIF generation."
+msgstr "Этот формат вложения не поддерживается для создания AVIF."
+
+msgid "AVIF generation is not available on this server."
+msgstr "Создание AVIF недоступно на этом сервере."
+
+msgid "The original image path could not be resolved."
+msgstr "Не удалось определить путь к оригинальному изображению."
+
+msgid "The original image file is missing or unreadable."
+msgstr "Файл оригинального изображения отсутствует или нечитаем."
+
+msgid "The original image file size could not be read."
+msgstr "Не удалось прочитать размер файла оригинального изображения."
+
+msgid "The AVIF output path could not be created."
+msgstr "Не удалось создать путь вывода AVIF."
+
+msgid "Existing AVIF file found. Metadata was refreshed."
+msgstr "Найден существующий файл AVIF. Метаданные обновлены."
+
+msgid "No available image engine can generate AVIF on this server."
+msgstr "Ни один доступный графический движок не может создать AVIF на этом сервере."
+
+msgid "AVIF generation failed with the available image engines."
+msgstr "Не удалось создать AVIF с помощью доступных графических движков."
+
+msgid "The generated AVIF file size could not be read."
+msgstr "Не удалось прочитать размер созданного файла AVIF."
+
+msgid "AVIF image generated successfully."
+msgstr "Изображение AVIF успешно создано."
+
+msgid "The original backup file is missing or unreadable."
+msgstr "Файл оригинальной резервной копии отсутствует или нечитаем."
+
+msgid "The attachment original path could not be resolved."
+msgstr "Не удалось определить исходный путь вложения."
+
+msgid "The original image directory could not be created."
+msgstr "Не удалось создать каталог оригинального изображения."
+
+msgid "The original image could not be restored from backup."
+msgstr "Не удалось восстановить оригинальное изображение из резервной копии."
+
+msgid "Original image restored successfully."
+msgstr "Оригинальное изображение успешно восстановлено."
+
+msgid "This attachment format is not supported for WebP generation."
+msgstr "Этот формат вложения не поддерживается для создания WebP."
+
+msgid "The WebP output path could not be created."
+msgstr "Не удалось создать путь вывода WebP."
+
+msgid "The original image backup could not be created."
+msgstr "Не удалось создать резервную копию оригинального изображения."
+
+msgid "Existing WebP file found. Metadata was refreshed."
+msgstr "Найден существующий файл WebP. Метаданные обновлены."
+
+msgid "No available image engine can generate WebP on this server."
+msgstr "Ни один доступный графический движок не может создать WebP на этом сервере."
+
+msgid "WebP generation failed with the available image engines."
+msgstr "Не удалось создать WebP с помощью доступных графических движков."
+
+msgid "The generated WebP file size could not be read."
+msgstr "Не удалось прочитать размер созданного файла WebP."
+
+msgid "WebP image generated successfully."
+msgstr "Изображение WebP успешно создано."
+
+msgid "Sorry, you are not allowed to manage this attachment."
+msgstr "Извините, у вас нет прав для управления этим вложением."
+
+msgid "Backups are disabled, so no backup is available to restore this image. Enable backups before optimizing to allow restores."
+msgstr "Резервные копии отключены, поэтому нет копии для восстановления этого изображения. Включите резервные копии перед оптимизацией, чтобы разрешить восстановление."
+
+msgid "Existing WebP file could not be deleted before regeneration."
+msgstr "Не удалось удалить существующий файл WebP перед пересозданием."
+
+msgid "WebP generation could not be completed."
+msgstr "Не удалось завершить создание WebP."
+
+msgid "AVIF generation could not be completed."
+msgstr "Не удалось завершить создание AVIF."
+
+msgid "WebP regeneration could not be completed."
+msgstr "Не удалось завершить пересоздание WebP."
+
+msgid "Original image restore could not be completed."
+msgstr "Не удалось завершить восстановление оригинального изображения."
+
+msgid "The requested attachment action is invalid."
+msgstr "Запрошенное действие с вложением недопустимо."
+
+msgid "Vacuum Image Optimizer actions are available for image attachments only."
+msgstr "Действия Vacuum Image Optimizer доступны только для вложений-изображений."
+
+msgid "%1$s (%2$s)"
+msgstr "%1$s (%2$s)"
+
+msgid "Vacuum"
+msgstr "Vacuum"
+
+msgid "Original"
+msgstr "Оригинал"
+
+msgid "Saved %"
+msgstr "Экономия %"
+
+msgid "Saved KB"
+msgstr "Экономия КБ"
+
+msgid "Generated by"
+msgstr "Создано"
+
+msgid "Format"
+msgstr "Формат"
+
+msgid "Source"
+msgstr "Источник"
+
+msgid "Not optimized"
+msgstr "Не оптимизировано"
+
+msgid "Optimized"
+msgstr "Оптимизировано"
+
+msgid "Excluded"
+msgstr "Исключено"
+
+msgid "Unsupported"
+msgstr "Не поддерживается"
+
+msgid "%d image added to queue."
+msgid_plural "%d images added to queue."
+msgstr[0] "%d изображение добавлено в очередь."
+msgstr[1] "%d изображения добавлено в очередь."
+msgstr[2] "%d изображений добавлено в очередь."
+
+msgid "The failed queue job could not be retried."
+msgstr "Не удалось повторить неудавшуюся задачу очереди."
+
+msgid "You are not allowed to manage the optimization queue."
+msgstr "У вас нет прав для управления очередью оптимизации."
+
+msgid "WebP generation failed."
+msgstr "Не удалось создать WebP."
+
+msgid "WordPress Default"
+msgstr "По умолчанию (WordPress)"
+
+msgid "Lossless"
+msgstr "Без потерь"
+
+msgid "Balanced"
+msgstr "Сбалансированный"
+
+msgid "Aggressive"
+msgstr "Агрессивный"
+
+msgid "Ultra"
+msgstr "Ультра"
+
+msgid "Automatic WebP generation failed."
+msgstr "Не удалось выполнить автоматическое создание WebP."

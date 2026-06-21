@@ -1,0 +1,1109 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Vacuum Image Optimizer package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Vacuum Image Optimizer\n"
+"Report-Msgid-Bugs-To: https://mcorucu.com\n"
+"POT-Creation-Date: 2026-06-19 12:05+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: src/Admin/Assets.php:115
+msgid "Scanning library…"
+msgstr ""
+
+#: src/Admin/Assets.php:116
+msgid "Processing queue…"
+msgstr ""
+
+#: src/Admin/Assets.php:117
+msgid "The queue request could not be completed."
+msgstr ""
+
+#: src/Admin/Menu.php:46 src/Admin/Views/Dashboard.php:56
+#: src/Media/LibraryIntegration.php:144
+msgid "Vacuum Image Optimizer"
+msgstr ""
+
+#: src/Admin/Menu.php:47
+msgid "Vacuum Optimizer"
+msgstr ""
+
+#: src/Admin/Menu.php:61 src/Admin/Router.php:48
+msgid "Sorry, you are not allowed to access this page."
+msgstr ""
+
+#: src/Admin/Router.php:111
+msgid ""
+"Modern image optimization for WordPress — WebP &amp; AVIF generation, bulk "
+"tools, and clean delivery."
+msgstr ""
+
+#: src/Admin/Router.php:127
+msgid "Vacuum Optimizer Sections"
+msgstr ""
+
+#: src/Admin/Router.php:150
+msgid "Dashboard"
+msgstr ""
+
+#: src/Admin/Router.php:151 src/Admin/Views/Dashboard.php:66
+#: src/Admin/Views/Dashboard.php:261
+msgid "Bulk Optimize"
+msgstr ""
+
+#: src/Admin/Router.php:152 src/Admin/Views/Dashboard.php:263
+msgid "WebP & AVIF"
+msgstr ""
+
+#: src/Admin/Router.php:153 src/Admin/Views/Dashboard.php:262
+msgid "Compression"
+msgstr ""
+
+#: src/Admin/Router.php:154
+msgid "Lazy Load"
+msgstr ""
+
+#: src/Admin/Router.php:155 src/Admin/Views/BackupRestore.php:39
+msgid "Backup & Restore"
+msgstr ""
+
+#: src/Admin/Router.php:156
+msgid "Exclusions"
+msgstr ""
+
+#: src/Admin/Router.php:157 src/Admin/Views/Reports.php:28
+msgid "Reports"
+msgstr ""
+
+#: src/Admin/Router.php:158 src/Admin/Views/Dashboard.php:68
+#: src/Admin/Views/Dashboard.php:264
+msgid "System Status"
+msgstr ""
+
+#: src/Admin/Router.php:174
+msgid "This feature is coming soon."
+msgstr ""
+
+#: src/Admin/Views/BackupRestore.php:29 src/Admin/Views/Exclusions.php:28
+#: src/Admin/Views/LazyLoad.php:28
+msgid "Sorry, you are not allowed to manage these settings."
+msgstr ""
+
+#: src/Admin/Views/BackupRestore.php:45
+msgid ""
+"Backups are disabled. New optimizations will not create restore points, and "
+"restore actions for images without an existing backup will be unavailable. "
+"Existing backups remain untouched."
+msgstr ""
+
+#: src/Admin/Views/BackupRestore.php:54
+msgid "Enable Backups"
+msgstr ""
+
+#: src/Admin/Views/BackupRestore.php:61
+msgid ""
+"Keep a copy of each original image before generating optimized formats so it "
+"can be restored later."
+msgstr ""
+
+#: src/Admin/Views/BackupRestore.php:65
+msgid "Backup Location"
+msgstr ""
+
+#: src/Admin/Views/BackupRestore.php:67
+msgid "Uploads directory unavailable"
+msgstr ""
+
+#: src/Admin/Views/BackupRestore.php:72 src/Admin/Views/Compression.php:209
+#: src/Admin/Views/Exclusions.php:67 src/Admin/Views/LazyLoad.php:56
+msgid "Save Settings"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:34
+msgid "Bulk Optimization"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:35
+msgid ""
+"Scan eligible JPEG and PNG images, then process the queue in safe WordPress "
+"AJAX batches."
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:37
+msgid "Scan Library"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:38
+msgid "Start Queue"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:39
+msgid "Pause Queue"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:40
+msgid "Resume Queue"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:46
+msgid "Queue Progress"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:50
+msgid "Total"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:51 src/Admin/Views/Dashboard.php:120
+msgid "Pending"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:52
+msgid "Processing"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:53 src/Admin/Views/Dashboard.php:121
+msgid "Completed"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:54 src/Admin/Views/Dashboard.php:122
+msgid "Failed"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:63
+msgid "Failed Jobs"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:68
+msgid "Attachment"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:69 src/Media/LibraryIntegration.php:213
+msgid "Error"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:70
+msgid "Attempts"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:71 src/Admin/Views/BulkOptimize.php:130
+msgid "Retry"
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:110
+msgid "No failed jobs."
+msgstr ""
+
+#: src/Admin/Views/BulkOptimize.php:117 src/Admin/Views/Dashboard.php:338
+#: src/Admin/Views/Dashboard.php:365 src/Queue/AjaxController.php:193
+msgid "Unknown attachment"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:28
+msgid "Sorry, you are not allowed to manage compression settings."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:36 src/Admin/Views/Dashboard.php:67
+msgid "Compression Settings"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:37
+msgid ""
+"Choose the compression profile and WebP quality used for manual WebP "
+"generation and regeneration."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:46
+msgid "Compression Profile"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:67 src/Admin/Views/Dashboard.php:61
+msgid "Quality"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:83
+msgid ""
+"Higher values preserve more visual detail. Lower values usually reduce file "
+"size more aggressively."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:87
+msgid "Upload Automation"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:97
+msgid "Enable auto optimization for new uploads"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:99 src/Admin/Views/Dashboard.php:171
+msgid "Automatically optimize new JPEG and PNG uploads."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:102
+msgid "Auto optimization mode"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:105
+msgid "Queue new uploads"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:107
+msgid ""
+"New uploads are added to the optimization queue. You can process them from "
+"Bulk Optimize."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:110
+msgid "Optimize immediately"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:112
+msgid ""
+"New uploads are optimized immediately after upload. Large uploads may take "
+"longer."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:117
+msgid "AVIF Generation"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:127
+msgid "Enable AVIF Generation"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:129
+msgid ""
+"AVIF typically provides smaller file sizes than WebP but may require more "
+"processing time."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:132
+msgid "AVIF Quality"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:147
+msgid ""
+"Lower AVIF quality values usually reduce file size further. Range: 0–100."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:151 src/Admin/Views/Dashboard.php:181
+#: src/Admin/Views/SystemStatus.php:124
+msgid "Frontend Delivery"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:161
+msgid "Enable Frontend Delivery"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:163
+msgid ""
+"Serve generated WebP/AVIF images on the frontend. Original media files are "
+"never modified and the browser always falls back to the original when a "
+"derivative is unavailable."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:166 src/Admin/Views/Dashboard.php:193
+#: src/Admin/Views/SystemStatus.php:140
+msgid "Preferred Format"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:169 src/Admin/Views/Dashboard.php:39
+msgid "Auto"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:170 src/Admin/Views/Dashboard.php:40
+#: src/Admin/Views/SystemStatus.php:130 src/Media/LibraryIntegration.php:100
+#: src/Media/LibraryIntegration.php:135
+msgid "AVIF"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:171 src/Admin/Views/Dashboard.php:41
+#: src/Admin/Views/SystemStatus.php:131 src/Media/LibraryIntegration.php:99
+#: src/Media/LibraryIntegration.php:134
+msgid "WebP"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:173
+msgid ""
+"Auto: Serve AVIF when available, otherwise WebP, otherwise the original "
+"image."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:174
+msgid "AVIF: Prefer AVIF and fall back to the original image."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:175
+msgid "WebP: Prefer WebP and fall back to the original image."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:180
+msgid "Interface Language"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:185
+msgid "Use WordPress Language (default)"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:186 src/Settings/CompressionSettings.php:345
+msgid "English"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:187
+msgid "Turkish"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:188
+msgid "German"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:189
+msgid "French"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:190
+msgid "Spanish"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:191
+msgid "Italian"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:192
+msgid "Portuguese"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:193
+msgid "Russian"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:194
+msgid "Dutch"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:195
+msgid "Polish"
+msgstr ""
+
+#: src/Admin/Views/Compression.php:204
+msgid ""
+"Choose the admin interface language for Vacuum Image Optimizer. Missing "
+"translations fall back to English."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:225
+msgid "Maximum quality, minimal compression."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:226
+msgid "Best speed to size ratio."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:227
+msgid "Stronger size reduction for most images."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:228
+msgid "Smallest files with the most compression."
+msgstr ""
+
+#: src/Admin/Views/Compression.php:235
+#, php-format
+msgid "%1$s Default: %2$d%% quality."
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:55
+msgid "Vacuum Image Optimizer logo"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:58
+msgid ""
+"Optimize smarter. Deliver faster. Keep your WordPress media library clean, "
+"lightweight, and future-ready."
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:60
+msgid "Profile"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:62
+msgid "Language"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:77
+msgid "Overview"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:78
+msgid "A quick snapshot of your media library and savings."
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:83
+msgid "Total Images"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:87
+msgid "Optimized Images"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:91
+msgid "Pending Images"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:95
+msgid "Space Saved"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:103
+msgid "Optimization & Queue"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:107
+msgid "Optimization Impact"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:109
+msgid "Total Original Size"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:110
+msgid "Total WebP Size"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:111
+msgid "Total Saved Space"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:112
+msgid "Average Savings %"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:117
+msgid "Queue Overview"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:119
+msgid "State"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:125
+msgid "Queue completion"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:132
+#, php-format
+msgid "%1$d%% complete (%2$s of %3$s)"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:140 src/Admin/Views/Dashboard.php:358
+msgid "No queue activity yet."
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:149
+msgid "Format Generation"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:153
+msgid "WebP Generated"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:154
+msgid "AVIF Generated"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:155
+msgid "AVIF Files Generated"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:156
+msgid "Generated WebP Attachments"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:157
+msgid "Generated AVIF Attachments"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:158
+msgid "Total AVIF Savings"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:166
+msgid "Automation & Delivery"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:170
+msgid "Auto Optimization"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:173 src/Admin/Views/Dashboard.php:192
+#: src/Admin/Views/SystemStatus.php:136 src/Media/LibraryIntegration.php:97
+msgid "Status"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:173 src/Admin/Views/Dashboard.php:192
+#: src/Admin/Views/Dashboard.php:218 src/Admin/Views/SystemStatus.php:137
+#: src/Admin/Views/SystemStatus.php:160
+msgid "Enabled"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:173 src/Admin/Views/Dashboard.php:192
+#: src/Admin/Views/Dashboard.php:218 src/Admin/Views/SystemStatus.php:137
+#: src/Admin/Views/SystemStatus.php:160
+msgid "Disabled"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:174
+msgid "Upload Mode"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:174
+msgid "Immediate"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:174
+msgid "Queue"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:175
+msgid "Processed Today"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:176
+msgid "Last Auto Processed"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:186
+msgid "Serving generated WebP/AVIF images with safe fallback to originals."
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:187
+msgid "Frontend delivery is currently disabled."
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:194
+msgid "Estimated Optimized Images Available"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:203
+msgid "Feature Status"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:209 src/Admin/Views/SystemStatus.php:150
+msgid "Backups"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:210 src/Admin/Views/LazyLoad.php:35
+#: src/Admin/Views/SystemStatus.php:151
+msgid "Lazy Loading"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:211 src/Admin/Views/SystemStatus.php:152
+msgid "GIF Exclusion"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:212 src/Admin/Views/SystemStatus.php:153
+msgid "SVG Exclusion"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:228
+msgid "Recent Activity"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:232
+msgid "Activity Log"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:233
+msgid "Last Optimized Images"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:235
+msgid "Recent Queue Activity"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:240
+msgid "System Health"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:242
+msgid "GD Available"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:243
+msgid "Imagick Available"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:244 src/Admin/Views/SystemStatus.php:74
+msgid "WebP via Imagick"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:245 src/Admin/Views/SystemStatus.php:78
+msgid "WebP via GD"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:246
+msgid "WebP Generation Available"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:247
+msgid "AVIF Supported"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:248 src/Admin/Views/SystemStatus.php:105
+msgid "Uploads Writable"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:257
+msgid "Quick Actions"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:298
+msgid "Quote of the Day"
+msgstr ""
+
+#: src/Admin/Views/Dashboard.php:331
+msgid "No optimized images yet. Run a bulk optimization to get started."
+msgstr ""
+
+#: src/Admin/Views/Exclusions.php:35
+msgid "Exclusion Rules"
+msgstr ""
+
+#: src/Admin/Views/Exclusions.php:44
+msgid "Exclude GIF Animations"
+msgstr ""
+
+#: src/Admin/Views/Exclusions.php:51
+msgid "When enabled, GIF images are ignored by eligibility detection."
+msgstr ""
+
+#: src/Admin/Views/Exclusions.php:55
+msgid "Exclude SVG Files"
+msgstr ""
+
+#: src/Admin/Views/Exclusions.php:62
+msgid "When enabled, SVG files are ignored by eligibility detection."
+msgstr ""
+
+#: src/Admin/Views/Formats.php:28
+msgid "WebP & AVIF Settings"
+msgstr ""
+
+#: src/Admin/Views/Formats.php:29
+msgid "Configure next-generation image format generation."
+msgstr ""
+
+#: src/Admin/Views/Formats.php:33
+msgid "Generate WebP"
+msgstr ""
+
+#: src/Admin/Views/Formats.php:39
+msgid "Enable WebP generation for all optimized images."
+msgstr ""
+
+#: src/Admin/Views/Formats.php:43
+msgid "Generate AVIF"
+msgstr ""
+
+#: src/Admin/Views/Formats.php:49
+msgid "Enable AVIF generation. Requires server support."
+msgstr ""
+
+#: src/Admin/Views/Formats.php:53
+msgid "Fallback Chain"
+msgstr ""
+
+#: src/Admin/Views/Formats.php:56
+msgid "Browsers will use the first supported format."
+msgstr ""
+
+#: src/Admin/Views/LazyLoad.php:44
+msgid "Enable Lazy Loading"
+msgstr ""
+
+#: src/Admin/Views/LazyLoad.php:51
+msgid ""
+"Add native browser loading=\"lazy\" to frontend images. No JavaScript is "
+"used."
+msgstr ""
+
+#: src/Admin/Views/Reports.php:29
+msgid ""
+"Optimization history and statistics will appear here once you start "
+"optimizing images."
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:31
+msgid "Server Environment"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:34
+msgid "PHP Version"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:39
+msgid "WordPress Version"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:44
+msgid "Memory Limit"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:48
+msgid "Upload Max Filesize"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:52
+msgid "Post Max Size"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:59
+msgid "Image Engines"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:62
+msgid "GD Extension"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:66
+msgid "Imagick Extension"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:70
+msgid "WebP Support"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:82
+msgid "AVIF via Imagick"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:86
+msgid "AVIF via GD"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:90
+msgid "AVIF Support"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:98
+msgid "Production Readiness"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:101
+msgid "Queue Table"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:109
+msgid "Backups Writable"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:113
+msgid "WebP Available"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:117
+msgid "AVIF Available"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:129
+msgid "Auto (AVIF → WebP → Original)"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:147
+msgid "Configuration"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:167
+msgid "Localization Status"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:171
+msgid "Override"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:172
+msgid "WordPress"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:176
+msgid "Text Domain Loaded"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:180
+msgid "Current Locale"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:184
+msgid "Language Source"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:191
+msgid "Debug Info"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:195
+msgid "Copy to Clipboard"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:211
+msgid "Available"
+msgstr ""
+
+#: src/Admin/Views/SystemStatus.php:211
+msgid "Not Available"
+msgstr ""
+
+#: src/Core/Installer.php:71
+msgid "Vacuum Image Optimizer requires PHP 8.1 or higher."
+msgstr ""
+
+#: src/Core/Installer.php:72
+msgid "Plugin Activation Error"
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:96 src/Engine/RestoreEngine.php:27
+#: src/Engine/WebPGenerator.php:93
+msgid "Invalid attachment ID."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:101 src/Engine/RestoreEngine.php:32
+#: src/Engine/WebPGenerator.php:98
+msgid "Attachment could not be found."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:106
+msgid "This attachment format is not supported for AVIF generation."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:110
+msgid "AVIF generation is not available on this server."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:115 src/Engine/WebPGenerator.php:108
+msgid "The original image path could not be resolved."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:122 src/Engine/WebPGenerator.php:115
+msgid "The original image file is missing or unreadable."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:127 src/Engine/WebPGenerator.php:120
+msgid "The original image file size could not be read."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:134
+msgid "The AVIF output path could not be created."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:143
+msgid "Existing AVIF file found. Metadata was refreshed."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:178
+msgid "No available image engine can generate AVIF on this server."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:179
+msgid "AVIF generation failed with the available image engines."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:186
+msgid "The generated AVIF file size could not be read."
+msgstr ""
+
+#: src/Engine/AVIFGenerator.php:189 src/Media/AttachmentActions.php:267
+msgid "AVIF image generated successfully."
+msgstr ""
+
+#: src/Engine/RestoreEngine.php:39
+msgid "The original backup file is missing or unreadable."
+msgstr ""
+
+#: src/Engine/RestoreEngine.php:46
+msgid "The attachment original path could not be resolved."
+msgstr ""
+
+#: src/Engine/RestoreEngine.php:51
+msgid "The original image directory could not be created."
+msgstr ""
+
+#: src/Engine/RestoreEngine.php:55
+msgid "The original image could not be restored from backup."
+msgstr ""
+
+#: src/Engine/RestoreEngine.php:60 src/Media/AttachmentActions.php:270
+msgid "Original image restored successfully."
+msgstr ""
+
+#: src/Engine/WebPGenerator.php:103
+msgid "This attachment format is not supported for WebP generation."
+msgstr ""
+
+#: src/Engine/WebPGenerator.php:127
+msgid "The WebP output path could not be created."
+msgstr ""
+
+#: src/Engine/WebPGenerator.php:136
+msgid "The original image backup could not be created."
+msgstr ""
+
+#: src/Engine/WebPGenerator.php:145
+msgid "Existing WebP file found. Metadata was refreshed."
+msgstr ""
+
+#: src/Engine/WebPGenerator.php:180
+msgid "No available image engine can generate WebP on this server."
+msgstr ""
+
+#: src/Engine/WebPGenerator.php:181
+msgid "WebP generation failed with the available image engines."
+msgstr ""
+
+#: src/Engine/WebPGenerator.php:188
+msgid "The generated WebP file size could not be read."
+msgstr ""
+
+#: src/Engine/WebPGenerator.php:191 src/Media/AttachmentActions.php:265
+msgid "WebP image generated successfully."
+msgstr ""
+
+#: src/Media/AttachmentActions.php:109
+msgid "Sorry, you are not allowed to manage this attachment."
+msgstr ""
+
+#: src/Media/AttachmentActions.php:129
+msgid ""
+"Backups are disabled, so no backup is available to restore this image. "
+"Enable backups before optimizing to allow restores."
+msgstr ""
+
+#: src/Media/AttachmentActions.php:159
+msgid "Existing WebP file could not be deleted before regeneration."
+msgstr ""
+
+#: src/Media/AttachmentActions.php:266
+msgid "WebP generation could not be completed."
+msgstr ""
+
+#: src/Media/AttachmentActions.php:268
+msgid "AVIF generation could not be completed."
+msgstr ""
+
+#: src/Media/AttachmentActions.php:269
+msgid "WebP regeneration could not be completed."
+msgstr ""
+
+#: src/Media/AttachmentActions.php:271
+msgid "Original image restore could not be completed."
+msgstr ""
+
+#: src/Media/AttachmentActions.php:272
+msgid "The requested attachment action is invalid."
+msgstr ""
+
+#: src/Media/AttachmentActions.php:273
+msgid ""
+"Vacuum Image Optimizer actions are available for image attachments only."
+msgstr ""
+
+#: src/Media/DerivativeLibrary.php:123
+#, php-format
+msgid "%1$s (%2$s)"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:53
+msgid "Vacuum"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:98
+msgid "Original"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:101
+msgid "Saved %"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:102
+msgid "Saved KB"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:143
+msgid "Generated by"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:148
+msgid "Format"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:155
+msgid "Source"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:181
+msgid "Not optimized"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:191
+msgid "Optimized"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:201
+msgid "Excluded"
+msgstr ""
+
+#: src/Media/LibraryIntegration.php:207
+msgid "Unsupported"
+msgstr ""
+
+#: src/Queue/AjaxController.php:67
+#, php-format
+msgid "%d image added to queue."
+msgid_plural "%d images added to queue."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Queue/AjaxController.php:156
+msgid "The failed queue job could not be retried."
+msgstr ""
+
+#: src/Queue/AjaxController.php:176
+msgid "You are not allowed to manage the optimization queue."
+msgstr ""
+
+#: src/Queue/QueueProcessor.php:103
+msgid "WebP generation failed."
+msgstr ""
+
+#: src/Settings/CompressionSettings.php:344
+msgid "WordPress Default"
+msgstr ""
+
+#: src/Settings/CompressionSettings.php:420
+msgid "Lossless"
+msgstr ""
+
+#: src/Settings/CompressionSettings.php:421
+msgid "Balanced"
+msgstr ""
+
+#: src/Settings/CompressionSettings.php:422
+msgid "Aggressive"
+msgstr ""
+
+#: src/Settings/CompressionSettings.php:423
+msgid "Ultra"
+msgstr ""
+
+#: src/Upload/UploadAutomation.php:140
+msgid "Automatic WebP generation failed."
+msgstr ""
