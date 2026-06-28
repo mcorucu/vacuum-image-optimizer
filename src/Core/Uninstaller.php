@@ -31,9 +31,9 @@ class Uninstaller {
 	 * @return void
 	 */
 	private static function clear_cron(): void {
-		$timestamp = wp_next_scheduled( 'vio_cleanup_backups' );
+		$timestamp = wp_next_scheduled( 'vacimg_cleanup_backups' );
 		if ( $timestamp ) {
-			wp_unschedule_event( $timestamp, 'vio_cleanup_backups' );
+			wp_unschedule_event( $timestamp, 'vacimg_cleanup_backups' );
 		}
 	}
 }

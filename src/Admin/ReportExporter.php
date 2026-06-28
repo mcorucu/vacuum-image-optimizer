@@ -21,14 +21,14 @@ class ReportExporter {
 	 *
 	 * @var string
 	 */
-	public const ACTION = 'vio_export_report';
+	public const ACTION = 'vacimg_export_report';
 
 	/**
 	 * Nonce action name.
 	 *
 	 * @var string
 	 */
-	public const NONCE = 'vio_export_report';
+	public const NONCE = 'vacimg_export_report';
 
 	/**
 	 * Rows fetched and streamed per page.

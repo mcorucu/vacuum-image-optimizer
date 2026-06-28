@@ -32,11 +32,11 @@ class AttachmentActions {
 	 * @var array<string, string>
 	 */
 	private array $actions = [
-		'vio_optimize_image'  => 'Optimize',
-		'vio_generate_webp'   => 'WebP',
-		'vio_generate_avif'   => 'AVIF',
-		'vio_regenerate_webp' => 'Regenerate',
-		'vio_restore_original' => 'Restore',
+		'vacimg_optimize_image'  => 'Optimize',
+		'vacimg_generate_webp'   => 'WebP',
+		'vacimg_generate_avif'   => 'AVIF',
+		'vacimg_regenerate_webp' => 'Regenerate',
+		'vacimg_restore_original' => 'Restore',
 	];
 
 	/**
@@ -122,8 +122,8 @@ class AttachmentActions {
 			$this->redirect_with_notice( 'not_image', '', 'error' );
 		}
 
-		if ( 'vio_restore_original' === $action ) {
-			$has_backup = '' !== (string) get_post_meta( $attachment_id, '_vio_backup_path', true );
+		if ( 'vacimg_restore_original' === $action ) {
+			$has_backup = '' !== (string) get_post_meta( $attachment_id, '_vacimg_backup_path', true );
 
 			if ( ! CompressionSettings::is_backups_enabled() && ! $has_backup ) {
 				$this->redirect_with_notice(
@@ -143,7 +143,7 @@ class AttachmentActions {
 			$this->redirect_with_notice( 'restore_error', (string) $result['message'], 'error' );
 		}
 
-		if ( 'vio_generate_avif' === $action ) {
+		if ( 'vacimg_generate_avif' === $action ) {
 			$avif_generator = new AVIFGenerator();
 			$avif_result    = $avif_generator->generate( $attachment_id );
 
@@ -156,7 +156,7 @@ class AttachmentActions {
 
 		$generator = new WebPGenerator();
 
-		if ( 'vio_regenerate_webp' === $action ) {
+		if ( 'vacimg_regenerate_webp' === $action ) {
 			if ( ! $generator->delete_existing_webp( $attachment_id ) ) {
 				$this->redirect_with_notice( 'regenerate_error', __( 'Existing WebP file could not be deleted before regeneration.', 'vacuum-image-optimizer' ), 'error' );
 			}
@@ -168,7 +168,7 @@ class AttachmentActions {
 			$this->redirect_with_notice( 'webp_success', (string) $result['message'], 'success' );
 		}
 
-		$status = get_post_meta( $attachment_id, '_vio_status', true );
+		$status = get_post_meta( $attachment_id, '_vacimg_status', true );
 		$type   = 'unsupported' === $status ? 'warning' : 'error';
 
 		$this->redirect_with_notice( 'webp_error', (string) $result['message'], $type );
@@ -180,14 +180,14 @@ class AttachmentActions {
 	 * @return void
 	 */
 	public function render_admin_notice(): void {
-		$notice = isset( $_GET['vio_notice'] ) ? sanitize_key( wp_unslash( $_GET['vio_notice'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$type   = isset( $_GET['vio_notice_type'] ) ? sanitize_key( wp_unslash( $_GET['vio_notice_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$notice = isset( $_GET['vacimg_notice'] ) ? sanitize_key( wp_unslash( $_GET['vacimg_notice'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$type   = isset( $_GET['vacimg_notice_type'] ) ? sanitize_key( wp_unslash( $_GET['vacimg_notice_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		if ( '' === $notice ) {
 			return;
 		}
 
-		$message = isset( $_GET['vio_message'] ) ? sanitize_text_field( wp_unslash( $_GET['vio_message'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$message = isset( $_GET['vacimg_message'] ) ? sanitize_text_field( wp_unslash( $_GET['vacimg_message'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$message = '' === $message ? $this->get_notice_message( $notice ) : $message;
 
 		if ( '' === $message ) {
@@ -213,11 +213,11 @@ class AttachmentActions {
 	 */
 	private function get_action_labels(): array {
 		return [
-			'vio_optimize_image'   => __( 'Optimize', 'vacuum-image-optimizer' ),
-			'vio_generate_webp'    => __( 'WebP', 'vacuum-image-optimizer' ),
-			'vio_generate_avif'    => __( 'AVIF', 'vacuum-image-optimizer' ),
-			'vio_regenerate_webp'  => __( 'Regenerate', 'vacuum-image-optimizer' ),
-			'vio_restore_original' => __( 'Restore', 'vacuum-image-optimizer' ),
+			'vacimg_optimize_image'   => __( 'Optimize', 'vacuum-image-optimizer' ),
+			'vacimg_generate_webp'    => __( 'WebP', 'vacuum-image-optimizer' ),
+			'vacimg_generate_avif'    => __( 'AVIF', 'vacuum-image-optimizer' ),
+			'vacimg_regenerate_webp'  => __( 'Regenerate', 'vacuum-image-optimizer' ),
+			'vacimg_restore_original' => __( 'Restore', 'vacuum-image-optimizer' ),
 		];
 	}
 
@@ -255,14 +255,14 @@ class AttachmentActions {
 	private function redirect_with_notice( string $notice, string $message = '', string $type = 'info' ): void {
 		$referer = wp_get_referer();
 		$url     = $referer ? $referer : admin_url( 'upload.php' );
-		$url     = remove_query_arg( [ 'vio_notice', 'vio_notice_type', 'vio_message', '_wpnonce', 'action', 'attachment_id' ], $url );
+		$url     = remove_query_arg( [ 'vacimg_notice', 'vacimg_notice_type', 'vacimg_message', '_wpnonce', 'action', 'attachment_id' ], $url );
 		$args    = [
-			'vio_notice'      => sanitize_key( $notice ),
-			'vio_notice_type' => sanitize_key( $type ),
+			'vacimg_notice'      => sanitize_key( $notice ),
+			'vacimg_notice_type' => sanitize_key( $type ),
 		];
 
 		if ( '' !== $message ) {
-			$args['vio_message'] = sanitize_text_field( $message );
+			$args['vacimg_message'] = sanitize_text_field( $message );
 		}
 
 		$url = add_query_arg( $args, $url );

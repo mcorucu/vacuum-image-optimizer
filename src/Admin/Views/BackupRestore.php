@@ -34,8 +34,8 @@ class BackupRestore {
 		$settings       = CompressionSettings::get();
 		$backups_on     = ! empty( $settings['enable_backups'] );
 		?>
-		<div class="vio-backup">
-			<div class="vio-card">
+		<div class="vacimg-backup">
+			<div class="vacimg-card">
 				<h2><?php esc_html_e( 'Backup & Restore', 'vacuum-image-optimizer' ); ?></h2>
 
 				<?php settings_errors( CompressionSettings::OPTION_NAME ); ?>
@@ -46,17 +46,17 @@ class BackupRestore {
 					</div>
 				<?php endif; ?>
 
-				<form method="post" action="options.php" class="vio-settings-form">
+				<form method="post" action="options.php" class="vacimg-settings-form">
 					<?php settings_fields( CompressionSettings::OPTION_GROUP ); ?>
 
-					<table class="form-table vio-form-table">
+					<table class="form-table vacimg-form-table">
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Enable Backups', 'vacuum-image-optimizer' ); ?></th>
 							<td>
 								<input type="hidden" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[enable_backups]" value="0">
-								<label class="vio-toggle">
+								<label class="vacimg-toggle">
 									<input type="checkbox" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[enable_backups]" value="1" <?php checked( $backups_on ); ?>>
-									<span class="vio-toggle__slider"></span>
+									<span class="vacimg-toggle__slider"></span>
 								</label>
 								<p class="description"><?php esc_html_e( 'Keep a copy of each original image before generating optimized formats so it can be restored later.', 'vacuum-image-optimizer' ); ?></p>
 							</td>
@@ -65,7 +65,7 @@ class BackupRestore {
 							<th scope="row"><?php esc_html_e( 'Backup Retention', 'vacuum-image-optimizer' ); ?></th>
 							<td>
 								<input type="number" min="0" max="3650" step="1"
-									id="vio-backup-retention-days"
+									id="vacimg-backup-retention-days"
 									name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[backup_retention_days]"
 									value="<?php echo esc_attr( (string) ( $settings['backup_retention_days'] ?? 0 ) ); ?>"
 									class="small-text">
@@ -81,7 +81,7 @@ class BackupRestore {
 						</tr>
 					</table>
 
-					<?php submit_button( __( 'Save Settings', 'vacuum-image-optimizer' ), 'primary vio-button vio-button--primary', 'submit', false ); ?>
+					<?php submit_button( __( 'Save Settings', 'vacuum-image-optimizer' ), 'primary vacimg-button vacimg-button--primary', 'submit', false ); ?>
 				</form>
 			</div>
 		</div>

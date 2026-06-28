@@ -19,7 +19,7 @@ class BackupPathHelper {
 	 *
 	 * @var string
 	 */
-	private const BACKUP_DIR_NAME = 'vio-backups';
+	private const BACKUP_DIR_NAME = 'vacimg-backups';
 
 	/**
 	 * Get the uploads base directory.

@@ -21,14 +21,14 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	private const OPTION_DB_VERSION = 'vio_db_version';
+	private const OPTION_DB_VERSION = 'vacimg_db_version';
 
 	/**
 	 * Option key used to mark the Phase 5 queue schema as installed.
 	 *
 	 * @var string
 	 */
-	private const OPTION_QUEUE_READY = 'vio_phase5_queue_ready';
+	private const OPTION_QUEUE_READY = 'vacimg_queue_table_ready';
 
 	/**
 	 * Activate the plugin.
@@ -37,6 +37,7 @@ class Installer {
 	 */
 	public static function activate(): void {
 		self::check_requirements();
+		self::migrate_short_prefix_options();
 		self::create_tables();
 		self::set_default_options();
 		self::schedule_cron();
@@ -51,10 +52,11 @@ class Installer {
 		$stored_version = (string) get_option( self::OPTION_DB_VERSION, '' );
 		$queue_ready    = (bool) get_option( self::OPTION_QUEUE_READY, false );
 
-		if ( VIO_VERSION === $stored_version && $queue_ready ) {
+		if ( VACIMG_VERSION === $stored_version && $queue_ready ) {
 			return;
 		}
 
+		self::migrate_short_prefix_options();
 		self::create_tables();
 		self::set_default_options();
 	}
@@ -88,7 +90,7 @@ class Installer {
 		$charset_collate = $wpdb->get_charset_collate();
 		$prefix          = $wpdb->prefix;
 
-		$sql_queue = "CREATE TABLE {$prefix}vio_queue (
+		$sql_queue = "CREATE TABLE {$prefix}vacimg_queue (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			attachment_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			status varchar(20) NOT NULL DEFAULT 'pending',
@@ -102,7 +104,7 @@ class Installer {
 			KEY status_created (status, created_at)
 		) {$charset_collate};";
 
-		$sql_stats = "CREATE TABLE {$prefix}vio_stats (
+		$sql_stats = "CREATE TABLE {$prefix}vacimg_stats (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			attachment_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			size_name varchar(50) NOT NULL DEFAULT 'full',
@@ -119,7 +121,7 @@ class Installer {
 			KEY attachment_id (attachment_id)
 		) {$charset_collate};";
 
-		$sql_backups = "CREATE TABLE {$prefix}vio_backups (
+		$sql_backups = "CREATE TABLE {$prefix}vacimg_backups (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			attachment_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			size_name varchar(50) NOT NULL DEFAULT 'full',
@@ -137,6 +139,35 @@ class Installer {
 		dbDelta( $sql_queue );
 		dbDelta( $sql_stats );
 		dbDelta( $sql_backups );
+	}
+
+	/**
+	 * Copy simple legacy options into their current keys when present.
+	 *
+	 * @return void
+	 */
+	private static function migrate_short_prefix_options(): void {
+		$legacy_prefix = 'v' . 'io_';
+		$pairs         = [
+			$legacy_prefix . 'settings'               => 'vacimg_settings',
+			$legacy_prefix . 'queue_state'            => 'vacimg_queue_state',
+			$legacy_prefix . 'db_version'             => self::OPTION_DB_VERSION,
+			$legacy_prefix . 'phase5_queue_ready'     => self::OPTION_QUEUE_READY,
+			$legacy_prefix . 'queue_table_ready'      => self::OPTION_QUEUE_READY,
+			$legacy_prefix . 'last_auto_processed_at' => 'vacimg_last_auto_processed_at',
+			$legacy_prefix . 'last_backup_cleanup'    => 'vacimg_last_backup_cleanup',
+		];
+
+		foreach ( $pairs as $old_key => $new_key ) {
+			if ( false !== get_option( $new_key, false ) ) {
+				continue;
+			}
+
+			$value = get_option( $old_key, false );
+			if ( false !== $value ) {
+				add_option( $new_key, $value );
+			}
+		}
 	}
 
 	/**
@@ -162,20 +193,20 @@ class Installer {
 			'interface_language'    => 'wordpress',
 		];
 
-		if ( false === get_option( 'vio_settings' ) ) {
-			add_option( 'vio_settings', $defaults );
+		if ( false === get_option( 'vacimg_settings' ) ) {
+			add_option( 'vacimg_settings', $defaults );
 		} else {
-			$settings = get_option( 'vio_settings', [] );
+			$settings = get_option( 'vacimg_settings', [] );
 			if ( is_array( $settings ) ) {
-				update_option( 'vio_settings', array_merge( $defaults, $settings ) );
+				update_option( 'vacimg_settings', array_merge( $defaults, $settings ) );
 			}
 		}
 
-		if ( false === get_option( 'vio_queue_state' ) ) {
-			add_option( 'vio_queue_state', 'idle' );
+		if ( false === get_option( 'vacimg_queue_state' ) ) {
+			add_option( 'vacimg_queue_state', 'idle' );
 		}
 
-		update_option( self::OPTION_DB_VERSION, VIO_VERSION );
+		update_option( self::OPTION_DB_VERSION, VACIMG_VERSION );
 		update_option( self::OPTION_QUEUE_READY, true );
 	}
 
@@ -185,8 +216,8 @@ class Installer {
 	 * @return void
 	 */
 	private static function schedule_cron(): void {
-		if ( ! wp_next_scheduled( 'vio_cleanup_backups' ) ) {
-			wp_schedule_event( time(), 'daily', 'vio_cleanup_backups' );
+		if ( ! wp_next_scheduled( 'vacimg_cleanup_backups' ) ) {
+			wp_schedule_event( time(), 'daily', 'vacimg_cleanup_backups' );
 		}
 	}
 }

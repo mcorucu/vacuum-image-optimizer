@@ -32,7 +32,7 @@ class RestoreEngine {
 			return $this->result( false, __( 'Attachment could not be found.', 'vacuum-image-optimizer' ), $attachment_id );
 		}
 
-		$backup_path = get_post_meta( $attachment_id, '_vio_backup_path', true );
+		$backup_path = get_post_meta( $attachment_id, '_vacimg_backup_path', true );
 		$backup_path = is_string( $backup_path ) ? wp_normalize_path( $backup_path ) : '';
 
 		if ( '' === $backup_path || ! file_exists( $backup_path ) || ! is_file( $backup_path ) || ! is_readable( $backup_path ) ) {
@@ -76,20 +76,20 @@ class RestoreEngine {
 	private function remove_derivatives( int $attachment_id, string $original_path ): void {
 		foreach ( [ 'webp', 'avif' ] as $format ) {
 			// Remove the linked derivative Media Library attachment (and its file).
-			$derivative_id = absint( get_post_meta( $attachment_id, '_vio_' . $format . '_attachment_id', true ) );
+			$derivative_id = absint( get_post_meta( $attachment_id, '_vacimg_' . $format . '_attachment_id', true ) );
 			if ( $derivative_id > 0 && $this->is_owned_derivative( $derivative_id, $format ) ) {
 				wp_delete_attachment( $derivative_id, true );
 			}
 
 			// Delete the derivative file recorded in meta, if it is still present.
-			$meta_path = get_post_meta( $attachment_id, '_vio_' . $format . '_path', true );
+			$meta_path = get_post_meta( $attachment_id, '_vacimg_' . $format . '_path', true );
 			$meta_path = is_string( $meta_path ) ? wp_normalize_path( $meta_path ) : '';
 			$this->delete_derivative_file( $meta_path, $format );
 
 			// Also delete the sibling derivative next to the original (covers untracked files).
 			$this->delete_derivative_file( $this->sibling_derivative_path( $original_path, $format ), $format );
 
-			delete_post_meta( $attachment_id, '_vio_' . $format . '_attachment_id' );
+			delete_post_meta( $attachment_id, '_vacimg_' . $format . '_attachment_id' );
 		}
 	}
 
@@ -106,7 +106,7 @@ class RestoreEngine {
 			return false;
 		}
 
-		return sanitize_key( (string) get_post_meta( $derivative_id, '_vio_generated_by', true ) ) === $format;
+		return sanitize_key( (string) get_post_meta( $derivative_id, '_vacimg_generated_by', true ) ) === $format;
 	}
 
 	/**
@@ -156,28 +156,28 @@ class RestoreEngine {
 	 * @return void
 	 */
 	private function reset_optimization_metadata( int $attachment_id ): void {
-		update_post_meta( $attachment_id, '_vio_status', 'pending' );
+		update_post_meta( $attachment_id, '_vacimg_status', 'pending' );
 
 		// Clear WebP + optimization tracking so the image looks freshly uploaded.
-		delete_post_meta( $attachment_id, '_vio_webp_path' );
-		delete_post_meta( $attachment_id, '_vio_webp_url' );
-		delete_post_meta( $attachment_id, '_vio_webp_size' );
-		delete_post_meta( $attachment_id, '_vio_savings_bytes' );
-		delete_post_meta( $attachment_id, '_vio_savings_percent' );
-		delete_post_meta( $attachment_id, '_vio_engine_used' );
-		delete_post_meta( $attachment_id, '_vio_source_size' );
-		delete_post_meta( $attachment_id, '_vio_optimized_at' );
-		delete_post_meta( $attachment_id, '_vio_error_message' );
+		delete_post_meta( $attachment_id, '_vacimg_webp_path' );
+		delete_post_meta( $attachment_id, '_vacimg_webp_url' );
+		delete_post_meta( $attachment_id, '_vacimg_webp_size' );
+		delete_post_meta( $attachment_id, '_vacimg_savings_bytes' );
+		delete_post_meta( $attachment_id, '_vacimg_savings_percent' );
+		delete_post_meta( $attachment_id, '_vacimg_engine_used' );
+		delete_post_meta( $attachment_id, '_vacimg_source_size' );
+		delete_post_meta( $attachment_id, '_vacimg_optimized_at' );
+		delete_post_meta( $attachment_id, '_vacimg_error_message' );
 
 		// Clear AVIF metadata so derivative state stays consistent after a restore.
-		delete_post_meta( $attachment_id, '_vio_avif_path' );
-		delete_post_meta( $attachment_id, '_vio_avif_url' );
-		delete_post_meta( $attachment_id, '_vio_avif_size' );
-		delete_post_meta( $attachment_id, '_vio_avif_savings_bytes' );
-		delete_post_meta( $attachment_id, '_vio_avif_savings_percent' );
-		delete_post_meta( $attachment_id, '_vio_avif_engine_used' );
-		delete_post_meta( $attachment_id, '_vio_avif_generated_at' );
-		delete_post_meta( $attachment_id, '_vio_avif_error_message' );
+		delete_post_meta( $attachment_id, '_vacimg_avif_path' );
+		delete_post_meta( $attachment_id, '_vacimg_avif_url' );
+		delete_post_meta( $attachment_id, '_vacimg_avif_size' );
+		delete_post_meta( $attachment_id, '_vacimg_avif_savings_bytes' );
+		delete_post_meta( $attachment_id, '_vacimg_avif_savings_percent' );
+		delete_post_meta( $attachment_id, '_vacimg_avif_engine_used' );
+		delete_post_meta( $attachment_id, '_vacimg_avif_generated_at' );
+		delete_post_meta( $attachment_id, '_vacimg_avif_error_message' );
 	}
 
 	/**

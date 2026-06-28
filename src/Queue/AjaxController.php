@@ -42,13 +42,13 @@ class AjaxController {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'wp_ajax_vio_scan_library', [ $this, 'scan_library' ] );
-		add_action( 'wp_ajax_vio_start_queue', [ $this, 'start_queue' ] );
-		add_action( 'wp_ajax_vio_pause_queue', [ $this, 'pause_queue' ] );
-		add_action( 'wp_ajax_vio_resume_queue', [ $this, 'resume_queue' ] );
-		add_action( 'wp_ajax_vio_process_batch', [ $this, 'process_batch' ] );
-		add_action( 'wp_ajax_vio_queue_status', [ $this, 'queue_status' ] );
-		add_action( 'wp_ajax_vio_retry_queue_job', [ $this, 'retry_queue_job' ] );
+		add_action( 'wp_ajax_vacimg_scan_library', [ $this, 'scan_library' ] );
+		add_action( 'wp_ajax_vacimg_start_queue', [ $this, 'start_queue' ] );
+		add_action( 'wp_ajax_vacimg_pause_queue', [ $this, 'pause_queue' ] );
+		add_action( 'wp_ajax_vacimg_resume_queue', [ $this, 'resume_queue' ] );
+		add_action( 'wp_ajax_vacimg_process_batch', [ $this, 'process_batch' ] );
+		add_action( 'wp_ajax_vacimg_queue_status', [ $this, 'queue_status' ] );
+		add_action( 'wp_ajax_vacimg_retry_queue_job', [ $this, 'retry_queue_job' ] );
 	}
 
 	/**
@@ -149,7 +149,8 @@ class AjaxController {
 	 * @return void
 	 */
 	public function retry_queue_job(): void {
-		$this->verify_request();
+		check_ajax_referer( 'vacimg_queue_ajax', 'nonce' );
+		$this->verify_capability();
 
 		$queue_id = isset( $_POST['queue_id'] ) ? absint( $_POST['queue_id'] ) : 0;
 		if ( 0 === $queue_id || ! $this->queue_manager->retry_job( $queue_id ) ) {
@@ -178,8 +179,16 @@ class AjaxController {
 	 * @return void
 	 */
 	private function verify_request(): void {
-		check_ajax_referer( 'vio_queue_ajax', 'nonce' );
+		check_ajax_referer( 'vacimg_queue_ajax', 'nonce' );
+		$this->verify_capability();
+	}
 
+	/**
+	 * Verify the current user's queue capability.
+	 *
+	 * @return void
+	 */
+	private function verify_capability(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( [ 'message' => __( 'You are not allowed to manage the optimization queue.', 'vacuum-image-optimizer' ) ], 403 );
 		}

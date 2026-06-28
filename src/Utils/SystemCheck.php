@@ -50,7 +50,7 @@ class SystemCheck {
 	public static function has_queue_table(): bool {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'vio_queue';
+		$table = $wpdb->prefix . 'vacimg_queue';
 		$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) );
 
 		return $found === $table;

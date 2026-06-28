@@ -38,82 +38,82 @@ class Reports {
 		$recent      = $stats->get_optimization_rows( 'recent', 20 );
 		$top         = $stats->get_optimization_rows( 'savings', 20 );
 		?>
-		<div class="vio-reports">
+		<div class="vacimg-reports">
 
 			<?php /* Header + export. */ ?>
-			<section class="vio-dashboard-section">
-				<div class="vio-dashboard-section-header vio-reports-header">
+			<section class="vacimg-dashboard-section">
+				<div class="vacimg-dashboard-section-header vacimg-reports-header">
 					<div>
 						<h2><?php esc_html_e( 'Reports', 'vacuum-image-optimizer' ); ?></h2>
 						<p><?php esc_html_e( 'Optimization history, savings, and media insights.', 'vacuum-image-optimizer' ); ?></p>
 					</div>
-					<a href="<?php echo esc_url( ReportExporter::get_export_url() ); ?>" class="vio-button vio-button--secondary">
+					<a href="<?php echo esc_url( ReportExporter::get_export_url() ); ?>" class="vacimg-button vacimg-button--secondary">
 						<?php esc_html_e( 'Export CSV', 'vacuum-image-optimizer' ); ?>
 					</a>
 				</div>
 
-				<div class="vio-kpi-grid vio-kpi-grid--wide">
-					<div class="vio-stat-card vio-kpi-card">
-						<span class="vio-stat-number"><?php echo esc_html( number_format_i18n( $summary['total_images'] ) ); ?></span>
-						<span class="vio-stat-label"><?php esc_html_e( 'Total Images', 'vacuum-image-optimizer' ); ?></span>
+				<div class="vacimg-kpi-grid vacimg-kpi-grid--wide">
+					<div class="vacimg-stat-card vacimg-kpi-card">
+						<span class="vacimg-stat-number"><?php echo esc_html( number_format_i18n( $summary['total_images'] ) ); ?></span>
+						<span class="vacimg-stat-label"><?php esc_html_e( 'Total Images', 'vacuum-image-optimizer' ); ?></span>
 					</div>
-					<div class="vio-stat-card vio-kpi-card">
-						<span class="vio-stat-number"><?php echo esc_html( number_format_i18n( $summary['optimized_images'] ) ); ?></span>
-						<span class="vio-stat-label"><?php esc_html_e( 'Optimized Images', 'vacuum-image-optimizer' ); ?></span>
+					<div class="vacimg-stat-card vacimg-kpi-card">
+						<span class="vacimg-stat-number"><?php echo esc_html( number_format_i18n( $summary['optimized_images'] ) ); ?></span>
+						<span class="vacimg-stat-label"><?php esc_html_e( 'Optimized Images', 'vacuum-image-optimizer' ); ?></span>
 					</div>
-					<div class="vio-stat-card vio-kpi-card">
-						<span class="vio-stat-number"><?php echo esc_html( number_format_i18n( $summary['webp_generated'] ) ); ?></span>
-						<span class="vio-stat-label"><?php esc_html_e( 'Generated WebP Files', 'vacuum-image-optimizer' ); ?></span>
+					<div class="vacimg-stat-card vacimg-kpi-card">
+						<span class="vacimg-stat-number"><?php echo esc_html( number_format_i18n( $summary['webp_generated'] ) ); ?></span>
+						<span class="vacimg-stat-label"><?php esc_html_e( 'Generated WebP Files', 'vacuum-image-optimizer' ); ?></span>
 					</div>
-					<div class="vio-stat-card vio-kpi-card">
-						<span class="vio-stat-number"><?php echo esc_html( number_format_i18n( $summary['avif_generated'] ) ); ?></span>
-						<span class="vio-stat-label"><?php esc_html_e( 'Generated AVIF Files', 'vacuum-image-optimizer' ); ?></span>
+					<div class="vacimg-stat-card vacimg-kpi-card">
+						<span class="vacimg-stat-number"><?php echo esc_html( number_format_i18n( $summary['avif_generated'] ) ); ?></span>
+						<span class="vacimg-stat-label"><?php esc_html_e( 'Generated AVIF Files', 'vacuum-image-optimizer' ); ?></span>
 					</div>
-					<div class="vio-stat-card vio-kpi-card">
-						<span class="vio-stat-number"><?php echo esc_html( number_format_i18n( absint( $queue_stats['completed'] ) ) ); ?></span>
-						<span class="vio-stat-label"><?php esc_html_e( 'Queue Jobs Completed', 'vacuum-image-optimizer' ); ?></span>
+					<div class="vacimg-stat-card vacimg-kpi-card">
+						<span class="vacimg-stat-number"><?php echo esc_html( number_format_i18n( absint( $queue_stats['completed'] ) ) ); ?></span>
+						<span class="vacimg-stat-label"><?php esc_html_e( 'Queue Jobs Completed', 'vacuum-image-optimizer' ); ?></span>
 					</div>
-					<div class="vio-stat-card vio-kpi-card">
-						<span class="vio-stat-number"><?php echo esc_html( number_format_i18n( absint( $queue_stats['failed'] ) ) ); ?></span>
-						<span class="vio-stat-label"><?php esc_html_e( 'Queue Jobs Failed', 'vacuum-image-optimizer' ); ?></span>
+					<div class="vacimg-stat-card vacimg-kpi-card">
+						<span class="vacimg-stat-number"><?php echo esc_html( number_format_i18n( absint( $queue_stats['failed'] ) ) ); ?></span>
+						<span class="vacimg-stat-label"><?php esc_html_e( 'Queue Jobs Failed', 'vacuum-image-optimizer' ); ?></span>
 					</div>
 				</div>
 			</section>
 
 			<?php /* Storage savings + automation. */ ?>
-			<section class="vio-dashboard-section">
-				<div class="vio-dashboard-section-header">
+			<section class="vacimg-dashboard-section">
+				<div class="vacimg-dashboard-section-header">
 					<h2><?php esc_html_e( 'Storage Savings', 'vacuum-image-optimizer' ); ?></h2>
 				</div>
-				<div class="vio-cards-row">
-					<div class="vio-card">
-						<ul class="vio-status-list">
-							<li><span class="vio-status-label"><?php esc_html_e( 'Total Original Size', 'vacuum-image-optimizer' ); ?></span><span class="vio-status-value"><?php echo esc_html( size_format( $summary['original_size'], 2 ) ); ?></span></li>
-							<li><span class="vio-status-label"><?php esc_html_e( 'Total WebP Size', 'vacuum-image-optimizer' ); ?></span><span class="vio-status-value"><?php echo esc_html( size_format( $summary['webp_size'], 2 ) ); ?></span></li>
-							<li><span class="vio-status-label"><?php esc_html_e( 'Total AVIF Size', 'vacuum-image-optimizer' ); ?></span><span class="vio-status-value"><?php echo esc_html( size_format( $summary['avif_size'], 2 ) ); ?></span></li>
-							<li><span class="vio-status-label"><?php esc_html_e( 'Total Saved Space', 'vacuum-image-optimizer' ); ?></span><span class="vio-status-value"><?php echo esc_html( size_format( $summary['saved_space'], 2 ) ); ?></span></li>
-							<li><span class="vio-status-label"><?php esc_html_e( 'Average Savings %', 'vacuum-image-optimizer' ); ?></span><span class="vio-status-value"><?php echo esc_html( number_format_i18n( $summary['average_savings'], 2 ) ); ?>%</span></li>
+				<div class="vacimg-cards-row">
+					<div class="vacimg-card">
+						<ul class="vacimg-status-list">
+							<li><span class="vacimg-status-label"><?php esc_html_e( 'Total Original Size', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( size_format( $summary['original_size'], 2 ) ); ?></span></li>
+							<li><span class="vacimg-status-label"><?php esc_html_e( 'Total WebP Size', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( size_format( $summary['webp_size'], 2 ) ); ?></span></li>
+							<li><span class="vacimg-status-label"><?php esc_html_e( 'Total AVIF Size', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( size_format( $summary['avif_size'], 2 ) ); ?></span></li>
+							<li><span class="vacimg-status-label"><?php esc_html_e( 'Total Saved Space', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( size_format( $summary['saved_space'], 2 ) ); ?></span></li>
+							<li><span class="vacimg-status-label"><?php esc_html_e( 'Average Savings %', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( number_format_i18n( $summary['average_savings'], 2 ) ); ?>%</span></li>
 						</ul>
 					</div>
 
-					<div class="vio-card">
+					<div class="vacimg-card">
 						<h3><?php esc_html_e( 'Automation', 'vacuum-image-optimizer' ); ?></h3>
-						<ul class="vio-status-list">
-							<li><span class="vio-status-label"><?php esc_html_e( 'Auto Optimized Uploads', 'vacuum-image-optimizer' ); ?></span><span class="vio-status-value"><?php echo esc_html( number_format_i18n( $automation['total'] ) ); ?></span></li>
-							<li><span class="vio-status-label"><?php esc_html_e( 'Queue Processed Uploads', 'vacuum-image-optimizer' ); ?></span><span class="vio-status-value"><?php echo esc_html( number_format_i18n( $automation['queue'] ) ); ?></span></li>
-							<li><span class="vio-status-label"><?php esc_html_e( 'Immediate Mode Uploads', 'vacuum-image-optimizer' ); ?></span><span class="vio-status-value"><?php echo esc_html( number_format_i18n( $automation['immediate'] ) ); ?></span></li>
-							<li><span class="vio-status-label"><?php esc_html_e( 'Last Automated Optimization', 'vacuum-image-optimizer' ); ?></span><span class="vio-status-value"><?php echo esc_html( $this->format_date( $last_auto ) ); ?></span></li>
+						<ul class="vacimg-status-list">
+							<li><span class="vacimg-status-label"><?php esc_html_e( 'Auto Optimized Uploads', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( number_format_i18n( $automation['total'] ) ); ?></span></li>
+							<li><span class="vacimg-status-label"><?php esc_html_e( 'Queue Processed Uploads', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( number_format_i18n( $automation['queue'] ) ); ?></span></li>
+							<li><span class="vacimg-status-label"><?php esc_html_e( 'Immediate Mode Uploads', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( number_format_i18n( $automation['immediate'] ) ); ?></span></li>
+							<li><span class="vacimg-status-label"><?php esc_html_e( 'Last Automated Optimization', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( $this->format_date( $last_auto ) ); ?></span></li>
 						</ul>
 					</div>
 				</div>
 			</section>
 
 			<?php /* Format distribution. */ ?>
-			<section class="vio-dashboard-section">
-				<div class="vio-dashboard-section-header">
+			<section class="vacimg-dashboard-section">
+				<div class="vacimg-dashboard-section-header">
 					<h2><?php esc_html_e( 'Format Distribution', 'vacuum-image-optimizer' ); ?></h2>
 				</div>
-				<div class="vio-card">
+				<div class="vacimg-card">
 					<?php
 					$distribution_total = max( $summary['total_images'], $summary['webp_generated'], $summary['avif_generated'], 1 );
 					$this->render_distribution_bar( __( 'Original Images', 'vacuum-image-optimizer' ), $summary['total_images'], $distribution_total );
@@ -124,11 +124,11 @@ class Reports {
 			</section>
 
 			<?php /* Recent activity. */ ?>
-			<section class="vio-dashboard-section">
-				<div class="vio-dashboard-section-header">
+			<section class="vacimg-dashboard-section">
+				<div class="vacimg-dashboard-section-header">
 					<h2><?php esc_html_e( 'Recent Activity', 'vacuum-image-optimizer' ); ?></h2>
 				</div>
-				<div class="vio-card">
+				<div class="vacimg-card">
 					<?php
 					$this->render_report_table(
 						$recent,
@@ -147,11 +147,11 @@ class Reports {
 			</section>
 
 			<?php /* Top savings. */ ?>
-			<section class="vio-dashboard-section">
-				<div class="vio-dashboard-section-header">
+			<section class="vacimg-dashboard-section">
+				<div class="vacimg-dashboard-section-header">
 					<h2><?php esc_html_e( 'Top Savings', 'vacuum-image-optimizer' ); ?></h2>
 				</div>
-				<div class="vio-card">
+				<div class="vacimg-card">
 					<?php
 					$this->render_report_table(
 						$top,
@@ -183,13 +183,13 @@ class Reports {
 		$value   = max( 0, $value );
 		$percent = $total > 0 ? (int) round( ( $value / $total ) * 100 ) : 0;
 		?>
-		<div class="vio-distribution-row">
-			<div class="vio-distribution-row__head">
-				<span class="vio-status-label"><?php echo esc_html( $label ); ?></span>
-				<span class="vio-status-value"><?php echo esc_html( number_format_i18n( $value ) ); ?></span>
+		<div class="vacimg-distribution-row">
+			<div class="vacimg-distribution-row__head">
+				<span class="vacimg-status-label"><?php echo esc_html( $label ); ?></span>
+				<span class="vacimg-status-value"><?php echo esc_html( number_format_i18n( $value ) ); ?></span>
 			</div>
-			<div class="vio-progress" role="progressbar" aria-valuenow="<?php echo esc_attr( (string) $percent ); ?>" aria-valuemin="0" aria-valuemax="100" aria-label="<?php echo esc_attr( $label ); ?>">
-				<div class="vio-progress__bar" style="width:<?php echo esc_attr( (string) $percent ); ?>%"></div>
+			<div class="vacimg-progress" role="progressbar" aria-valuenow="<?php echo esc_attr( (string) $percent ); ?>" aria-valuemin="0" aria-valuemax="100" aria-label="<?php echo esc_attr( $label ); ?>">
+				<div class="vacimg-progress__bar" style="width:<?php echo esc_attr( (string) $percent ); ?>%"></div>
 			</div>
 		</div>
 		<?php
@@ -205,11 +205,11 @@ class Reports {
 	 */
 	private function render_report_table( array $rows, array $headings, string $type ): void {
 		if ( empty( $rows ) ) {
-			printf( '<p class="vio-empty-state">%s</p>', esc_html__( 'No optimized images yet. Run a bulk optimization to get started.', 'vacuum-image-optimizer' ) );
+			printf( '<p class="vacimg-empty-state">%s</p>', esc_html__( 'No optimized images yet. Run a bulk optimization to get started.', 'vacuum-image-optimizer' ) );
 			return;
 		}
 
-		echo '<div class="vio-table-wrap"><table class="wp-list-table widefat striped vio-report-table"><thead><tr>';
+		echo '<div class="vacimg-table-wrap"><table class="wp-list-table widefat striped vacimg-report-table"><thead><tr>';
 		foreach ( $headings as $heading ) {
 			printf( '<th scope="col">%s</th>', esc_html( $heading ) );
 		}

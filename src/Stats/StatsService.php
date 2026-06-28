@@ -21,7 +21,7 @@ class StatsService {
 	 *
 	 * @var string
 	 */
-	private const REPORT_CACHE_KEY = 'vio_report_summary';
+	private const REPORT_CACHE_KEY = 'vacimg_report_summary';
 
 	/**
 	 * Report summary cache lifetime in seconds.
@@ -51,7 +51,7 @@ class StatsService {
 				'attachment',
 				'trash',
 				'image/%',
-				'_vio_generated_by'
+				'_vacimg_generated_by'
 			)
 		);
 
@@ -78,7 +78,7 @@ class StatsService {
 				AND pm.meta_value = %s",
 				'attachment',
 				'trash',
-				'_vio_status',
+				'_vacimg_status',
 				'optimized'
 			)
 		);
@@ -119,9 +119,9 @@ class StatsService {
 				AND savings.meta_key = %s",
 				'attachment',
 				'trash',
-				'_vio_status',
+				'_vacimg_status',
 				'optimized',
-				'_vio_savings_bytes'
+				'_vacimg_savings_bytes'
 			)
 		);
 
@@ -159,12 +159,12 @@ class StatsService {
 				AND percent_meta.meta_key = %s",
 				'attachment',
 				'trash',
-				'_vio_status',
+				'_vacimg_status',
 				'optimized',
-				'_vio_source_size',
-				'_vio_webp_size',
-				'_vio_savings_bytes',
-				'_vio_savings_percent'
+				'_vacimg_source_size',
+				'_vacimg_webp_size',
+				'_vacimg_savings_bytes',
+				'_vacimg_savings_percent'
 			),
 			ARRAY_A
 		);
@@ -202,9 +202,9 @@ class StatsService {
 				LIMIT %d",
 				'attachment',
 				'trash',
-				'_vio_status',
+				'_vacimg_status',
 				'optimized',
-				'_vio_optimized_at',
+				'_vacimg_optimized_at',
 				$limit
 			)
 		);
@@ -252,7 +252,7 @@ class StatsService {
 				AND processed_meta.meta_value BETWEEN %s AND %s",
 				'attachment',
 				'trash',
-				'_vio_auto_processed_at',
+				'_vacimg_auto_processed_at',
 				$start_of_day,
 				$end_of_day
 			)
@@ -267,7 +267,7 @@ class StatsService {
 	 * @return int
 	 */
 	public function get_webp_generated_count(): int {
-		return $this->count_attachments_with_positive_meta( '_vio_webp_size' );
+		return $this->count_attachments_with_positive_meta( '_vacimg_webp_size' );
 	}
 
 	/**
@@ -276,13 +276,13 @@ class StatsService {
 	 * @return int
 	 */
 	public function get_avif_generated_count(): int {
-		return $this->count_attachments_with_positive_meta( '_vio_avif_size' );
+		return $this->count_attachments_with_positive_meta( '_vacimg_avif_size' );
 	}
 
 	/**
 	 * Count Media Library attachments generated for a given format.
 	 *
-	 * Counts attachment records (not physical files) flagged with _vio_generated_by.
+	 * Counts attachment records (not physical files) flagged with _vacimg_generated_by.
 	 *
 	 * @param string $format Derivative format key (webp/avif).
 	 * @return int
@@ -301,7 +301,7 @@ class StatsService {
 				AND pm.meta_value = %s",
 				'attachment',
 				'trash',
-				'_vio_generated_by',
+				'_vacimg_generated_by',
 				sanitize_key( $format )
 			)
 		);
@@ -349,8 +349,8 @@ class StatsService {
 				AND CAST(pm.meta_value AS UNSIGNED) > 0",
 				'attachment',
 				'trash',
-				'_vio_webp_size',
-				'_vio_avif_size'
+				'_vacimg_webp_size',
+				'_vacimg_avif_size'
 			)
 		);
 
@@ -375,7 +375,7 @@ class StatsService {
 				AND savings.meta_key = %s",
 				'attachment',
 				'trash',
-				'_vio_avif_savings_bytes'
+				'_vacimg_avif_savings_bytes'
 			)
 		);
 
@@ -388,7 +388,7 @@ class StatsService {
 	 * @return string
 	 */
 	public function get_last_auto_processed_at(): string {
-		$value = get_option( 'vio_last_auto_processed_at', '' );
+		$value = get_option( 'vacimg_last_auto_processed_at', '' );
 
 		return is_string( $value ) ? sanitize_text_field( $value ) : '';
 	}
@@ -411,7 +411,7 @@ class StatsService {
 				AND pm.meta_key = %s",
 				'attachment',
 				'trash',
-				'_vio_avif_size'
+				'_vacimg_avif_size'
 			)
 		);
 
@@ -438,7 +438,7 @@ class StatsService {
 				LIMIT 1",
 				'attachment',
 				'trash',
-				'_vio_optimized_at'
+				'_vacimg_optimized_at'
 			)
 		);
 
@@ -464,7 +464,7 @@ class StatsService {
 				GROUP BY pm.meta_value",
 				'attachment',
 				'trash',
-				'_vio_auto_processed'
+				'_vacimg_auto_processed'
 			),
 			ARRAY_A
 		);
@@ -499,48 +499,84 @@ class StatsService {
 	public function get_optimization_rows( string $order_by = 'recent', int $limit = 20 ): array {
 		global $wpdb;
 
-		$order = 'savings' === $order_by
-			? 'CAST(sav.meta_value AS UNSIGNED) DESC'
-			: 'opt.meta_value DESC';
-
-		$sql = "SELECT p.ID, p.post_title,
-				src.meta_value AS source_size,
-				webp.meta_value AS webp_size,
-				avif.meta_value AS avif_size,
-				sav.meta_value AS savings_bytes,
-				pct.meta_value AS savings_percent,
-				opt.meta_value AS optimized_at
-			FROM {$wpdb->posts} p
-			INNER JOIN {$wpdb->postmeta} st ON p.ID = st.post_id AND st.meta_key = %s AND st.meta_value = %s
-			LEFT JOIN {$wpdb->postmeta} src ON p.ID = src.post_id AND src.meta_key = %s
-			LEFT JOIN {$wpdb->postmeta} webp ON p.ID = webp.post_id AND webp.meta_key = %s
-			LEFT JOIN {$wpdb->postmeta} avif ON p.ID = avif.post_id AND avif.meta_key = %s
-			LEFT JOIN {$wpdb->postmeta} sav ON p.ID = sav.post_id AND sav.meta_key = %s
-			LEFT JOIN {$wpdb->postmeta} pct ON p.ID = pct.post_id AND pct.meta_key = %s
-			LEFT JOIN {$wpdb->postmeta} opt ON p.ID = opt.post_id AND opt.meta_key = %s
-			WHERE p.post_type = %s AND p.post_status != %s
-			ORDER BY {$order}";
-
-		$params = [
-			'_vio_status',
-			'optimized',
-			'_vio_source_size',
-			'_vio_webp_size',
-			'_vio_avif_size',
-			'_vio_savings_bytes',
-			'_vio_savings_percent',
-			'_vio_optimized_at',
-			'attachment',
-			'trash',
-		];
+		$sort  = 'savings' === $order_by ? 'savings' : 'recent';
+		$limit = min( 1000, absint( $limit ) );
 
 		if ( $limit > 0 ) {
-			$sql     .= ' LIMIT %d';
-			$params[] = min( 1000, absint( $limit ) );
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT p.ID, p.post_title,
+						src.meta_value AS source_size,
+						webp.meta_value AS webp_size,
+						avif.meta_value AS avif_size,
+						sav.meta_value AS savings_bytes,
+						pct.meta_value AS savings_percent,
+						opt.meta_value AS optimized_at
+					FROM {$wpdb->posts} p
+					INNER JOIN {$wpdb->postmeta} st ON p.ID = st.post_id AND st.meta_key = %s AND st.meta_value = %s
+					LEFT JOIN {$wpdb->postmeta} src ON p.ID = src.post_id AND src.meta_key = %s
+					LEFT JOIN {$wpdb->postmeta} webp ON p.ID = webp.post_id AND webp.meta_key = %s
+					LEFT JOIN {$wpdb->postmeta} avif ON p.ID = avif.post_id AND avif.meta_key = %s
+					LEFT JOIN {$wpdb->postmeta} sav ON p.ID = sav.post_id AND sav.meta_key = %s
+					LEFT JOIN {$wpdb->postmeta} pct ON p.ID = pct.post_id AND pct.meta_key = %s
+					LEFT JOIN {$wpdb->postmeta} opt ON p.ID = opt.post_id AND opt.meta_key = %s
+					WHERE p.post_type = %s AND p.post_status != %s
+					ORDER BY
+						CASE WHEN %s = 'savings' THEN CAST(sav.meta_value AS UNSIGNED) END DESC,
+						CASE WHEN %s = 'recent' THEN opt.meta_value END DESC
+					LIMIT %d",
+					'_vacimg_status',
+					'optimized',
+					'_vacimg_source_size',
+					'_vacimg_webp_size',
+					'_vacimg_avif_size',
+					'_vacimg_savings_bytes',
+					'_vacimg_savings_percent',
+					'_vacimg_optimized_at',
+					'attachment',
+					'trash',
+					$sort,
+					$sort,
+					$limit
+				)
+			);
+		} else {
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT p.ID, p.post_title,
+						src.meta_value AS source_size,
+						webp.meta_value AS webp_size,
+						avif.meta_value AS avif_size,
+						sav.meta_value AS savings_bytes,
+						pct.meta_value AS savings_percent,
+						opt.meta_value AS optimized_at
+					FROM {$wpdb->posts} p
+					INNER JOIN {$wpdb->postmeta} st ON p.ID = st.post_id AND st.meta_key = %s AND st.meta_value = %s
+					LEFT JOIN {$wpdb->postmeta} src ON p.ID = src.post_id AND src.meta_key = %s
+					LEFT JOIN {$wpdb->postmeta} webp ON p.ID = webp.post_id AND webp.meta_key = %s
+					LEFT JOIN {$wpdb->postmeta} avif ON p.ID = avif.post_id AND avif.meta_key = %s
+					LEFT JOIN {$wpdb->postmeta} sav ON p.ID = sav.post_id AND sav.meta_key = %s
+					LEFT JOIN {$wpdb->postmeta} pct ON p.ID = pct.post_id AND pct.meta_key = %s
+					LEFT JOIN {$wpdb->postmeta} opt ON p.ID = opt.post_id AND opt.meta_key = %s
+					WHERE p.post_type = %s AND p.post_status != %s
+					ORDER BY
+						CASE WHEN %s = 'savings' THEN CAST(sav.meta_value AS UNSIGNED) END DESC,
+						CASE WHEN %s = 'recent' THEN opt.meta_value END DESC",
+					'_vacimg_status',
+					'optimized',
+					'_vacimg_source_size',
+					'_vacimg_webp_size',
+					'_vacimg_avif_size',
+					'_vacimg_savings_bytes',
+					'_vacimg_savings_percent',
+					'_vacimg_optimized_at',
+					'attachment',
+					'trash',
+					$sort,
+					$sort
+				)
+			);
 		}
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ) );
 
 		return is_array( $rows ) ? $rows : [];
 	}
@@ -562,11 +598,11 @@ class StatsService {
 		$offset = max( 0, $offset );
 		$limit  = max( 1, min( 1000, absint( $limit ) ) );
 
-		$order = 'savings' === $order_by
-			? 'CAST(sav.meta_value AS UNSIGNED) DESC'
-			: 'opt.meta_value DESC';
+		$sort = 'savings' === $order_by ? 'savings' : 'recent';
 
-		$sql = "SELECT p.ID, p.post_title,
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT p.ID, p.post_title,
 				src.meta_value AS source_size,
 				webp.meta_value AS webp_size,
 				avif.meta_value AS avif_size,
@@ -580,25 +616,25 @@ class StatsService {
 			LEFT JOIN {$wpdb->postmeta} avif ON p.ID = avif.post_id AND avif.meta_key = %s
 			LEFT JOIN {$wpdb->postmeta} sav ON p.ID = sav.post_id AND sav.meta_key = %s
 			LEFT JOIN {$wpdb->postmeta} pct ON p.ID = pct.post_id AND pct.meta_key = %s
-			LEFT JOIN {$wpdb->postmeta} opt ON p.ID = opt.post_id AND opt.meta_key = %s
-			WHERE p.post_type = %s AND p.post_status != %s
-			ORDER BY {$order}, p.ID ASC
-			LIMIT %d OFFSET %d";
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				$sql,
-				'_vio_status',
+				LEFT JOIN {$wpdb->postmeta} opt ON p.ID = opt.post_id AND opt.meta_key = %s
+					WHERE p.post_type = %s AND p.post_status != %s
+					ORDER BY
+						CASE WHEN %s = 'savings' THEN CAST(sav.meta_value AS UNSIGNED) END DESC,
+						CASE WHEN %s = 'recent' THEN opt.meta_value END DESC,
+						p.ID ASC
+					LIMIT %d OFFSET %d",
+				'_vacimg_status',
 				'optimized',
-				'_vio_source_size',
-				'_vio_webp_size',
-				'_vio_avif_size',
-				'_vio_savings_bytes',
-				'_vio_savings_percent',
-				'_vio_optimized_at',
+				'_vacimg_source_size',
+				'_vacimg_webp_size',
+				'_vacimg_avif_size',
+				'_vacimg_savings_bytes',
+				'_vacimg_savings_percent',
+				'_vacimg_optimized_at',
 				'attachment',
 				'trash',
+				$sort,
+				$sort,
 				$limit,
 				$offset
 			)

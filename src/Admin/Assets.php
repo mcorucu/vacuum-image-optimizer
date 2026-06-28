@@ -82,13 +82,13 @@ class Assets {
 	 */
 	private function enqueue_styles(): void {
 		wp_register_style(
-			'vio-admin',
-			VIO_PLUGIN_URL . 'assets/admin/css/admin.css',
+			'vacimg-admin',
+			VACIMG_PLUGIN_URL . 'assets/admin/css/admin.css',
 			[],
-			VIO_VERSION
+			VACIMG_VERSION
 		);
 
-		wp_enqueue_style( 'vio-admin' );
+		wp_enqueue_style( 'vacimg-admin' );
 	}
 
 	/**
@@ -98,19 +98,19 @@ class Assets {
 	 */
 	private function enqueue_scripts(): void {
 		wp_register_script(
-			'vio-admin',
-			VIO_PLUGIN_URL . 'assets/admin/js/admin.js',
+			'vacimg-admin',
+			VACIMG_PLUGIN_URL . 'assets/admin/js/admin.js',
 			[],
-			VIO_VERSION,
+			VACIMG_VERSION,
 			true
 		);
 
 		wp_localize_script(
-			'vio-admin',
-			'vioQueue',
+			'vacimg-admin',
+			'vacimgQueue',
 			[
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( 'vio_queue_ajax' ),
+				'nonce'   => wp_create_nonce( 'vacimg_queue_ajax' ),
 				'i18n'    => [
 					'scanning'   => __( 'Scanning library…', 'vacuum-image-optimizer' ),
 					'processing' => __( 'Processing queue…', 'vacuum-image-optimizer' ),
@@ -119,6 +119,6 @@ class Assets {
 			]
 		);
 
-		wp_enqueue_script( 'vio-admin' );
+		wp_enqueue_script( 'vacimg-admin' );
 	}
 }

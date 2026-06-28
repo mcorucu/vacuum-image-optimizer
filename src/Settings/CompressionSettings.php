@@ -19,14 +19,14 @@ class CompressionSettings {
 	 *
 	 * @var string
 	 */
-	public const OPTION_NAME = 'vio_settings';
+	public const OPTION_NAME = 'vacimg_settings';
 
 	/**
 	 * Settings API group name for the Compression tab.
 	 *
 	 * @var string
 	 */
-	public const OPTION_GROUP = 'vio_compression_settings';
+	public const OPTION_GROUP = 'vacimg_compression_settings';
 
 	/**
 	 * Default compression profile.
@@ -299,7 +299,7 @@ class CompressionSettings {
 	/**
 	 * Get the configured backup retention period in days (0 = keep indefinitely).
 	 *
-	 * Filterable via "vio_backup_retention_days" for advanced/headless setups.
+	 * Filterable via "vacimg_backup_retention_days" for advanced/headless setups.
 	 *
 	 * @return int
 	 */
@@ -312,7 +312,7 @@ class CompressionSettings {
 		 *
 		 * @param int $days Retention period in days. 0 disables automatic cleanup.
 		 */
-		$days = (int) apply_filters( 'vio_backup_retention_days', $days );
+		$days = (int) apply_filters( 'vacimg_backup_retention_days', $days );
 
 		return self::clamp_retention_days( max( 0, $days ) );
 	}

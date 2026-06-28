@@ -12,12 +12,12 @@ use VacuumImageOptimizer\Settings\CompressionSettings;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Handles the daily vio_cleanup_backups cron event.
+ * Handles the daily vacimg_cleanup_backups cron event.
  *
  * Deletes only expired original backups (files that live inside the plugin's
  * backup directory and whose age exceeds the configured retention period).
  * Originals and attachment records are never touched. When retention is
- * disabled (0 days) the service is a safe no-op so existing behaviour — keeping
+ * disabled (0 days) the service is a safe no-op so existing behavior — keeping
  * every backup forever — is preserved by default.
  */
 class BackupCleanup {
@@ -27,14 +27,14 @@ class BackupCleanup {
 	 *
 	 * @var string
 	 */
-	public const CRON_HOOK = 'vio_cleanup_backups';
+	public const CRON_HOOK = 'vacimg_cleanup_backups';
 
 	/**
 	 * Option storing the result of the most recent cleanup run.
 	 *
 	 * @var string
 	 */
-	public const LAST_RUN_OPTION = 'vio_last_backup_cleanup';
+	public const LAST_RUN_OPTION = 'vacimg_last_backup_cleanup';
 
 	/**
 	 * Backup path validator.
@@ -159,7 +159,7 @@ class BackupCleanup {
 				AND p.post_type = %s
 				ORDER BY pm.post_id ASC
 				LIMIT %d",
-				'_vio_backup_path',
+				'_vacimg_backup_path',
 				'attachment',
 				$limit
 			)
@@ -184,7 +184,7 @@ class BackupCleanup {
 			return (int) $mtime;
 		}
 
-		$optimized_at = (string) get_post_meta( $attachment_id, '_vio_optimized_at', true );
+		$optimized_at = (string) get_post_meta( $attachment_id, '_vacimg_optimized_at', true );
 		if ( '' !== $optimized_at ) {
 			$timestamp = strtotime( $optimized_at );
 			if ( false !== $timestamp ) {
@@ -202,7 +202,7 @@ class BackupCleanup {
 	 * @return void
 	 */
 	private function forget_backup( int $attachment_id ): void {
-		delete_post_meta( $attachment_id, '_vio_backup_path' );
+		delete_post_meta( $attachment_id, '_vacimg_backup_path' );
 	}
 
 	/**
@@ -244,7 +244,7 @@ class BackupCleanup {
 	 * @return int
 	 */
 	private function get_batch_size(): int {
-		$batch = defined( 'VIO_BACKUP_CLEANUP_BATCH' ) ? (int) VIO_BACKUP_CLEANUP_BATCH : 500;
+		$batch = defined( 'VACIMG_BACKUP_CLEANUP_BATCH' ) ? (int) VACIMG_BACKUP_CLEANUP_BATCH : 500;
 
 		return max( 1, min( 5000, $batch ) );
 	}

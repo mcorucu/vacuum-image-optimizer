@@ -103,16 +103,16 @@ class Router {
 	 */
 	private function render_header( string $active_tab ): void {
 		?>
-		<div class="wrap vio-admin">
-			<header class="vio-page-header">
-				<img class="vio-page-header__logo" src="<?php echo esc_url( VIO_PLUGIN_URL . 'assets/branding/admin-icon.svg' ); ?>" width="36" height="36" alt="" aria-hidden="true">
-				<div class="vio-page-header__text">
-					<h1 class="vio-page-title"><?php echo esc_html( get_admin_page_title() ); ?></h1>
-					<p class="vio-page-description"><?php esc_html_e( 'Modern image optimization for WordPress — WebP &amp; AVIF generation, bulk tools, and clean delivery.', 'vacuum-image-optimizer' ); ?></p>
+		<div class="wrap vacimg-admin">
+			<header class="vacimg-page-header">
+				<img class="vacimg-page-header__logo" src="<?php echo esc_url( VACIMG_PLUGIN_URL . 'assets/branding/admin-icon.svg' ); ?>" width="36" height="36" alt="" aria-hidden="true">
+				<div class="vacimg-page-header__text">
+					<h1 class="vacimg-page-title"><?php echo esc_html( get_admin_page_title() ); ?></h1>
+					<p class="vacimg-page-description"><?php esc_html_e( 'Modern image optimization for WordPress — WebP &amp; AVIF generation, bulk tools, and clean delivery.', 'vacuum-image-optimizer' ); ?></p>
 				</div>
 			</header>
 			<?php $this->render_tab_nav( $active_tab ); ?>
-			<div class="vio-tab-content">
+			<div class="vacimg-tab-content">
 		<?php
 	}
 
@@ -124,11 +124,11 @@ class Router {
 	 */
 	private function render_tab_nav( string $active_tab ): void {
 		?>
-		<nav class="vio-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Vacuum Optimizer Sections', 'vacuum-image-optimizer' ); ?>">
+		<nav class="vacimg-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Vacuum Optimizer Sections', 'vacuum-image-optimizer' ); ?>">
 			<?php foreach ( $this->tabs as $slug => $label ) : ?>
 				<a
 					href="<?php echo esc_url( self::get_tab_url( $slug ) ); ?>"
-					class="vio-tab<?php echo ( $slug === $active_tab ) ? ' is-active' : ''; ?>"
+					class="vacimg-tab<?php echo ( $slug === $active_tab ) ? ' is-active' : ''; ?>"
 					role="tab"
 					aria-selected="<?php echo ( $slug === $active_tab ) ? 'true' : 'false'; ?>"
 				>
@@ -169,7 +169,7 @@ class Router {
 	 */
 	private function render_placeholder( string $tab ): void {
 		?>
-		<div class="vio-card">
+		<div class="vacimg-card">
 			<h2><?php echo esc_html( self::get_tab_label( $tab ) ); ?></h2>
 			<p><?php esc_html_e( 'This feature is coming soon.', 'vacuum-image-optimizer' ); ?></p>
 		</div>

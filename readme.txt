@@ -1,22 +1,24 @@
 === Vacuum Image Optimizer ===
 Contributors: mcorucu
 Author URI: https://mcorucu.com
-Plugin URI: https://mcorucu.com/vacuum-image-optimizer/
+Plugin URI: https://mcorucu.com/en/projects/vacuum-image-optimizer
 Tags: image optimization, webp, avif, compression, lazy load
 Requires at least: 6.2
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 8.1
 Stable tag: 0.9.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Generate WebP and AVIF, bulk-optimize your media library, automate uploads, and serve modern image formats — without altering your originals.
+Local WebP and AVIF image optimization with bulk processing, backups, restore tools, reports, and no external API.
 
 == Description ==
 
-Vacuum Image Optimizer is a modern, lightweight image optimization toolkit for WordPress. It shrinks your image footprint and speeds up your site by generating next-generation WebP and AVIF formats, while always keeping your original files safe and untouched.
+Vacuum Image Optimizer is a modern, lightweight image optimization toolkit for WordPress. It shrinks your image footprint by generating next-generation WebP and optional AVIF files locally, while always keeping your original files safe and untouched.
 
 Everything happens inside a clean, friendly admin interface — no command line, no external services, and no account required.
+
+Unlike optimizers that rewrite originals or depend on a remote API, Vacuum writes generated formats alongside the source image, can keep restorable backups, and serves WebP/AVIF on the frontend without changing stored media URLs.
 
 **What it does**
 
@@ -28,6 +30,7 @@ Everything happens inside a clean, friendly admin interface — no command line,
 * **Frontend delivery** — Serve generated WebP/AVIF on the frontend with automatic, safe fallback to the original image — your media URLs in the database are never changed.
 * **Reports** — See storage savings, recent activity, top savings, format distribution, and automation stats, with one-click CSV export.
 * **Localization** — Fully translatable, shipping with 9 bundled languages plus an in-plugin interface-language selector.
+* **Local processing** — No external API dependency; optimization runs on your WordPress server.
 
 **Safe by design**
 
@@ -44,6 +47,7 @@ Vacuum never modifies or deletes your original images. Optimized formats are wri
 * Per-image WebP/AVIF actions in the Media Library
 * Generated derivatives registered as Media Library items
 * Original backups and one-click restore
+* Local processing with no external API dependency
 * Compression profiles and adjustable quality
 * GIF and SVG eligibility exclusions
 * Reports dashboard with CSV export

@@ -100,7 +100,7 @@ class DerivativeLibrary {
 	 * @return string
 	 */
 	private function get_link_meta_key( string $format ): string {
-		return '_vio_' . $format . '_attachment_id';
+		return '_vacimg_' . $format . '_attachment_id';
 	}
 
 	/**
@@ -155,8 +155,8 @@ class DerivativeLibrary {
 	 * @return void
 	 */
 	private function mark_derivative( int $attachment_id, int $source_id, string $format ): void {
-		update_post_meta( $attachment_id, '_vio_source_attachment_id', absint( $source_id ) );
-		update_post_meta( $attachment_id, '_vio_generated_by', sanitize_key( $format ) );
+		update_post_meta( $attachment_id, '_vacimg_source_attachment_id', absint( $source_id ) );
+		update_post_meta( $attachment_id, '_vacimg_generated_by', sanitize_key( $format ) );
 	}
 
 	/**

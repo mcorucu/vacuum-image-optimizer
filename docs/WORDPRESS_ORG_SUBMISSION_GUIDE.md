@@ -1,10 +1,19 @@
 # WordPress.org Submission Guide — Vacuum Image Optimizer
 
-**Phase:** 8.7 — WordPress.org Asset Generation & Submission Readiness
-**Date:** 2026-06-19
+**Phase:** Post-publication record
+**Date:** 2026-06-28
 **Plugin version (frozen):** 0.9.0
-**Scope:** Listing assets, branding, screenshots, and submission readiness only.
+**WordPress.org plugin page:** https://wordpress.org/plugins/vacuum-image-optimizer/
+**WordPress.org SVN:** https://plugins.svn.wordpress.org/vacuum-image-optimizer
+**Latest SVN revision:** 3588409
+**Scope:** Listing assets, branding, screenshots, submission readiness, and publication record.
 No plugin features, architecture, or PHP changes.
+
+## Publication Record
+
+Vacuum Image Optimizer 0.9.0 was published to the official WordPress.org Plugin Directory via SVN revision 3588409. The plugin page is available at:
+
+https://wordpress.org/plugins/vacuum-image-optimizer/
 
 > **Important:** WordPress.org listing assets (icon, banner, screenshots) live in
 > the SVN repository's top-level **`/assets/`** directory — they are **not** part

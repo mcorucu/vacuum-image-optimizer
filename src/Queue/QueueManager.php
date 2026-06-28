@@ -35,7 +35,7 @@ class QueueManager {
 	 *
 	 * @var string
 	 */
-	private const OPTION_QUEUE_STATE = 'vio_queue_state';
+	private const OPTION_QUEUE_STATE = 'vacimg_queue_state';
 
 	/**
 	 * Fallback maximum retry attempts when no constant is defined.
@@ -50,7 +50,7 @@ class QueueManager {
 	 * @return int
 	 */
 	public function get_max_attempts(): int {
-		$max = defined( 'VIO_MAX_RETRIES' ) ? (int) VIO_MAX_RETRIES : self::DEFAULT_MAX_ATTEMPTS;
+		$max = defined( 'VACIMG_MAX_RETRIES' ) ? (int) VACIMG_MAX_RETRIES : self::DEFAULT_MAX_ATTEMPTS;
 
 		return max( 1, $max );
 	}
@@ -63,7 +63,16 @@ class QueueManager {
 	public function get_table_name(): string {
 		global $wpdb;
 
-		return $wpdb->prefix . 'vio_queue';
+		return $wpdb->prefix . 'vacimg_queue';
+	}
+
+	/**
+	 * Get the queue table name escaped for direct SQL interpolation.
+	 *
+	 * @return string
+	 */
+	private function get_escaped_table_name(): string {
+		return esc_sql( $this->get_table_name() );
 	}
 
 	/**
@@ -81,7 +90,7 @@ class QueueManager {
 		}
 
 		$inserted = $wpdb->insert(
-			$this->get_table_name(),
+			$this->get_escaped_table_name(),
 			[
 				'attachment_id'  => $attachment_id,
 				'status'         => 'pending',
@@ -107,7 +116,7 @@ class QueueManager {
 		global $wpdb;
 
 		$deleted = $wpdb->delete(
-			$this->get_table_name(),
+			$this->get_escaped_table_name(),
 			[ 'attachment_id' => absint( $attachment_id ) ],
 			[ '%d' ]
 		);
@@ -155,9 +164,10 @@ class QueueManager {
 		global $wpdb;
 
 		$limit = max( 1, min( 20, absint( $limit ) ) );
+		$table = $this->get_escaped_table_name();
 		$jobs  = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$this->get_table_name()} ORDER BY COALESCE(completed_at, started_at, created_at) DESC, id DESC LIMIT %d",
+				"SELECT * FROM {$table} ORDER BY COALESCE(completed_at, started_at, created_at) DESC, id DESC LIMIT %d",
 				$limit
 			)
 		);
@@ -182,8 +192,9 @@ class QueueManager {
 			'state'      => $this->get_queue_state(),
 		];
 
-		$rows = $wpdb->get_results(
-			"SELECT status, COUNT(*) AS count FROM {$this->get_table_name()} GROUP BY status",
+		$table = $this->get_escaped_table_name();
+		$rows  = $wpdb->get_results(
+			"SELECT status, COUNT(*) AS count FROM {$table} GROUP BY status",
 			ARRAY_A
 		);
 
@@ -217,7 +228,7 @@ class QueueManager {
 				AND p.post_status != %s
 				AND p.post_mime_type IN ( 'image/jpeg', 'image/png' )
 				AND ( status_meta.meta_value IS NULL OR status_meta.meta_value != %s )",
-				'_vio_status',
+				'_vacimg_status',
 				'attachment',
 				'trash',
 				'optimized'
@@ -253,9 +264,10 @@ class QueueManager {
 
 		// Conditional reset: only failed jobs that have not exhausted their retry
 		// budget become pending again. Jobs at the limit stay failed.
+		$table    = $this->get_escaped_table_name();
 		$affected = $wpdb->query(
 			$wpdb->prepare(
-				"UPDATE {$this->get_table_name()}
+				"UPDATE {$table}
 				SET status = %s, started_at = NULL, completed_at = NULL, error_message = NULL
 				WHERE id = %d AND status = %s AND attempts < %d",
 				'pending',
@@ -277,9 +289,10 @@ class QueueManager {
 	public function is_retry_exhausted( int $queue_id ): bool {
 		global $wpdb;
 
+		$table    = $this->get_escaped_table_name();
 		$attempts = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT attempts FROM {$this->get_table_name()} WHERE id = %d",
+				"SELECT attempts FROM {$table} WHERE id = %d",
 				absint( $queue_id )
 			)
 		);
@@ -305,9 +318,10 @@ class QueueManager {
 	public function claim_job( int $queue_id ): bool {
 		global $wpdb;
 
+		$table    = $this->get_escaped_table_name();
 		$affected = $wpdb->query(
 			$wpdb->prepare(
-				"UPDATE {$this->get_table_name()}
+				"UPDATE {$table}
 				SET status = %s, started_at = %s, completed_at = NULL
 				WHERE id = %d AND status = %s",
 				'processing',
@@ -330,7 +344,7 @@ class QueueManager {
 		global $wpdb;
 
 		$updated = $wpdb->update(
-			$this->get_table_name(),
+			$this->get_escaped_table_name(),
 			[
 				'status'       => 'processing',
 				'started_at'   => current_time( 'mysql' ),
@@ -354,7 +368,7 @@ class QueueManager {
 		global $wpdb;
 
 		$updated = $wpdb->update(
-			$this->get_table_name(),
+			$this->get_escaped_table_name(),
 			[
 				'status'        => 'completed',
 				'completed_at'  => current_time( 'mysql' ),
@@ -378,9 +392,10 @@ class QueueManager {
 	public function mark_failed( int $queue_id, string $message ): bool {
 		global $wpdb;
 
+		$table   = $this->get_escaped_table_name();
 		$updated = $wpdb->query(
 			$wpdb->prepare(
-				"UPDATE {$this->get_table_name()}
+				"UPDATE {$table}
 				SET status = %s, completed_at = %s, attempts = attempts + 1, error_message = %s
 				WHERE id = %d",
 				'failed',
@@ -402,7 +417,7 @@ class QueueManager {
 		global $wpdb;
 
 		$wpdb->update(
-			$this->get_table_name(),
+			$this->get_escaped_table_name(),
 			[
 				'status'     => 'pending',
 				'started_at' => null,
@@ -461,7 +476,7 @@ class QueueManager {
 			return false;
 		}
 
-		return 'optimized' !== (string) get_post_meta( $attachment_id, '_vio_status', true );
+		return 'optimized' !== (string) get_post_meta( $attachment_id, '_vacimg_status', true );
 	}
 
 	/**
@@ -473,9 +488,10 @@ class QueueManager {
 	private function has_queue_entry( int $attachment_id ): bool {
 		global $wpdb;
 
+		$table = $this->get_escaped_table_name();
 		$count = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$this->get_table_name()} WHERE attachment_id = %d AND status IN ( 'pending', 'processing', 'completed', 'failed' )",
+				"SELECT COUNT(*) FROM {$table} WHERE attachment_id = %d AND status IN ( 'pending', 'processing', 'completed', 'failed' )",
 				absint( $attachment_id )
 			)
 		);
@@ -500,9 +516,10 @@ class QueueManager {
 
 		$limit = max( 1, min( 100, absint( $limit ) ) );
 
+		$table = $this->get_escaped_table_name();
 		$jobs = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$this->get_table_name()} WHERE status = %s ORDER BY created_at ASC, id ASC LIMIT %d",
+				"SELECT * FROM {$table} WHERE status = %s ORDER BY created_at ASC, id ASC LIMIT %d",
 				$status,
 				$limit
 			)

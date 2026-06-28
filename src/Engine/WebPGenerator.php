@@ -60,7 +60,7 @@ class WebPGenerator {
 	 * @return bool
 	 */
 	public function delete_existing_webp( int $attachment_id ): bool {
-		$webp_path = get_post_meta( $attachment_id, '_vio_webp_path', true );
+		$webp_path = get_post_meta( $attachment_id, '_vacimg_webp_path', true );
 		$webp_path = is_string( $webp_path ) ? wp_normalize_path( $webp_path ) : '';
 
 		if ( '' === $webp_path ) {
@@ -136,7 +136,7 @@ class WebPGenerator {
 				return $this->fail( $result, __( 'The original image backup could not be created.', 'vacuum-image-optimizer' ) );
 			}
 
-			update_post_meta( $attachment_id, '_vio_backup_path', $backup_path );
+			update_post_meta( $attachment_id, '_vacimg_backup_path', $backup_path );
 		}
 
 		if ( file_exists( $webp_path ) && is_readable( $webp_path ) ) {
@@ -238,8 +238,8 @@ class WebPGenerator {
 
 		$attachment_id = absint( $result['attachment_id'] );
 		if ( $attachment_id > 0 ) {
-			update_post_meta( $attachment_id, '_vio_status', sanitize_key( $status ) );
-			update_post_meta( $attachment_id, '_vio_error_message', sanitize_text_field( $message ) );
+			update_post_meta( $attachment_id, '_vacimg_status', sanitize_key( $status ) );
+			update_post_meta( $attachment_id, '_vacimg_error_message', sanitize_text_field( $message ) );
 		}
 
 		return $result;
@@ -283,16 +283,16 @@ class WebPGenerator {
 
 		$webp_url = $this->path_to_upload_url( (string) $result['webp_path'] );
 
-		update_post_meta( $attachment_id, '_vio_webp_path', (string) $result['webp_path'] );
-		update_post_meta( $attachment_id, '_vio_webp_url', $webp_url );
-		update_post_meta( $attachment_id, '_vio_source_size', absint( $result['source_size'] ) );
-		update_post_meta( $attachment_id, '_vio_webp_size', absint( $result['webp_size'] ) );
-		update_post_meta( $attachment_id, '_vio_savings_bytes', absint( $result['savings_bytes'] ) );
-		update_post_meta( $attachment_id, '_vio_savings_percent', (float) $result['savings_percent'] );
-		update_post_meta( $attachment_id, '_vio_engine_used', sanitize_key( (string) $result['engine_used'] ) );
-		update_post_meta( $attachment_id, '_vio_optimized_at', current_time( 'mysql' ) );
-		update_post_meta( $attachment_id, '_vio_status', 'optimized' );
-		delete_post_meta( $attachment_id, '_vio_error_message' );
+		update_post_meta( $attachment_id, '_vacimg_webp_path', (string) $result['webp_path'] );
+		update_post_meta( $attachment_id, '_vacimg_webp_url', $webp_url );
+		update_post_meta( $attachment_id, '_vacimg_source_size', absint( $result['source_size'] ) );
+		update_post_meta( $attachment_id, '_vacimg_webp_size', absint( $result['webp_size'] ) );
+		update_post_meta( $attachment_id, '_vacimg_savings_bytes', absint( $result['savings_bytes'] ) );
+		update_post_meta( $attachment_id, '_vacimg_savings_percent', (float) $result['savings_percent'] );
+		update_post_meta( $attachment_id, '_vacimg_engine_used', sanitize_key( (string) $result['engine_used'] ) );
+		update_post_meta( $attachment_id, '_vacimg_optimized_at', current_time( 'mysql' ) );
+		update_post_meta( $attachment_id, '_vacimg_status', 'optimized' );
+		delete_post_meta( $attachment_id, '_vacimg_error_message' );
 
 		// Register (or reuse) a Media Library item for the generated WebP file.
 		( new DerivativeLibrary() )->ensure_attachment( $attachment_id, (string) $result['webp_path'], 'webp' );
@@ -323,7 +323,7 @@ class WebPGenerator {
 	 * @return string
 	 */
 	private function ensure_backup_copy( int $attachment_id, string $source_path ): string {
-		$existing_backup = get_post_meta( $attachment_id, '_vio_backup_path', true );
+		$existing_backup = get_post_meta( $attachment_id, '_vacimg_backup_path', true );
 		if ( is_string( $existing_backup ) && '' !== $existing_backup && file_exists( $existing_backup ) && is_readable( $existing_backup ) ) {
 			return wp_normalize_path( $existing_backup );
 		}
@@ -348,7 +348,7 @@ class WebPGenerator {
 	}
 
 	/**
-	 * Build a backup path under uploads/vio-backups while preserving upload relative path when possible.
+	 * Build a backup path under uploads/vacimg-backups while preserving upload relative path when possible.
 	 *
 	 * @param int    $attachment_id Attachment ID.
 	 * @param string $source_path Source image path.

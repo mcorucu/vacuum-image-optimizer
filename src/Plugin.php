@@ -157,19 +157,13 @@ class Plugin {
 	}
 
 	/**
-	 * Load translations.
+	 * Register the plugin locale override.
 	 *
 	 * @return void
 	 */
 	private function load_textdomain(): void {
-		// Apply the plugin's interface-language override before the catalog loads.
+		// WordPress loads plugin translations on demand; this keeps the interface-language override available before that happens.
 		add_filter( 'plugin_locale', [ $this, 'filter_plugin_locale' ], 10, 2 );
-
-		load_plugin_textdomain(
-			'vacuum-image-optimizer',
-			false,
-			dirname( VIO_PLUGIN_BASENAME ) . '/languages'
-		);
 	}
 
 	/**

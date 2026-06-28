@@ -63,7 +63,7 @@ class AVIFGenerator {
 	 * @return bool
 	 */
 	public function delete_existing_avif( int $attachment_id ): bool {
-		$avif_path = get_post_meta( $attachment_id, '_vio_avif_path', true );
+		$avif_path = get_post_meta( $attachment_id, '_vacimg_avif_path', true );
 		$avif_path = is_string( $avif_path ) ? wp_normalize_path( $avif_path ) : '';
 
 		if ( '' === $avif_path ) {
@@ -235,7 +235,7 @@ class AVIFGenerator {
 
 		$attachment_id = absint( $result['attachment_id'] );
 		if ( $attachment_id > 0 ) {
-			update_post_meta( $attachment_id, '_vio_avif_error_message', sanitize_text_field( $message ) );
+			update_post_meta( $attachment_id, '_vacimg_avif_error_message', sanitize_text_field( $message ) );
 		}
 
 		return $result;
@@ -279,14 +279,14 @@ class AVIFGenerator {
 
 		$avif_url = $this->path_to_upload_url( (string) $result['avif_path'] );
 
-		update_post_meta( $attachment_id, '_vio_avif_path', (string) $result['avif_path'] );
-		update_post_meta( $attachment_id, '_vio_avif_url', $avif_url );
-		update_post_meta( $attachment_id, '_vio_avif_size', absint( $result['avif_size'] ) );
-		update_post_meta( $attachment_id, '_vio_avif_savings_bytes', absint( $result['savings_bytes'] ) );
-		update_post_meta( $attachment_id, '_vio_avif_savings_percent', (float) $result['savings_percent'] );
-		update_post_meta( $attachment_id, '_vio_avif_engine_used', sanitize_key( (string) $result['engine_used'] ) );
-		update_post_meta( $attachment_id, '_vio_avif_generated_at', current_time( 'mysql' ) );
-		delete_post_meta( $attachment_id, '_vio_avif_error_message' );
+		update_post_meta( $attachment_id, '_vacimg_avif_path', (string) $result['avif_path'] );
+		update_post_meta( $attachment_id, '_vacimg_avif_url', $avif_url );
+		update_post_meta( $attachment_id, '_vacimg_avif_size', absint( $result['avif_size'] ) );
+		update_post_meta( $attachment_id, '_vacimg_avif_savings_bytes', absint( $result['savings_bytes'] ) );
+		update_post_meta( $attachment_id, '_vacimg_avif_savings_percent', (float) $result['savings_percent'] );
+		update_post_meta( $attachment_id, '_vacimg_avif_engine_used', sanitize_key( (string) $result['engine_used'] ) );
+		update_post_meta( $attachment_id, '_vacimg_avif_generated_at', current_time( 'mysql' ) );
+		delete_post_meta( $attachment_id, '_vacimg_avif_error_message' );
 
 		// Register (or reuse) a Media Library item for the generated AVIF file.
 		( new DerivativeLibrary() )->ensure_attachment( $attachment_id, (string) $result['avif_path'], 'avif' );

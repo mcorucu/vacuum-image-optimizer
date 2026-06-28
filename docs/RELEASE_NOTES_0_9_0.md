@@ -1,15 +1,24 @@
 # Release Notes — Vacuum Image Optimizer 0.9.0
 
-**Release type:** Release Candidate (late beta)
-**Date:** 2026-06-19
+**Release type:** First public WordPress.org release
+**Date:** 2026-06-28
 **Requires:** WordPress 6.2+ · PHP 8.1+
 **License:** GPLv2 or later
+**WordPress.org plugin page:** https://wordpress.org/plugins/vacuum-image-optimizer/
+**WordPress.org SVN:** https://plugins.svn.wordpress.org/vacuum-image-optimizer
+**SVN revision:** 3588409
 
 ---
 
 ## Overview
 
-Version 0.9.0 is the first public Release Candidate of Vacuum Image Optimizer — a complete, self-contained image optimization toolkit for WordPress. It generates modern WebP and AVIF formats, optimizes your library in bulk, automates new uploads, and serves optimized images on the frontend, all while keeping your originals untouched.
+Version 0.9.0 is the first public WordPress.org release of Vacuum Image Optimizer — a complete, self-contained image optimization toolkit for WordPress. It generates modern WebP and AVIF formats, optimizes your library in bulk, automates new uploads, and serves optimized images on the frontend, all while keeping your originals untouched.
+
+## Publication Status
+
+- Published to WordPress.org SVN in revision 3588409.
+- Public plugin page: https://wordpress.org/plugins/vacuum-image-optimizer/
+- GitHub release: https://github.com/mcorucu/vacuum-image-optimizer/releases/tag/v0.9.0
 
 ## New Features
 
@@ -44,4 +53,4 @@ Version 0.9.0 is the first public Release Candidate of Vacuum Image Optimizer �
 
 - This is the initial release; no migration steps are required.
 - After activating, visit **Media → Vacuum Image Optimizer → System Status** to confirm WebP/AVIF support, then use **Bulk Optimize** to process existing images.
-- Uninstalling performs database-only cleanup (options, plugin tables, and `_vio_*` metadata). Image files, including generated WebP/AVIF and backups, are intentionally left in place.
+- Uninstalling performs database-only cleanup (options, plugin tables, and `_vacimg_*` metadata). Image files, including generated WebP/AVIF and backups, are intentionally left in place.

@@ -119,7 +119,7 @@ class UploadAutomation {
 			return;
 		}
 
-		update_post_meta( $attachment_id, '_vio_status', 'pending' );
+		update_post_meta( $attachment_id, '_vacimg_status', 'pending' );
 	}
 
 	/**
@@ -155,7 +155,7 @@ class UploadAutomation {
 		try {
 			$this->avif_generator->generate( $attachment_id );
 		} catch ( \Throwable $throwable ) {
-			update_post_meta( $attachment_id, '_vio_avif_error_message', sanitize_text_field( $throwable->getMessage() ) );
+			update_post_meta( $attachment_id, '_vacimg_avif_error_message', sanitize_text_field( $throwable->getMessage() ) );
 		}
 	}
 
@@ -190,9 +190,9 @@ class UploadAutomation {
 	private function mark_auto_processed( int $attachment_id, string $mode ): void {
 		$now = current_time( 'mysql' );
 
-		update_post_meta( $attachment_id, '_vio_auto_processed', sanitize_key( $mode ) );
-		update_post_meta( $attachment_id, '_vio_auto_processed_at', $now );
-		update_option( 'vio_last_auto_processed_at', $now );
+		update_post_meta( $attachment_id, '_vacimg_auto_processed', sanitize_key( $mode ) );
+		update_post_meta( $attachment_id, '_vacimg_auto_processed_at', $now );
+		update_option( 'vacimg_last_auto_processed_at', $now );
 	}
 
 	/**
@@ -207,7 +207,7 @@ class UploadAutomation {
 			return;
 		}
 
-		update_post_meta( $attachment_id, '_vio_status', 'error' );
-		update_post_meta( $attachment_id, '_vio_error_message', sanitize_text_field( $message ) );
+		update_post_meta( $attachment_id, '_vacimg_status', 'error' );
+		update_post_meta( $attachment_id, '_vacimg_error_message', sanitize_text_field( $message ) );
 	}
 }

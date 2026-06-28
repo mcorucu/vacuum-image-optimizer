@@ -70,7 +70,7 @@ class QueueProcessor {
 			];
 		}
 
-		$batch_size = $batch_size ?? (int) VIO_QUEUE_BATCH_SIZE;
+		$batch_size = $batch_size ?? (int) VACIMG_QUEUE_BATCH_SIZE;
 		$batch_size = max( 1, min( 50, absint( $batch_size ) ) );
 		$jobs       = $this->queue_manager->get_pending_jobs( $batch_size );
 
@@ -145,7 +145,7 @@ class QueueProcessor {
 		try {
 			$this->avif_generator->generate( $attachment_id );
 		} catch ( \Throwable $throwable ) {
-			update_post_meta( $attachment_id, '_vio_avif_error_message', sanitize_text_field( $throwable->getMessage() ) );
+			update_post_meta( $attachment_id, '_vacimg_avif_error_message', sanitize_text_field( $throwable->getMessage() ) );
 		}
 	}
 }

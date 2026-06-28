@@ -2,12 +2,12 @@
 	'use strict';
 
 	document.addEventListener( 'DOMContentLoaded', function () {
-		var copyButton = document.getElementById( 'vio-copy-debug' );
-		var debugInfo = document.querySelector( '.vio-debug-info' );
-		var qualityInput = document.querySelector( '[data-vio-quality-input]' );
-		var qualityValue = document.querySelector( '[data-vio-quality-value]' );
-		var profileCards = document.querySelectorAll( '[data-vio-profile-cards] .vio-profile-card' );
-		var queueRoot = document.querySelector( '[data-vio-queue]' );
+		var copyButton = document.getElementById( 'vacimg-copy-debug' );
+		var debugInfo = document.querySelector( '.vacimg-debug-info' );
+		var qualityInput = document.querySelector( '[data-vacimg-quality-input]' );
+		var qualityValue = document.querySelector( '[data-vacimg-quality-value]' );
+		var profileCards = document.querySelectorAll( '[data-vacimg-profile-cards] .vacimg-profile-card' );
+		var queueRoot = document.querySelector( '[data-vacimg-queue]' );
 
 		if ( qualityInput && qualityValue ) {
 			qualityInput.addEventListener( 'input', function () {
@@ -36,7 +36,7 @@
 			} );
 		} );
 
-		if ( queueRoot && window.vioQueue ) {
+		if ( queueRoot && window.vacimgQueue ) {
 			initQueue( queueRoot );
 		}
 
@@ -59,26 +59,26 @@
 	function initQueue( root ) {
 		var processing = false;
 		var actions = {
-			scan: 'vio_scan_library',
-			start: 'vio_start_queue',
-			pause: 'vio_pause_queue',
-			resume: 'vio_resume_queue'
+			scan: 'vacimg_scan_library',
+			start: 'vacimg_start_queue',
+			pause: 'vacimg_pause_queue',
+			resume: 'vacimg_resume_queue'
 		};
 
 		root.addEventListener( 'click', function ( event ) {
-			var actionButton = event.target.closest( '[data-vio-queue-action]' );
-			var retryButton = event.target.closest( '[data-vio-retry-job]' );
+			var actionButton = event.target.closest( '[data-vacimg-queue-action]' );
+			var retryButton = event.target.closest( '[data-vacimg-retry-job]' );
 
 			if ( actionButton ) {
-				handleQueueAction( actionButton.getAttribute( 'data-vio-queue-action' ) );
+				handleQueueAction( actionButton.getAttribute( 'data-vacimg-queue-action' ) );
 			}
 
 			if ( retryButton ) {
-				retryJob( retryButton.getAttribute( 'data-vio-retry-job' ) );
+				retryJob( retryButton.getAttribute( 'data-vacimg-retry-job' ) );
 			}
 		} );
 
-		request( 'vio_queue_status' ).then( updateUi ).catch( showError );
+		request( 'vacimg_queue_status' ).then( updateUi ).catch( showError );
 
 		function handleQueueAction( action ) {
 			if ( ! actions[ action ] ) {
@@ -109,7 +109,7 @@
 			}
 
 			processing = true;
-			request( 'vio_process_batch' )
+			request( 'vacimg_process_batch' )
 				.then( function ( payload ) {
 					updateUi( payload );
 
@@ -131,7 +131,7 @@
 
 		function retryJob( queueId ) {
 			setBusy( true );
-			request( 'vio_retry_queue_job', { queue_id: queueId } )
+			request( 'vacimg_retry_queue_job', { queue_id: queueId } )
 				.then( function ( payload ) {
 					updateUi( payload );
 					showNotice( 'Job requeued.', 'success' );
@@ -145,13 +145,13 @@
 		function request( action, data ) {
 			var formData = new window.FormData();
 			formData.append( 'action', action );
-			formData.append( 'nonce', window.vioQueue.nonce );
+			formData.append( 'nonce', window.vacimgQueue.nonce );
 
 			Object.keys( data || {} ).forEach( function ( key ) {
 				formData.append( key, data[ key ] );
 			} );
 
-			return window.fetch( window.vioQueue.ajaxUrl, {
+			return window.fetch( window.vacimgQueue.ajaxUrl, {
 				method: 'POST',
 				credentials: 'same-origin',
 				body: formData
@@ -159,7 +159,7 @@
 				return response.json();
 			} ).then( function ( response ) {
 				if ( ! response || ! response.success ) {
-					throw new Error( response && response.data && response.data.message ? response.data.message : window.vioQueue.i18n.error );
+					throw new Error( response && response.data && response.data.message ? response.data.message : window.vacimgQueue.i18n.error );
 				}
 
 				return response.data || {};
@@ -173,18 +173,18 @@
 			var percent = total > 0 ? Math.round( ( completed / total ) * 100 ) : 0;
 
 			[ 'total', 'pending', 'processing', 'completed', 'failed' ].forEach( function ( key ) {
-				var node = root.querySelector( '[data-vio-stat="' + key + '"]' );
+				var node = root.querySelector( '[data-vacimg-stat="' + key + '"]' );
 				if ( node ) {
 					node.textContent = formatNumber( stats[ key ] || 0 );
 				}
 			} );
 
-			var state = root.querySelector( '[data-vio-queue-state]' );
+			var state = root.querySelector( '[data-vacimg-queue-state]' );
 			if ( state ) {
 				state.textContent = capitalize( stats.state || 'idle' );
 			}
 
-			var progress = root.querySelector( '[data-vio-progress-bar]' );
+			var progress = root.querySelector( '[data-vacimg-progress-bar]' );
 			if ( progress ) {
 				progress.style.width = percent + '%';
 				if ( progress.parentNode ) {
@@ -192,7 +192,7 @@
 				}
 			}
 
-			var progressLabel = root.querySelector( '[data-vio-progress-percent]' );
+			var progressLabel = root.querySelector( '[data-vacimg-progress-percent]' );
 			if ( progressLabel ) {
 				progressLabel.textContent = percent + '%';
 			}
@@ -201,13 +201,13 @@
 		}
 
 		function renderFailedJobs( jobs ) {
-			var tbody = root.querySelector( '[data-vio-failed-jobs]' );
+			var tbody = root.querySelector( '[data-vacimg-failed-jobs]' );
 			if ( ! tbody ) {
 				return;
 			}
 
 			if ( ! jobs.length ) {
-				tbody.innerHTML = '<tr class="vio-empty-row"><td colspan="4">No failed jobs.</td></tr>';
+				tbody.innerHTML = '<tr class="vacimg-empty-row"><td colspan="4">No failed jobs.</td></tr>';
 				return;
 			}
 
@@ -216,30 +216,30 @@
 					'<td>' + escapeHtml( job.attachment || '' ) + '</td>' +
 					'<td>' + escapeHtml( job.error || '' ) + '</td>' +
 					'<td>' + formatNumber( job.attempts || 0 ) + '</td>' +
-					'<td><button type="button" class="vio-button vio-button--secondary vio-button--small" data-vio-retry-job="' + parseInt( job.id || 0, 10 ) + '">Retry</button></td>' +
+					'<td><button type="button" class="vacimg-button vacimg-button--secondary vacimg-button--small" data-vacimg-retry-job="' + parseInt( job.id || 0, 10 ) + '">Retry</button></td>' +
 				'</tr>';
 			} ).join( '' );
 		}
 
 		function setBusy( busy ) {
-			root.querySelectorAll( '[data-vio-queue-action], [data-vio-retry-job]' ).forEach( function ( button ) {
+			root.querySelectorAll( '[data-vacimg-queue-action], [data-vacimg-retry-job]' ).forEach( function ( button ) {
 				button.disabled = !! busy;
 			} );
 		}
 
 		function showNotice( message, type ) {
-			var notice = root.querySelector( '[data-vio-queue-notice]' );
+			var notice = root.querySelector( '[data-vacimg-queue-notice]' );
 			if ( ! notice ) {
 				return;
 			}
 
 			notice.hidden = false;
-			notice.className = 'vio-notice vio-notice--' + ( type || 'info' );
+			notice.className = 'vacimg-notice vacimg-notice--' + ( type || 'info' );
 			notice.textContent = message;
 		}
 
 		function showError( error ) {
-			showNotice( error && error.message ? error.message : window.vioQueue.i18n.error, 'error' );
+			showNotice( error && error.message ? error.message : window.vacimgQueue.i18n.error, 'error' );
 		}
 	}
 

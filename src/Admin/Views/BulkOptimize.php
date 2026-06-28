@@ -27,42 +27,42 @@ class BulkOptimize {
 		$failed_jobs   = $queue_manager->get_failed_jobs( 20 );
 		$percent       = $this->get_progress_percent( $stats );
 		?>
-		<div class="vio-bulk" data-vio-queue>
-			<div class="vio-notice" data-vio-queue-notice hidden></div>
+		<div class="vacimg-bulk" data-vacimg-queue>
+			<div class="vacimg-notice" data-vacimg-queue-notice hidden></div>
 
-			<div class="vio-card">
+			<div class="vacimg-card">
 				<h2><?php esc_html_e( 'Bulk Optimization', 'vacuum-image-optimizer' ); ?></h2>
 				<p><?php esc_html_e( 'Scan eligible JPEG and PNG images, then process the queue in safe WordPress AJAX batches.', 'vacuum-image-optimizer' ); ?></p>
-				<div class="vio-button-row">
-					<button type="button" class="vio-button vio-button--secondary" data-vio-queue-action="scan"><?php esc_html_e( 'Scan Library', 'vacuum-image-optimizer' ); ?></button>
-					<button type="button" class="vio-button vio-button--primary" data-vio-queue-action="start"><?php esc_html_e( 'Start Queue', 'vacuum-image-optimizer' ); ?></button>
-					<button type="button" class="vio-button vio-button--secondary" data-vio-queue-action="pause"><?php esc_html_e( 'Pause Queue', 'vacuum-image-optimizer' ); ?></button>
-					<button type="button" class="vio-button vio-button--secondary" data-vio-queue-action="resume"><?php esc_html_e( 'Resume Queue', 'vacuum-image-optimizer' ); ?></button>
+				<div class="vacimg-button-row">
+					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="scan"><?php esc_html_e( 'Scan Library', 'vacuum-image-optimizer' ); ?></button>
+					<button type="button" class="vacimg-button vacimg-button--primary" data-vacimg-queue-action="start"><?php esc_html_e( 'Start Queue', 'vacuum-image-optimizer' ); ?></button>
+					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="pause"><?php esc_html_e( 'Pause Queue', 'vacuum-image-optimizer' ); ?></button>
+					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="resume"><?php esc_html_e( 'Resume Queue', 'vacuum-image-optimizer' ); ?></button>
 				</div>
 			</div>
 
-			<div class="vio-card">
-				<div class="vio-card-header-inline">
+			<div class="vacimg-card">
+				<div class="vacimg-card-header-inline">
 					<h2><?php esc_html_e( 'Queue Progress', 'vacuum-image-optimizer' ); ?></h2>
-					<span class="vio-badge" data-vio-queue-state><?php echo esc_html( ucfirst( (string) $stats['state'] ) ); ?></span>
+					<span class="vacimg-badge" data-vacimg-queue-state><?php echo esc_html( ucfirst( (string) $stats['state'] ) ); ?></span>
 				</div>
-				<div class="vio-queue-stats">
+				<div class="vacimg-queue-stats">
 					<?php $this->render_stat( 'total', __( 'Total', 'vacuum-image-optimizer' ), $stats['total'] ); ?>
 					<?php $this->render_stat( 'pending', __( 'Pending', 'vacuum-image-optimizer' ), $stats['pending'] ); ?>
 					<?php $this->render_stat( 'processing', __( 'Processing', 'vacuum-image-optimizer' ), $stats['processing'] ); ?>
 					<?php $this->render_stat( 'completed', __( 'Completed', 'vacuum-image-optimizer' ), $stats['completed'] ); ?>
 					<?php $this->render_stat( 'failed', __( 'Failed', 'vacuum-image-optimizer' ), $stats['failed'] ); ?>
 				</div>
-				<div class="vio-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( (string) $percent ); ?>">
-					<div class="vio-progress__bar" data-vio-progress-bar style="width: <?php echo esc_attr( (string) $percent ); ?>%;"></div>
+				<div class="vacimg-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( (string) $percent ); ?>">
+					<div class="vacimg-progress__bar" data-vacimg-progress-bar style="width: <?php echo esc_attr( (string) $percent ); ?>%;"></div>
 				</div>
-				<p class="vio-progress-label"><strong data-vio-progress-percent><?php echo esc_html( (string) $percent ); ?>%</strong></p>
+				<p class="vacimg-progress-label"><strong data-vacimg-progress-percent><?php echo esc_html( (string) $percent ); ?>%</strong></p>
 			</div>
 
-			<div class="vio-card">
+			<div class="vacimg-card">
 				<h2><?php esc_html_e( 'Failed Jobs', 'vacuum-image-optimizer' ); ?></h2>
-				<div class="vio-table-wrap">
-					<table class="widefat striped vio-failed-jobs">
+				<div class="vacimg-table-wrap">
+					<table class="widefat striped vacimg-failed-jobs">
 						<thead>
 							<tr>
 								<th><?php esc_html_e( 'Attachment', 'vacuum-image-optimizer' ); ?></th>
@@ -71,7 +71,7 @@ class BulkOptimize {
 								<th><?php esc_html_e( 'Retry', 'vacuum-image-optimizer' ); ?></th>
 							</tr>
 						</thead>
-						<tbody data-vio-failed-jobs>
+						<tbody data-vacimg-failed-jobs>
 							<?php $this->render_failed_rows( $failed_jobs ); ?>
 						</tbody>
 					</table>
@@ -91,9 +91,9 @@ class BulkOptimize {
 	 */
 	private function render_stat( string $key, string $label, int|string $value ): void {
 		?>
-		<div class="vio-queue-stat">
-			<span class="vio-queue-stat__number" data-vio-stat="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( number_format_i18n( absint( $value ) ) ); ?></span>
-			<span class="vio-queue-stat__label"><?php echo esc_html( $label ); ?></span>
+		<div class="vacimg-queue-stat">
+			<span class="vacimg-queue-stat__number" data-vacimg-stat="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( number_format_i18n( absint( $value ) ) ); ?></span>
+			<span class="vacimg-queue-stat__label"><?php echo esc_html( $label ); ?></span>
 		</div>
 		<?php
 	}
@@ -107,7 +107,7 @@ class BulkOptimize {
 	private function render_failed_rows( array $jobs ): void {
 		if ( empty( $jobs ) ) {
 			?>
-			<tr class="vio-empty-row"><td colspan="4"><?php esc_html_e( 'No failed jobs.', 'vacuum-image-optimizer' ); ?></td></tr>
+			<tr class="vacimg-empty-row"><td colspan="4"><?php esc_html_e( 'No failed jobs.', 'vacuum-image-optimizer' ); ?></td></tr>
 			<?php
 			return;
 		}
@@ -127,7 +127,7 @@ class BulkOptimize {
 				</td>
 				<td><?php echo esc_html( wp_html_excerpt( (string) ( $job->error_message ?? '' ), 140, '…' ) ); ?></td>
 				<td><?php echo esc_html( number_format_i18n( absint( $job->attempts ?? 0 ) ) ); ?></td>
-				<td><button type="button" class="vio-button vio-button--secondary vio-button--small" data-vio-retry-job="<?php echo esc_attr( (string) absint( $job->id ?? 0 ) ); ?>"><?php esc_html_e( 'Retry', 'vacuum-image-optimizer' ); ?></button></td>
+				<td><button type="button" class="vacimg-button vacimg-button--secondary vacimg-button--small" data-vacimg-retry-job="<?php echo esc_attr( (string) absint( $job->id ?? 0 ) ); ?>"><?php esc_html_e( 'Retry', 'vacuum-image-optimizer' ); ?></button></td>
 			</tr>
 			<?php
 		}
