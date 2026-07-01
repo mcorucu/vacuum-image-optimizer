@@ -2,7 +2,7 @@
 
 **Release type:** Feature and safety update  
 **Version:** 1.0.1  
-**Status:** Prepared for QA and packaging
+**Status:** Released on WordPress.org
 
 ## Summary
 
