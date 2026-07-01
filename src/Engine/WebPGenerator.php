@@ -10,6 +10,7 @@ namespace VacuumImageOptimizer\Engine;
 use VacuumImageOptimizer\Backup\BackupManager;
 use VacuumImageOptimizer\Media\DerivativeLibrary;
 use VacuumImageOptimizer\Settings\CompressionSettings;
+use VacuumImageOptimizer\Utils\ImageFormat;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -26,6 +27,7 @@ class WebPGenerator {
 	private const SUPPORTED_MIME_TYPES = [
 		'image/jpeg',
 		'image/png',
+		'image/webp',
 	];
 
 	/**
@@ -60,6 +62,10 @@ class WebPGenerator {
 	 * @return bool
 	 */
 	public function delete_existing_webp( int $attachment_id ): bool {
+		if ( ImageFormat::is_webp_mime( ImageFormat::get_attachment_mime_type( $attachment_id ) ) ) {
+			return true;
+		}
+
 		$webp_path = get_post_meta( $attachment_id, '_vacimg_webp_path', true );
 		$webp_path = is_string( $webp_path ) ? wp_normalize_path( $webp_path ) : '';
 
@@ -93,14 +99,18 @@ class WebPGenerator {
 			return $this->fail( $result, __( 'Invalid attachment ID.', 'vacuum-image-optimizer' ) );
 		}
 
+		if ( ! CompressionSettings::is_webp_enabled() ) {
+			return $this->fail( $result, __( 'WebP generation is disabled in settings.', 'vacuum-image-optimizer' ), 'skipped' );
+		}
+
 		$post = get_post( $attachment_id );
 		if ( ! $post instanceof \WP_Post || 'attachment' !== $post->post_type ) {
 			return $this->fail( $result, __( 'Attachment could not be found.', 'vacuum-image-optimizer' ) );
 		}
 
-		$mime_type = (string) get_post_mime_type( $attachment_id );
-		if ( ! wp_attachment_is_image( $attachment_id ) || ! in_array( $mime_type, self::SUPPORTED_MIME_TYPES, true ) ) {
-			return $this->fail( $result, __( 'This attachment format is not supported for WebP generation.', 'vacuum-image-optimizer' ), 'unsupported' );
+		$mime_type = ImageFormat::get_attachment_mime_type( $attachment_id );
+		if ( ! ImageFormat::is_supported_source_attachment( $attachment_id ) || ! in_array( $mime_type, self::SUPPORTED_MIME_TYPES, true ) ) {
+			return $this->fail( $result, ImageFormat::get_skip_reason( $attachment_id ), 'unsupported' );
 		}
 
 		$source_path = get_attached_file( $attachment_id );
@@ -121,6 +131,11 @@ class WebPGenerator {
 		}
 
 		$result['source_size'] = (int) $source_size;
+
+		if ( ImageFormat::is_webp_mime( $mime_type ) ) {
+			return $this->optimize_webp_source( $attachment_id, $source_path, (int) $source_size, $result );
+		}
+
 		$webp_path             = $this->build_webp_path( $source_path );
 
 		if ( '' === $webp_path ) {
@@ -200,7 +215,7 @@ class WebPGenerator {
 	 * @return array<int, string>
 	 */
 	public static function get_supported_mime_types(): array {
-		return self::SUPPORTED_MIME_TYPES;
+		return ImageFormat::get_supported_source_mime_types();
 	}
 
 	/**
@@ -220,6 +235,7 @@ class WebPGenerator {
 			'savings_bytes'   => 0,
 			'savings_percent' => 0.0,
 			'engine_used'     => '',
+			'mode'            => 'derivative',
 			'message'         => '',
 		];
 	}
@@ -282,6 +298,7 @@ class WebPGenerator {
 		}
 
 		$webp_url = $this->path_to_upload_url( (string) $result['webp_path'] );
+		$is_source_optimization = 'source' === (string) ( $result['mode'] ?? '' );
 
 		update_post_meta( $attachment_id, '_vacimg_webp_path', (string) $result['webp_path'] );
 		update_post_meta( $attachment_id, '_vacimg_webp_url', $webp_url );
@@ -294,8 +311,99 @@ class WebPGenerator {
 		update_post_meta( $attachment_id, '_vacimg_status', 'optimized' );
 		delete_post_meta( $attachment_id, '_vacimg_error_message' );
 
-		// Register (or reuse) a Media Library item for the generated WebP file.
+		if ( $is_source_optimization ) {
+			update_post_meta( $attachment_id, '_vacimg_webp_source_optimized', absint( $result['savings_bytes'] ) > 0 ? 1 : 0 );
+			return;
+		}
+
 		( new DerivativeLibrary() )->ensure_attachment( $attachment_id, (string) $result['webp_path'], 'webp' );
+	}
+
+	/**
+	 * Recompress an existing WebP source file and replace it only when smaller.
+	 *
+	 * @param int                                  $attachment_id Attachment ID.
+	 * @param string                               $source_path Source WebP path.
+	 * @param int                                  $source_size Original source size.
+	 * @param array<string, bool|float|int|string> $result Base result.
+	 * @return array<string, bool|float|int|string>
+	 */
+	private function optimize_webp_source( int $attachment_id, string $source_path, int $source_size, array $result ): array {
+		$backup_path = $this->ensure_backup_copy( $attachment_id, $source_path );
+		if ( '' === $backup_path ) {
+			return $this->fail( $result, __( 'The original WebP backup could not be created.', 'vacuum-image-optimizer' ) );
+		}
+
+		update_post_meta( $attachment_id, '_vacimg_backup_path', $backup_path );
+
+		$temp_path = $this->get_unique_path( $source_path . '.vacimg-tmp.webp' );
+		if ( '' === $temp_path ) {
+			return $this->fail( $result, __( 'A temporary WebP optimization path could not be created.', 'vacuum-image-optimizer' ) );
+		}
+
+		$engine_errors = [];
+		$engine_used   = '';
+		$generated     = false;
+
+		if ( $this->supports_imagick_webp() ) {
+			try {
+				$generated = $this->generate_with_imagick( $source_path, $temp_path );
+				if ( $generated ) {
+					$engine_used = 'imagick';
+				}
+			} catch ( \Throwable $throwable ) {
+				$engine_errors[] = $throwable->getMessage();
+			}
+		}
+
+		if ( ! $generated && $this->supports_gd_webp( 'image/webp' ) ) {
+			try {
+				$generated = $this->generate_with_gd( $source_path, $temp_path, 'image/webp' );
+				if ( $generated ) {
+					$engine_used = 'gd';
+				}
+			} catch ( \Throwable $throwable ) {
+				$engine_errors[] = $throwable->getMessage();
+			}
+		}
+
+		if ( ! $generated ) {
+			$this->delete_temp_file( $temp_path );
+			$message = empty( $engine_errors )
+				? __( 'No available image engine can optimize WebP source files on this server.', 'vacuum-image-optimizer' )
+				: __( 'WebP source optimization failed with the available image engines.', 'vacuum-image-optimizer' );
+
+			return $this->fail( $result, $message );
+		}
+
+		$temp_size = filesize( $temp_path );
+		if ( false === $temp_size ) {
+			$this->delete_temp_file( $temp_path );
+			return $this->fail( $result, __( 'The optimized WebP file size could not be read.', 'vacuum-image-optimizer' ) );
+		}
+
+		$result['webp_path'] = $source_path;
+		$result['mode']      = 'source';
+
+		if ( (int) $temp_size >= $source_size ) {
+			$this->delete_temp_file( $temp_path );
+			$result = $this->complete_result( $result, $source_size, $engine_used, __( 'WebP source already appears optimized; the original file was left unchanged.', 'vacuum-image-optimizer' ) );
+			$this->save_success_metadata( $result );
+
+			return $result;
+		}
+
+		if ( ! copy( $temp_path, $source_path ) ) {
+			$this->delete_temp_file( $temp_path );
+			return $this->fail( $result, __( 'The optimized WebP file could not replace the source image.', 'vacuum-image-optimizer' ) );
+		}
+
+		$this->delete_temp_file( $temp_path );
+
+		$result = $this->complete_result( $result, (int) $temp_size, $engine_used, __( 'WebP source image optimized successfully.', 'vacuum-image-optimizer' ) );
+		$this->save_success_metadata( $result );
+
+		return $result;
 	}
 
 	/**
@@ -460,6 +568,10 @@ class WebPGenerator {
 			return function_exists( 'imagecreatefrompng' );
 		}
 
+		if ( 'image/webp' === $mime_type ) {
+			return function_exists( 'imagecreatefromwebp' );
+		}
+
 		return false;
 	}
 
@@ -500,7 +612,13 @@ class WebPGenerator {
 	 * @return bool
 	 */
 	private function generate_with_gd( string $source_path, string $webp_path, string $mime_type ): bool {
-		$image = 'image/jpeg' === $mime_type ? imagecreatefromjpeg( $source_path ) : imagecreatefrompng( $source_path );
+		if ( 'image/jpeg' === $mime_type ) {
+			$image = imagecreatefromjpeg( $source_path );
+		} elseif ( 'image/webp' === $mime_type ) {
+			$image = imagecreatefromwebp( $source_path );
+		} else {
+			$image = imagecreatefrompng( $source_path );
+		}
 
 		if ( false === $image ) {
 			return false;
@@ -519,5 +637,17 @@ class WebPGenerator {
 		imagedestroy( $image );
 
 		return $written && file_exists( $webp_path );
+	}
+
+	/**
+	 * Delete a temporary file created by the optimizer.
+	 *
+	 * @param string $path Temporary path.
+	 * @return void
+	 */
+	private function delete_temp_file( string $path ): void {
+		if ( '' !== $path && file_exists( $path ) && is_file( $path ) ) {
+			wp_delete_file( $path );
+		}
 	}
 }

@@ -6,7 +6,7 @@ Tags: image optimization, webp, avif, compression, lazy load
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.9.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,11 +22,11 @@ Unlike optimizers that rewrite originals or depend on a remote API, Vacuum write
 
 **What it does**
 
-* **WebP generation** — Create optimized WebP copies of your JPEG and PNG images using Imagick or GD.
-* **AVIF generation** — Optionally generate AVIF, a newer format that is often even smaller than WebP, as a parallel format.
+* **WebP generation and source optimization** — Create optimized WebP copies of JPEG/PNG images and safely recompress uploaded WebP source files when the result is smaller.
+* **AVIF generation** — Optionally generate AVIF, a newer format that is often even smaller than WebP, as a parallel format when the server supports it.
 * **Bulk optimization** — Scan your media library and process eligible images in safe, batched background steps.
 * **Queue processing** — A reliable queue runs work in small WordPress AJAX batches you can start, pause, and resume.
-* **Upload automation** — Automatically optimize new JPEG and PNG uploads, either by queueing them or processing them immediately.
+* **Upload automation** — Automatically optimize new JPEG, PNG, and WebP uploads, either by queueing them or processing them immediately.
 * **Frontend delivery** — Serve generated WebP/AVIF on the frontend with automatic, safe fallback to the original image — your media URLs in the database are never changed.
 * **Reports** — See storage savings, recent activity, top savings, format distribution, and automation stats, with one-click CSV export.
 * **Localization** — Fully translatable, shipping with 9 bundled languages plus an in-plugin interface-language selector.
@@ -39,7 +39,9 @@ Vacuum never modifies or deletes your original images. Optimized formats are wri
 == Features ==
 
 * WebP image generation (Imagick or GD)
+* WebP source-file recompression with backup-first safety
 * AVIF image generation as a parallel format
+* Optional setup wizard with Safe Mode defaults
 * Bulk optimization with a start/pause/resume queue
 * Automatic optimization of new uploads (queue or immediate mode)
 * Non-destructive frontend delivery with original fallback
@@ -47,6 +49,7 @@ Vacuum never modifies or deletes your original images. Optimized formats are wri
 * Per-image WebP/AVIF actions in the Media Library
 * Generated derivatives registered as Media Library items
 * Original backups and one-click restore
+* Expanded exclusions for MIME types, file sizes, filenames, and paths
 * Local processing with no external API dependency
 * Compression profiles and adjustable quality
 * GIF and SVG eligibility exclusions
@@ -60,8 +63,9 @@ Vacuum never modifies or deletes your original images. Optimized formats are wri
 1. Upload the `vacuum-image-optimizer` folder to the `/wp-content/plugins/` directory, or install the plugin through the **Plugins → Add New** screen in WordPress.
 2. Activate the plugin through the **Plugins** screen.
 3. Go to **Media → Vacuum Image Optimizer** to open the dashboard.
-4. Open the **Compression** tab to choose a compression profile and quality, and to optionally enable AVIF, upload automation, and frontend delivery.
-5. Open the **Bulk Optimize** tab, click **Scan Library**, then **Start Queue** to optimize existing images.
+4. Complete or skip the optional setup wizard.
+5. Open the **Compression** tab to choose a compression profile and quality, and to optionally enable AVIF, upload automation, and frontend delivery.
+6. Open the **Bulk Optimize** tab, click **Optimize all unoptimized images**, then **Start Queue** to optimize existing images.
 
 == Frequently Asked Questions ==
 
@@ -75,7 +79,10 @@ Yes. AVIF generation is available as a parallel format when your server supports
 Yes. When backups are enabled, each original is copied before optimization, and you can restore it at any time from the per-image **Restore** action in the Media Library.
 
 = Does it support bulk optimization? =
-Yes. The Bulk Optimize tab scans eligible JPEG and PNG images and processes them in safe, batched steps that you can start, pause, and resume.
+Yes. The Bulk Optimize tab scans eligible JPEG, PNG, and WebP images and processes them in safe, batched steps that you can start, pause, and resume.
+
+= Does it optimize uploaded WebP files? =
+Yes. Existing WebP source files can be recompressed safely. Vacuum creates a backup first and replaces the source only when the optimized WebP is smaller.
 
 = Does it work with WooCommerce? =
 Yes. Frontend delivery hooks into the standard WordPress image functions used by WooCommerce product and gallery images, so generated formats are served automatically with fallback to originals.
@@ -101,6 +108,16 @@ WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD ext
 
 == Changelog ==
 
+= 1.0.1 =
+* Added optional setup wizard with skip/complete flow and settings relaunch.
+* Added WebP source optimization for uploaded WebP files with backup-first replacement only when smaller.
+* Improved image format handling for JPEG, PNG, WebP, AVIF capability checks, GIF skipping, and SVG exclusion.
+* Improved server compatibility checks for WordPress/PHP versions, writable directories, Imagick/GD, WebP/AVIF read/write support, execution time, memory, and disk free space.
+* Improved backup and restore safety with clearer status and metadata handling.
+* Improved bulk optimization workflow labels, skipped counts, retry/pause/resume visibility, and WebP source eligibility.
+* Improved Media Library status/actions with compact format availability, savings, skipped reasons, optimize, WebP/AVIF, and restore links.
+* Added safer default settings and Safe Mode improvements.
+
 = 0.9.0 =
 * Initial public release candidate.
 * WebP generation engine (Imagick/GD).
@@ -116,6 +133,9 @@ WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD ext
 * Full internationalization with 9 bundled languages and an interface-language selector.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Adds optional setup, WebP source optimization, expanded format handling, improved server checks, safer defaults, and Media Library/bulk workflow improvements.
 
 = 0.9.0 =
 First public release candidate of Vacuum Image Optimizer. Generate WebP/AVIF, bulk-optimize, automate uploads, and deliver modern formats safely — originals are never modified.

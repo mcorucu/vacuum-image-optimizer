@@ -73,7 +73,7 @@ class StatsService {
 				INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
 				WHERE p.post_type = %s
 				AND p.post_status != %s
-				AND p.post_mime_type IN ( 'image/jpeg', 'image/png' )
+					AND p.post_mime_type IN ( 'image/jpeg', 'image/png', 'image/webp' )
 				AND pm.meta_key = %s
 				AND pm.meta_value = %s",
 				'attachment',
@@ -96,6 +96,34 @@ class StatsService {
 		$optimized = $this->get_optimized_images();
 
 		return max( 0, $supported - $optimized );
+	}
+
+	/**
+	 * Get skipped or unsupported image count.
+	 *
+	 * @return int
+	 */
+	public function get_skipped_images(): int {
+		global $wpdb;
+
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(DISTINCT p.ID)
+				FROM {$wpdb->posts} p
+				INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+				WHERE p.post_type = %s
+				AND p.post_status != %s
+				AND p.post_mime_type LIKE %s
+				AND pm.meta_key = %s
+				AND pm.meta_value IN ( 'skipped', 'unsupported', 'excluded' )",
+				'attachment',
+				'trash',
+				'image/%',
+				'_vacimg_status'
+			)
+		);
+
+		return absint( $count );
 	}
 
 	/**
@@ -717,7 +745,7 @@ class StatsService {
 				FROM {$wpdb->posts}
 				WHERE post_type = %s
 				AND post_status != %s
-				AND post_mime_type IN ( 'image/jpeg', 'image/png' )",
+					AND post_mime_type IN ( 'image/jpeg', 'image/png', 'image/webp' )",
 				'attachment',
 				'trash'
 			)

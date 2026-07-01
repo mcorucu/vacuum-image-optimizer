@@ -7,6 +7,8 @@
 
 namespace VacuumImageOptimizer\Admin;
 
+use VacuumImageOptimizer\Admin\Onboarding;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -52,6 +54,10 @@ class Router {
 
 		// Output the page wrapper and tab navigation.
 		$this->render_header( $tab );
+
+		if ( Onboarding::should_show() ) {
+			( new Onboarding() )->render();
+		}
 
 		// Route to the view class.
 		$view_class = $this->resolve_view_class( $tab );

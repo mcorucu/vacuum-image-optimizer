@@ -10,6 +10,7 @@ namespace VacuumImageOptimizer\Engine;
 use VacuumImageOptimizer\Backup\BackupManager;
 use VacuumImageOptimizer\Media\DerivativeLibrary;
 use VacuumImageOptimizer\Settings\CompressionSettings;
+use VacuumImageOptimizer\Utils\ImageFormat;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,6 +30,7 @@ class AVIFGenerator {
 	private const SUPPORTED_MIME_TYPES = [
 		'image/jpeg',
 		'image/png',
+		'image/webp',
 	];
 
 	/**
@@ -101,9 +103,9 @@ class AVIFGenerator {
 			return $this->fail( $result, __( 'Attachment could not be found.', 'vacuum-image-optimizer' ) );
 		}
 
-		$mime_type = (string) get_post_mime_type( $attachment_id );
-		if ( ! wp_attachment_is_image( $attachment_id ) || ! in_array( $mime_type, self::SUPPORTED_MIME_TYPES, true ) ) {
-			return $this->fail( $result, __( 'This attachment format is not supported for AVIF generation.', 'vacuum-image-optimizer' ) );
+		$mime_type = ImageFormat::get_attachment_mime_type( $attachment_id );
+		if ( ! ImageFormat::is_supported_source_attachment( $attachment_id ) || ! in_array( $mime_type, self::SUPPORTED_MIME_TYPES, true ) ) {
+			return $this->fail( $result, ImageFormat::get_skip_reason( $attachment_id ) );
 		}
 
 		if ( ! $this->supports_imagick_avif() && ! $this->supports_gd_avif( $mime_type ) ) {
@@ -364,6 +366,10 @@ class AVIFGenerator {
 			return function_exists( 'imagecreatefrompng' );
 		}
 
+		if ( 'image/webp' === $mime_type ) {
+			return function_exists( 'imagecreatefromwebp' );
+		}
+
 		return false;
 	}
 
@@ -404,7 +410,13 @@ class AVIFGenerator {
 	 * @return bool
 	 */
 	private function generate_with_gd( string $source_path, string $avif_path, string $mime_type ): bool {
-		$image = 'image/jpeg' === $mime_type ? imagecreatefromjpeg( $source_path ) : imagecreatefrompng( $source_path );
+		if ( 'image/jpeg' === $mime_type ) {
+			$image = imagecreatefromjpeg( $source_path );
+		} elseif ( 'image/webp' === $mime_type ) {
+			$image = imagecreatefromwebp( $source_path );
+		} else {
+			$image = imagecreatefrompng( $source_path );
+		}
 
 		if ( false === $image ) {
 			return false;

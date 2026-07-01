@@ -7,8 +7,8 @@
 
 namespace VacuumImageOptimizer\Media;
 
-use VacuumImageOptimizer\Engine\WebPGenerator;
 use VacuumImageOptimizer\Settings\CompressionSettings;
+use VacuumImageOptimizer\Utils\ImageFormat;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -119,6 +119,8 @@ class LibraryIntegration {
 			);
 		}
 
+		$this->render_inline_actions( $attachment_id, $data );
+
 		echo '</div>';
 	}
 
@@ -169,11 +171,11 @@ class LibraryIntegration {
 	private function get_column_data( int $attachment_id ): array {
 		$status = (string) get_post_meta( $attachment_id, '_vacimg_status', true );
 		$status = '' === $status ? 'pending' : sanitize_key( $status );
-		$mime   = (string) get_post_mime_type( $attachment_id );
+		$mime   = ImageFormat::get_attachment_mime_type( $attachment_id );
 
 		if ( 'pending' === $status && CompressionSettings::is_mime_excluded( $mime ) ) {
 			$status = 'excluded';
-		} elseif ( 'pending' === $status && ( ! wp_attachment_is_image( $attachment_id ) || ! in_array( $mime, WebPGenerator::get_supported_mime_types(), true ) ) ) {
+		} elseif ( 'pending' === $status && ! ImageFormat::is_supported_source_attachment( $attachment_id ) ) {
 			$status = 'unsupported';
 		}
 
@@ -199,12 +201,14 @@ class LibraryIntegration {
 
 		if ( 'excluded' === $status ) {
 			$data['status_label'] = __( 'Excluded', 'vacuum-image-optimizer' );
+			$data['message']      = ImageFormat::get_skip_reason( $attachment_id );
 
 			return $data;
 		}
 
-		if ( 'unsupported' === $status ) {
-			$data['status_label'] = __( 'Unsupported', 'vacuum-image-optimizer' );
+		if ( in_array( $status, [ 'unsupported', 'skipped' ], true ) ) {
+			$data['status_label'] = __( 'Skipped', 'vacuum-image-optimizer' );
+			$data['message']      = $this->get_short_error_message( $attachment_id ) ?: ImageFormat::get_skip_reason( $attachment_id );
 
 			return $data;
 		}
@@ -308,5 +312,47 @@ class LibraryIntegration {
 	 */
 	private function get_placeholder(): string {
 		return '—';
+	}
+
+	/**
+	 * Render compact action buttons in the Vacuum column.
+	 *
+	 * @param int                  $attachment_id Attachment ID.
+	 * @param array<string,string> $data Column data.
+	 * @return void
+	 */
+	private function render_inline_actions( int $attachment_id, array $data ): void {
+		if ( ! current_user_can( 'upload_files' ) || ! ImageFormat::is_supported_source_attachment( $attachment_id ) ) {
+			return;
+		}
+
+		$actions = [
+			'vacimg_optimize_image' => __( 'Optimize', 'vacuum-image-optimizer' ),
+			'vacimg_generate_webp'  => __( 'Generate WebP', 'vacuum-image-optimizer' ),
+		];
+
+		if ( CompressionSettings::is_avif_enabled() ) {
+			$actions['vacimg_generate_avif'] = __( 'AVIF', 'vacuum-image-optimizer' );
+		}
+
+		$backup_path = get_post_meta( $attachment_id, '_vacimg_backup_path', true );
+		if ( is_string( $backup_path ) && '' !== $backup_path ) {
+			$actions['vacimg_restore_original'] = __( 'Restore', 'vacuum-image-optimizer' );
+		}
+
+		echo '<div class="vacimg-media-actions">';
+		foreach ( $actions as $action => $label ) {
+			$url = wp_nonce_url(
+				admin_url( 'admin.php?action=' . sanitize_key( $action ) . '&attachment_id=' . absint( $attachment_id ) ),
+				$action . '_' . absint( $attachment_id )
+			);
+
+			printf(
+				'<a class="vacimg-media-action" href="%1$s">%2$s</a>',
+				esc_url( $url ),
+				esc_html( $label )
+			);
+		}
+		echo '</div>';
 	}
 }

@@ -80,7 +80,7 @@ class Dashboard {
 				<div class="vacimg-kpi-grid">
 					<div class="vacimg-stat-card vacimg-kpi-card">
 						<span class="vacimg-stat-number"><?php echo esc_html( number_format_i18n( $stats->get_total_images() ) ); ?></span>
-						<span class="vacimg-stat-label"><?php esc_html_e( 'Total Images', 'vacuum-image-optimizer' ); ?></span>
+						<span class="vacimg-stat-label"><?php esc_html_e( 'Total Images Scanned', 'vacuum-image-optimizer' ); ?></span>
 					</div>
 					<div class="vacimg-stat-card vacimg-kpi-card">
 						<span class="vacimg-stat-number"><?php echo esc_html( number_format_i18n( $stats->get_optimized_images() ) ); ?></span>
@@ -91,8 +91,16 @@ class Dashboard {
 						<span class="vacimg-stat-label"><?php esc_html_e( 'Pending Images', 'vacuum-image-optimizer' ); ?></span>
 					</div>
 					<div class="vacimg-stat-card vacimg-kpi-card">
+						<span class="vacimg-stat-number"><?php echo esc_html( number_format_i18n( $stats->get_skipped_images() ) ); ?></span>
+						<span class="vacimg-stat-label"><?php esc_html_e( 'Skipped Images', 'vacuum-image-optimizer' ); ?></span>
+					</div>
+					<div class="vacimg-stat-card vacimg-kpi-card">
 						<span class="vacimg-stat-number"><?php echo esc_html( size_format( $stats->get_space_saved(), 2 ) ); ?></span>
 						<span class="vacimg-stat-label"><?php esc_html_e( 'Space Saved', 'vacuum-image-optimizer' ); ?></span>
+					</div>
+					<div class="vacimg-stat-card vacimg-kpi-card">
+						<span class="vacimg-stat-number vacimg-stat-number--text"><?php echo esc_html( $stats->get_last_optimization_date() ?: '—' ); ?></span>
+						<span class="vacimg-stat-label"><?php esc_html_e( 'Last Optimization', 'vacuum-image-optimizer' ); ?></span>
 					</div>
 				</div>
 			</section>
@@ -168,7 +176,7 @@ class Dashboard {
 				<div class="vacimg-cards-row">
 					<div class="vacimg-card">
 						<h3><?php esc_html_e( 'Auto Optimization', 'vacuum-image-optimizer' ); ?></h3>
-						<p><?php esc_html_e( 'Automatically optimize new JPEG and PNG uploads.', 'vacuum-image-optimizer' ); ?></p>
+						<p><?php esc_html_e( 'Automatically optimize new JPEG, PNG, and WebP uploads.', 'vacuum-image-optimizer' ); ?></p>
 						<ul class="vacimg-status-list">
 							<li><span class="vacimg-status-label"><?php esc_html_e( 'Status', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-badge <?php echo esc_attr( $auto_status ? 'vacimg-badge--success' : 'vacimg-badge--error' ); ?>"><?php echo esc_html( $auto_status ? __( 'Enabled', 'vacuum-image-optimizer' ) : __( 'Disabled', 'vacuum-image-optimizer' ) ); ?></span></li>
 							<li><span class="vacimg-status-label"><?php esc_html_e( 'Upload Mode', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( 'immediate' === $auto_mode ? __( 'Immediate', 'vacuum-image-optimizer' ) : __( 'Queue', 'vacuum-image-optimizer' ) ); ?></span></li>
@@ -208,6 +216,8 @@ class Dashboard {
 						$feature_rows = [
 							__( 'Backups', 'vacuum-image-optimizer' )       => ! empty( $settings['enable_backups'] ),
 							__( 'Lazy Loading', 'vacuum-image-optimizer' )  => ! empty( $settings['enable_lazy_loading'] ),
+							__( 'Safe Mode', 'vacuum-image-optimizer' )     => ! empty( $settings['safe_mode'] ),
+							__( 'WebP', 'vacuum-image-optimizer' )          => ! empty( $settings['enable_webp'] ),
 							__( 'GIF Exclusion', 'vacuum-image-optimizer' ) => ! empty( $settings['exclude_gif'] ),
 							__( 'SVG Exclusion', 'vacuum-image-optimizer' ) => ! empty( $settings['exclude_svg'] ),
 						];

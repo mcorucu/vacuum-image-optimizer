@@ -7,7 +7,7 @@
 
 namespace VacuumImageOptimizer\Queue;
 
-use VacuumImageOptimizer\Engine\WebPGenerator;
+use VacuumImageOptimizer\Utils\ImageFormat;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -226,7 +226,7 @@ class QueueManager {
 					ON p.ID = status_meta.post_id AND status_meta.meta_key = %s
 				WHERE p.post_type = %s
 				AND p.post_status != %s
-				AND p.post_mime_type IN ( 'image/jpeg', 'image/png' )
+					AND p.post_mime_type IN ( 'image/jpeg', 'image/png', 'image/webp' )
 				AND ( status_meta.meta_value IS NULL OR status_meta.meta_value != %s )",
 				'_vacimg_status',
 				'attachment',
@@ -239,7 +239,15 @@ class QueueManager {
 		$skipped = 0;
 
 		foreach ( (array) $ids as $id ) {
-			if ( $this->add_attachment( absint( $id ) ) ) {
+			$attachment_id = absint( $id );
+			if ( ! ImageFormat::is_supported_source_attachment( $attachment_id ) ) {
+				update_post_meta( $attachment_id, '_vacimg_status', 'skipped' );
+				update_post_meta( $attachment_id, '_vacimg_error_message', ImageFormat::get_skip_reason( $attachment_id ) );
+				$skipped++;
+				continue;
+			}
+
+			if ( $this->add_attachment( $attachment_id ) ) {
 				$added++;
 			} else {
 				$skipped++;
@@ -471,8 +479,7 @@ class QueueManager {
 			return false;
 		}
 
-		$mime_type = (string) get_post_mime_type( $attachment_id );
-		if ( ! wp_attachment_is_image( $attachment_id ) || ! in_array( $mime_type, WebPGenerator::get_supported_mime_types(), true ) ) {
+		if ( ! ImageFormat::is_supported_source_attachment( $attachment_id ) ) {
 			return false;
 		}
 

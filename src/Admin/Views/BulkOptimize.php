@@ -8,6 +8,7 @@
 namespace VacuumImageOptimizer\Admin\Views;
 
 use VacuumImageOptimizer\Queue\QueueManager;
+use VacuumImageOptimizer\Stats\StatsService;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -23,6 +24,7 @@ class BulkOptimize {
 	 */
 	public function render(): void {
 		$queue_manager = new QueueManager();
+		$stats_service  = new StatsService();
 		$stats         = $queue_manager->get_statistics();
 		$failed_jobs   = $queue_manager->get_failed_jobs( 20 );
 		$percent       = $this->get_progress_percent( $stats );
@@ -32,9 +34,9 @@ class BulkOptimize {
 
 			<div class="vacimg-card">
 				<h2><?php esc_html_e( 'Bulk Optimization', 'vacuum-image-optimizer' ); ?></h2>
-				<p><?php esc_html_e( 'Scan eligible JPEG and PNG images, then process the queue in safe WordPress AJAX batches.', 'vacuum-image-optimizer' ); ?></p>
+				<p><?php esc_html_e( 'Scan eligible JPEG, PNG, and WebP images, then process the queue in safe WordPress AJAX batches.', 'vacuum-image-optimizer' ); ?></p>
 				<div class="vacimg-button-row">
-					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="scan"><?php esc_html_e( 'Scan Library', 'vacuum-image-optimizer' ); ?></button>
+					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="scan"><?php esc_html_e( 'Optimize all unoptimized images', 'vacuum-image-optimizer' ); ?></button>
 					<button type="button" class="vacimg-button vacimg-button--primary" data-vacimg-queue-action="start"><?php esc_html_e( 'Start Queue', 'vacuum-image-optimizer' ); ?></button>
 					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="pause"><?php esc_html_e( 'Pause Queue', 'vacuum-image-optimizer' ); ?></button>
 					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="resume"><?php esc_html_e( 'Resume Queue', 'vacuum-image-optimizer' ); ?></button>
@@ -52,6 +54,8 @@ class BulkOptimize {
 					<?php $this->render_stat( 'processing', __( 'Processing', 'vacuum-image-optimizer' ), $stats['processing'] ); ?>
 					<?php $this->render_stat( 'completed', __( 'Completed', 'vacuum-image-optimizer' ), $stats['completed'] ); ?>
 					<?php $this->render_stat( 'failed', __( 'Failed', 'vacuum-image-optimizer' ), $stats['failed'] ); ?>
+					<?php $this->render_static_stat( __( 'Skipped', 'vacuum-image-optimizer' ), $stats_service->get_skipped_images() ); ?>
+					<?php $this->render_static_stat( __( 'Total Saved', 'vacuum-image-optimizer' ), size_format( $stats_service->get_space_saved(), 2 ) ); ?>
 				</div>
 				<div class="vacimg-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr( (string) $percent ); ?>">
 					<div class="vacimg-progress__bar" data-vacimg-progress-bar style="width: <?php echo esc_attr( (string) $percent ); ?>%;"></div>
@@ -93,6 +97,22 @@ class BulkOptimize {
 		?>
 		<div class="vacimg-queue-stat">
 			<span class="vacimg-queue-stat__number" data-vacimg-stat="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( number_format_i18n( absint( $value ) ) ); ?></span>
+			<span class="vacimg-queue-stat__label"><?php echo esc_html( $label ); ?></span>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render a queue-adjacent static stat box.
+	 *
+	 * @param string     $label Stat label.
+	 * @param int|string $value Stat value.
+	 * @return void
+	 */
+	private function render_static_stat( string $label, int|string $value ): void {
+		?>
+		<div class="vacimg-queue-stat">
+			<span class="vacimg-queue-stat__number"><?php echo esc_html( is_numeric( $value ) ? number_format_i18n( absint( $value ) ) : (string) $value ); ?></span>
 			<span class="vacimg-queue-stat__label"><?php echo esc_html( $label ); ?></span>
 		</div>
 		<?php

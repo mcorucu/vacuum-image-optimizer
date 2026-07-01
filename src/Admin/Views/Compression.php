@@ -7,7 +7,9 @@
 
 namespace VacuumImageOptimizer\Admin\Views;
 
+use VacuumImageOptimizer\Admin\Onboarding;
 use VacuumImageOptimizer\Settings\CompressionSettings;
+use VacuumImageOptimizer\Utils\SystemCheck;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -30,11 +32,13 @@ class Compression {
 
 		$settings = CompressionSettings::get();
 		$profiles = CompressionSettings::get_profiles();
+		$status   = SystemCheck::get_status();
 		?>
 		<div class="vacimg-compression">
 			<div class="vacimg-card">
 				<h2><?php esc_html_e( 'Compression Settings', 'vacuum-image-optimizer' ); ?></h2>
 				<p><?php esc_html_e( 'Choose the compression profile and WebP quality used for manual WebP generation and regeneration.', 'vacuum-image-optimizer' ); ?></p>
+				<p><a class="vacimg-button vacimg-button--secondary vacimg-button--small" href="<?php echo esc_url( Onboarding::get_relaunch_url() ); ?>"><?php esc_html_e( 'Launch setup wizard', 'vacuum-image-optimizer' ); ?></a></p>
 
 				<?php settings_errors( CompressionSettings::OPTION_NAME ); ?>
 
@@ -63,6 +67,22 @@ class Compression {
 							</td>
 						</tr>
 						<tr>
+							<th scope="row"><?php esc_html_e( 'Safe Mode', 'vacuum-image-optimizer' ); ?></th>
+							<td>
+								<input type="hidden" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[safe_mode]" value="0">
+								<label>
+									<input
+										type="checkbox"
+										name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[safe_mode]"
+										value="1"
+										<?php checked( ! empty( $settings['safe_mode'] ) ); ?>
+									>
+									<?php esc_html_e( 'Enable Safe Mode', 'vacuum-image-optimizer' ); ?>
+								</label>
+								<p class="description"><?php esc_html_e( 'Safe Mode preserves originals, keeps backups enabled, skips risky formats, and prefers generated alternatives over destructive replacement.', 'vacuum-image-optimizer' ); ?></p>
+							</td>
+						</tr>
+						<tr>
 							<th scope="row">
 								<label for="vacimg-quality"><?php esc_html_e( 'Quality', 'vacuum-image-optimizer' ); ?></label>
 							</th>
@@ -84,6 +104,22 @@ class Compression {
 							</td>
 						</tr>
 						<tr>
+							<th scope="row"><?php esc_html_e( 'WebP Optimization', 'vacuum-image-optimizer' ); ?></th>
+							<td>
+								<input type="hidden" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[enable_webp]" value="0">
+								<label>
+									<input
+										type="checkbox"
+										name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[enable_webp]"
+										value="1"
+										<?php checked( ! empty( $settings['enable_webp'] ) ); ?>
+									>
+									<?php esc_html_e( 'Enable WebP generation and WebP source optimization', 'vacuum-image-optimizer' ); ?>
+								</label>
+								<p class="description"><?php esc_html_e( 'JPEG and PNG images generate WebP alternatives. Existing WebP uploads are recompressed in place only when the optimized result is smaller and a backup is available.', 'vacuum-image-optimizer' ); ?></p>
+							</td>
+						</tr>
+						<tr>
 							<th scope="row"><?php esc_html_e( 'Upload Automation', 'vacuum-image-optimizer' ); ?></th>
 							<td>
 								<input type="hidden" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[auto_optimize_uploads]" value="0">
@@ -96,7 +132,7 @@ class Compression {
 									>
 									<?php esc_html_e( 'Enable auto optimization for new uploads', 'vacuum-image-optimizer' ); ?>
 								</label>
-								<p class="description"><?php esc_html_e( 'Automatically optimize new JPEG and PNG uploads.', 'vacuum-image-optimizer' ); ?></p>
+								<p class="description"><?php esc_html_e( 'Automatically optimize new JPEG, PNG, and WebP uploads.', 'vacuum-image-optimizer' ); ?></p>
 
 								<fieldset class="vacimg-radio-group">
 									<legend class="screen-reader-text"><?php esc_html_e( 'Auto optimization mode', 'vacuum-image-optimizer' ); ?></legend>
@@ -123,6 +159,7 @@ class Compression {
 										name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[enable_avif]"
 										value="1"
 										<?php checked( ! empty( $settings['enable_avif'] ) ); ?>
+										<?php disabled( empty( $status['avif_support'] ) ); ?>
 									>
 									<?php esc_html_e( 'Enable AVIF Generation', 'vacuum-image-optimizer' ); ?>
 								</label>
@@ -145,6 +182,16 @@ class Compression {
 									<strong><span data-vacimg-avif-quality-value><?php echo esc_html( (string) $settings['avif_quality'] ); ?></span>%</strong>
 								</div>
 								<p class="description"><?php esc_html_e( 'Lower AVIF quality values usually reduce file size further. Range: 0–100.', 'vacuum-image-optimizer' ); ?></p>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Resize Limits', 'vacuum-image-optimizer' ); ?></th>
+							<td>
+								<label for="vacimg-max-width"><strong><?php esc_html_e( 'Max width', 'vacuum-image-optimizer' ); ?></strong></label>
+								<input id="vacimg-max-width" type="number" min="0" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[max_width]" value="<?php echo esc_attr( (string) $settings['max_width'] ); ?>">
+								<label for="vacimg-max-height"><strong><?php esc_html_e( 'Max height', 'vacuum-image-optimizer' ); ?></strong></label>
+								<input id="vacimg-max-height" type="number" min="0" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[max_height]" value="<?php echo esc_attr( (string) $settings['max_height'] ); ?>">
+								<p class="description"><?php esc_html_e( 'Use 0 to preserve original dimensions. Resize limits are stored for safe workflows and future optimization passes.', 'vacuum-image-optimizer' ); ?></p>
 							</td>
 						</tr>
 						<tr>

@@ -177,8 +177,9 @@ class Installer {
 	 */
 	private static function set_default_options(): void {
 		$defaults = [
-			'quality'               => 85,
+			'quality'               => 82,
 			'profile'               => 'balanced',
+			'enable_webp'           => true,
 			'auto_optimize_uploads' => false,
 			'auto_optimize_mode'    => 'queue',
 			'enable_avif'           => false,
@@ -187,7 +188,15 @@ class Installer {
 			'preferred_format'      => 'auto',
 			'enable_backups'        => true,
 			'backup_retention_days' => 0,
-			'enable_lazy_loading'   => false,
+			'enable_lazy_loading'   => true,
+			'safe_mode'             => true,
+			'max_width'             => 0,
+			'max_height'            => 0,
+			'exclude_mime_types'    => [],
+			'min_file_size'         => 0,
+			'max_file_size'         => 0,
+			'exclude_filename_patterns' => '',
+			'exclude_path_patterns' => '',
 			'exclude_gif'           => true,
 			'exclude_svg'           => true,
 			'interface_language'    => 'wordpress',
@@ -204,6 +213,10 @@ class Installer {
 
 		if ( false === get_option( 'vacimg_queue_state' ) ) {
 			add_option( 'vacimg_queue_state', 'idle' );
+		}
+
+		if ( false === get_option( 'vacimg_setup_wizard_status' ) ) {
+			add_option( 'vacimg_setup_wizard_status', 'pending' );
 		}
 
 		update_option( self::OPTION_DB_VERSION, VACIMG_VERSION );

@@ -117,7 +117,7 @@ class CompressionSettings {
 	 */
 	private const PROFILES = [
 		'lossless'   => 95,
-		'balanced'   => 85,
+		'balanced'   => 82,
 		'aggressive' => 75,
 		'ultra'      => 65,
 	];
@@ -158,6 +158,7 @@ class CompressionSettings {
 		return [
 			'quality'               => self::PROFILES[ self::DEFAULT_PROFILE ],
 			'profile'               => self::DEFAULT_PROFILE,
+			'enable_webp'           => true,
 			'auto_optimize_uploads' => false,
 			'auto_optimize_mode'    => self::DEFAULT_AUTO_OPTIMIZE_MODE,
 			'enable_avif'           => false,
@@ -166,7 +167,15 @@ class CompressionSettings {
 			'preferred_format'      => self::DEFAULT_PREFERRED_FORMAT,
 			'enable_backups'        => true,
 			'backup_retention_days' => self::DEFAULT_BACKUP_RETENTION_DAYS,
-			'enable_lazy_loading'   => false,
+			'enable_lazy_loading'   => true,
+			'safe_mode'             => true,
+			'max_width'             => 0,
+			'max_height'            => 0,
+			'exclude_mime_types'    => [],
+			'min_file_size'         => 0,
+			'max_file_size'         => 0,
+			'exclude_filename_patterns' => '',
+			'exclude_path_patterns' => '',
 			'exclude_gif'           => true,
 			'exclude_svg'           => true,
 			'interface_language'    => self::DEFAULT_INTERFACE_LANGUAGE,
@@ -208,6 +217,17 @@ class CompressionSettings {
 		$settings = self::get();
 
 		return $settings['quality'];
+	}
+
+	/**
+	 * Check whether WebP generation/optimization is enabled.
+	 *
+	 * @return bool
+	 */
+	public static function is_webp_enabled(): bool {
+		$settings = self::get();
+
+		return (bool) $settings['enable_webp'];
 	}
 
 	/**
@@ -338,6 +358,86 @@ class CompressionSettings {
 	}
 
 	/**
+	 * Check whether Safe Mode is enabled.
+	 *
+	 * @return bool
+	 */
+	public static function is_safe_mode_enabled(): bool {
+		$settings = self::get();
+
+		return (bool) $settings['safe_mode'];
+	}
+
+	/**
+	 * Get configured resize limits. Zero means preserve original dimension.
+	 *
+	 * @return array{max_width: int, max_height: int}
+	 */
+	public static function get_resize_limits(): array {
+		$settings = self::get();
+
+		return [
+			'max_width'  => absint( $settings['max_width'] ),
+			'max_height' => absint( $settings['max_height'] ),
+		];
+	}
+
+	/**
+	 * Get excluded MIME types.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function get_excluded_mime_types(): array {
+		$settings = self::get();
+
+		return array_values( array_filter( array_map( 'sanitize_mime_type', (array) $settings['exclude_mime_types'] ) ) );
+	}
+
+	/**
+	 * Get minimum file size exclusion threshold.
+	 *
+	 * @return int
+	 */
+	public static function get_min_file_size(): int {
+		$settings = self::get();
+
+		return absint( $settings['min_file_size'] );
+	}
+
+	/**
+	 * Get maximum file size exclusion threshold.
+	 *
+	 * @return int
+	 */
+	public static function get_max_file_size(): int {
+		$settings = self::get();
+
+		return absint( $settings['max_file_size'] );
+	}
+
+	/**
+	 * Get filename exclusion patterns.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function get_filename_patterns(): array {
+		$settings = self::get();
+
+		return self::split_patterns( (string) $settings['exclude_filename_patterns'] );
+	}
+
+	/**
+	 * Get path exclusion patterns.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function get_path_patterns(): array {
+		$settings = self::get();
+
+		return self::split_patterns( (string) $settings['exclude_path_patterns'] );
+	}
+
+	/**
 	 * Check whether animated GIF files are excluded.
 	 *
 	 * @return bool
@@ -443,6 +543,10 @@ class CompressionSettings {
 	 * @return bool
 	 */
 	public static function is_mime_excluded( string $mime_type ): bool {
+		if ( in_array( $mime_type, self::get_excluded_mime_types(), true ) ) {
+			return true;
+		}
+
 		if ( 'image/gif' === $mime_type ) {
 			return self::is_gif_excluded();
 		}
@@ -495,6 +599,10 @@ class CompressionSettings {
 			$settings['quality'] = absint( $input['quality'] );
 		}
 
+		if ( array_key_exists( 'enable_webp', $input ) ) {
+			$settings['enable_webp'] = ! empty( $input['enable_webp'] );
+		}
+
 		if ( array_key_exists( 'auto_optimize_uploads', $input ) ) {
 			$settings['auto_optimize_uploads'] = ! empty( $input['auto_optimize_uploads'] );
 		}
@@ -531,6 +639,38 @@ class CompressionSettings {
 
 		if ( array_key_exists( 'enable_lazy_loading', $input ) ) {
 			$settings['enable_lazy_loading'] = ! empty( $input['enable_lazy_loading'] );
+		}
+
+		if ( array_key_exists( 'safe_mode', $input ) ) {
+			$settings['safe_mode'] = ! empty( $input['safe_mode'] );
+		}
+
+		if ( array_key_exists( 'max_width', $input ) && is_numeric( $input['max_width'] ) ) {
+			$settings['max_width'] = absint( $input['max_width'] );
+		}
+
+		if ( array_key_exists( 'max_height', $input ) && is_numeric( $input['max_height'] ) ) {
+			$settings['max_height'] = absint( $input['max_height'] );
+		}
+
+		if ( array_key_exists( 'exclude_mime_types', $input ) ) {
+			$settings['exclude_mime_types'] = self::sanitize_mime_list( $input['exclude_mime_types'] );
+		}
+
+		if ( array_key_exists( 'min_file_size', $input ) && is_numeric( $input['min_file_size'] ) ) {
+			$settings['min_file_size'] = absint( $input['min_file_size'] );
+		}
+
+		if ( array_key_exists( 'max_file_size', $input ) && is_numeric( $input['max_file_size'] ) ) {
+			$settings['max_file_size'] = absint( $input['max_file_size'] );
+		}
+
+		if ( array_key_exists( 'exclude_filename_patterns', $input ) ) {
+			$settings['exclude_filename_patterns'] = self::sanitize_pattern_text( (string) $input['exclude_filename_patterns'] );
+		}
+
+		if ( array_key_exists( 'exclude_path_patterns', $input ) ) {
+			$settings['exclude_path_patterns'] = self::sanitize_pattern_text( (string) $input['exclude_path_patterns'] );
 		}
 
 		if ( array_key_exists( 'exclude_gif', $input ) ) {
@@ -570,6 +710,8 @@ class CompressionSettings {
 			? absint( $settings['quality'] )
 			: self::PROFILES[ $profile ];
 
+		$enable_webp = array_key_exists( 'enable_webp', $settings ) ? ! empty( $settings['enable_webp'] ) : true;
+
 		$auto_optimize_uploads = ! empty( $settings['auto_optimize_uploads'] );
 		$auto_optimize_mode    = isset( $settings['auto_optimize_mode'] ) ? sanitize_key( (string) $settings['auto_optimize_mode'] ) : self::DEFAULT_AUTO_OPTIMIZE_MODE;
 
@@ -595,9 +737,20 @@ class CompressionSettings {
 
 		// Defaults for these differ from "false", so honor stored keys explicitly.
 		$enable_backups      = array_key_exists( 'enable_backups', $settings ) ? ! empty( $settings['enable_backups'] ) : true;
-		$enable_lazy_loading = ! empty( $settings['enable_lazy_loading'] );
+		$enable_lazy_loading = array_key_exists( 'enable_lazy_loading', $settings ) ? ! empty( $settings['enable_lazy_loading'] ) : true;
+		$safe_mode           = array_key_exists( 'safe_mode', $settings ) ? ! empty( $settings['safe_mode'] ) : true;
+		if ( $safe_mode ) {
+			$enable_backups = true;
+		}
 		$exclude_gif         = array_key_exists( 'exclude_gif', $settings ) ? ! empty( $settings['exclude_gif'] ) : true;
 		$exclude_svg         = array_key_exists( 'exclude_svg', $settings ) ? ! empty( $settings['exclude_svg'] ) : true;
+		$exclude_mime_types  = isset( $settings['exclude_mime_types'] ) ? self::sanitize_mime_list( $settings['exclude_mime_types'] ) : [];
+		$min_file_size       = isset( $settings['min_file_size'] ) && is_numeric( $settings['min_file_size'] ) ? absint( $settings['min_file_size'] ) : 0;
+		$max_file_size       = isset( $settings['max_file_size'] ) && is_numeric( $settings['max_file_size'] ) ? absint( $settings['max_file_size'] ) : 0;
+		$max_width           = isset( $settings['max_width'] ) && is_numeric( $settings['max_width'] ) ? absint( $settings['max_width'] ) : 0;
+		$max_height          = isset( $settings['max_height'] ) && is_numeric( $settings['max_height'] ) ? absint( $settings['max_height'] ) : 0;
+		$filename_patterns   = isset( $settings['exclude_filename_patterns'] ) ? self::sanitize_pattern_text( (string) $settings['exclude_filename_patterns'] ) : '';
+		$path_patterns       = isset( $settings['exclude_path_patterns'] ) ? self::sanitize_pattern_text( (string) $settings['exclude_path_patterns'] ) : '';
 
 		$interface_language = isset( $settings['interface_language'] ) ? sanitize_text_field( (string) $settings['interface_language'] ) : self::DEFAULT_INTERFACE_LANGUAGE;
 		if ( ! in_array( $interface_language, self::INTERFACE_LANGUAGES, true ) ) {
@@ -605,20 +758,29 @@ class CompressionSettings {
 		}
 
 		return [
-			'quality'               => self::clamp_quality( $quality ),
-			'profile'               => $profile,
-			'auto_optimize_uploads' => $auto_optimize_uploads,
-			'auto_optimize_mode'    => $auto_optimize_mode,
-			'enable_avif'           => $enable_avif,
+				'quality'               => self::clamp_quality( $quality ),
+				'profile'               => $profile,
+				'enable_webp'           => $enable_webp,
+				'auto_optimize_uploads' => $auto_optimize_uploads,
+				'auto_optimize_mode'    => $auto_optimize_mode,
+				'enable_avif'           => $enable_avif,
 			'avif_quality'          => self::clamp_avif_quality( $avif_quality ),
 			'enable_frontend_delivery' => $enable_frontend_delivery,
 			'preferred_format'      => $preferred_format,
-			'enable_backups'        => $enable_backups,
-			'backup_retention_days' => $backup_retention_days,
-			'enable_lazy_loading'   => $enable_lazy_loading,
-			'exclude_gif'           => $exclude_gif,
-			'exclude_svg'           => $exclude_svg,
-			'interface_language'    => $interface_language,
+				'enable_backups'        => $enable_backups,
+				'backup_retention_days' => $backup_retention_days,
+				'enable_lazy_loading'   => $enable_lazy_loading,
+				'safe_mode'             => $safe_mode,
+				'max_width'             => $max_width,
+				'max_height'            => $max_height,
+				'exclude_mime_types'    => $exclude_mime_types,
+				'min_file_size'         => $min_file_size,
+				'max_file_size'         => $max_file_size,
+				'exclude_filename_patterns' => $filename_patterns,
+				'exclude_path_patterns' => $path_patterns,
+				'exclude_gif'           => $exclude_gif,
+				'exclude_svg'           => $exclude_svg,
+				'interface_language'    => $interface_language,
 		];
 	}
 
@@ -650,5 +812,62 @@ class CompressionSettings {
 	 */
 	private static function clamp_avif_quality( int $quality ): int {
 		return max( 0, min( 100, $quality ) );
+	}
+
+	/**
+	 * Sanitize a MIME type list from an array or textarea string.
+	 *
+	 * @param mixed $value Raw MIME list.
+	 * @return array<int, string>
+	 */
+	private static function sanitize_mime_list( $value ): array {
+		$items = is_array( $value ) ? $value : preg_split( '/[\r\n,]+/', (string) $value );
+		$items = false === $items ? [] : $items;
+
+		return array_values(
+			array_unique(
+				array_filter(
+					array_map(
+						static fn( $item ): string => sanitize_mime_type( trim( (string) $item ) ),
+						$items
+					)
+				)
+			)
+		);
+	}
+
+	/**
+	 * Sanitize newline-separated filename/path patterns.
+	 *
+	 * @param string $value Raw textarea value.
+	 * @return string
+	 */
+	private static function sanitize_pattern_text( string $value ): string {
+		$patterns = self::split_patterns( $value );
+
+		return implode( "\n", $patterns );
+	}
+
+	/**
+	 * Split textarea patterns into sanitized lines.
+	 *
+	 * @param string $value Raw textarea value.
+	 * @return array<int, string>
+	 */
+	private static function split_patterns( string $value ): array {
+		$lines = preg_split( '/\r\n|\r|\n/', $value );
+		$lines = false === $lines ? [] : $lines;
+
+		return array_values(
+			array_filter(
+				array_map(
+					static function ( string $line ): string {
+						$line = trim( wp_strip_all_tags( $line ) );
+						return substr( $line, 0, 160 );
+					},
+					$lines
+				)
+			)
+		);
 	}
 }

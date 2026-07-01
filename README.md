@@ -4,29 +4,32 @@ Local WebP and AVIF image optimization for WordPress, with bulk processing, uplo
 
 ## Current Release
 
-- Current version: `0.9.0`
+- Current version: `1.0.1`
 - WordPress.org status: published via SVN
 - Latest WordPress.org SVN revision: `3588409`
-- Stable tag: `0.9.0`
+- Stable tag: `1.0.1`
 - Tested up to: WordPress `7.0`
 - Requires PHP: `8.1`
 
 ## Features
 
 - Generate WebP files for JPEG and PNG uploads using local Imagick or GD support.
+- Safely recompress uploaded WebP source files with backup-first replacement only when smaller.
 - Optionally generate AVIF files when the server supports AVIF.
+- Use an optional setup wizard with Safe Mode defaults.
 - Bulk optimize existing Media Library images with a start, pause, resume queue.
 - Automatically process new uploads in queue or immediate mode.
 - Preserve originals and optionally keep restorable backups.
 - Serve generated WebP/AVIF on the frontend with safe fallback to original images.
 - View storage savings, recent activity, top savings, and export reports as CSV.
 - Use a multilingual admin interface with bundled translations.
+- Exclude risky sources by MIME type, file size, filename pattern, or path pattern.
 
 ## Links
 
 - WordPress.org plugin page: <https://wordpress.org/plugins/vacuum-image-optimizer/>
 - WordPress.org SVN: <https://plugins.svn.wordpress.org/vacuum-image-optimizer>
-- GitHub release: <https://github.com/mcorucu/vacuum-image-optimizer/releases/tag/v0.9.0>
+- GitHub releases: <https://github.com/mcorucu/vacuum-image-optimizer/releases>
 - Project page: <https://mcorucu.com/en/projects/vacuum-image-optimizer>
 
 Download the installable plugin from WordPress.org once the directory page has finished propagating.
@@ -58,6 +61,7 @@ The runtime plugin includes a lightweight PSR-4 fallback autoloader, so Composer
 ## Development / Release Notes
 
 - Public version `0.9.0` was published to WordPress.org in SVN revision `3588409`.
+- Version `1.0.1` prepares safer onboarding, WebP source optimization, expanded format checks, and improved system/Media Library UX.
 - The WordPress.org ZIP is intentionally runtime-focused and does not include GitHub-only documentation.
 - GitHub documentation in `docs/` is maintained for architecture, release history, and contributor context.
 

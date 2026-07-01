@@ -74,6 +74,8 @@ class RestoreEngine {
 	 * @return void
 	 */
 	private function remove_derivatives( int $attachment_id, string $original_path ): void {
+		$original_path = wp_normalize_path( $original_path );
+
 		foreach ( [ 'webp', 'avif' ] as $format ) {
 			// Remove the linked derivative Media Library attachment (and its file).
 			$derivative_id = absint( get_post_meta( $attachment_id, '_vacimg_' . $format . '_attachment_id', true ) );
@@ -84,10 +86,15 @@ class RestoreEngine {
 			// Delete the derivative file recorded in meta, if it is still present.
 			$meta_path = get_post_meta( $attachment_id, '_vacimg_' . $format . '_path', true );
 			$meta_path = is_string( $meta_path ) ? wp_normalize_path( $meta_path ) : '';
-			$this->delete_derivative_file( $meta_path, $format );
+			if ( $meta_path !== $original_path ) {
+				$this->delete_derivative_file( $meta_path, $format );
+			}
 
 			// Also delete the sibling derivative next to the original (covers untracked files).
-			$this->delete_derivative_file( $this->sibling_derivative_path( $original_path, $format ), $format );
+			$sibling_path = $this->sibling_derivative_path( $original_path, $format );
+			if ( $sibling_path !== $original_path ) {
+				$this->delete_derivative_file( $sibling_path, $format );
+			}
 
 			delete_post_meta( $attachment_id, '_vacimg_' . $format . '_attachment_id' );
 		}

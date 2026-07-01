@@ -45,6 +45,14 @@ class SystemStatus {
 							<span class="vacimg-status-value"><?php echo esc_html( $status['memory_limit'] ); ?></span>
 						</li>
 						<li>
+							<span class="vacimg-status-label"><?php esc_html_e( 'Max Execution Time', 'vacuum-image-optimizer' ); ?></span>
+							<span class="vacimg-status-value"><?php echo esc_html( (string) $status['max_execution_time'] ); ?></span>
+						</li>
+						<li>
+							<span class="vacimg-status-label"><?php esc_html_e( 'Disk Free Space', 'vacuum-image-optimizer' ); ?></span>
+							<span class="vacimg-status-value"><?php echo esc_html( absint( $status['disk_free_space'] ) > 0 ? size_format( absint( $status['disk_free_space'] ), 2 ) : __( 'Not available', 'vacuum-image-optimizer' ) ); ?></span>
+						</li>
+						<li>
 							<span class="vacimg-status-label"><?php esc_html_e( 'Upload Max Filesize', 'vacuum-image-optimizer' ); ?></span>
 							<span class="vacimg-status-value"><?php echo esc_html( $status['upload_limit'] ); ?></span>
 						</li>
@@ -67,8 +75,12 @@ class SystemStatus {
 							<?php $this->render_badge( $status['imagick'] ); ?>
 						</li>
 						<li>
-							<span class="vacimg-status-label"><?php esc_html_e( 'WebP Support', 'vacuum-image-optimizer' ); ?></span>
-							<?php $this->render_badge( $status['webp_support'] ); ?>
+							<span class="vacimg-status-label"><?php esc_html_e( 'WebP Read Support', 'vacuum-image-optimizer' ); ?></span>
+							<?php $this->render_support_badge( $status['webp_read'] ); ?>
+						</li>
+						<li>
+							<span class="vacimg-status-label"><?php esc_html_e( 'WebP Write Support', 'vacuum-image-optimizer' ); ?></span>
+							<?php $this->render_support_badge( $status['webp_write'] ); ?>
 						</li>
 						<li>
 							<span class="vacimg-status-label"><?php esc_html_e( 'WebP via Imagick', 'vacuum-image-optimizer' ); ?></span>
@@ -87,8 +99,16 @@ class SystemStatus {
 							<?php $this->render_badge( $status['avif_gd'] ); ?>
 						</li>
 						<li>
+							<span class="vacimg-status-label"><?php esc_html_e( 'AVIF Read Support', 'vacuum-image-optimizer' ); ?></span>
+							<?php $this->render_support_badge( $status['avif_read'] ); ?>
+						</li>
+						<li>
+							<span class="vacimg-status-label"><?php esc_html_e( 'AVIF Write Support', 'vacuum-image-optimizer' ); ?></span>
+							<?php $this->render_support_badge( $status['avif_write'] ); ?>
+						</li>
+						<li>
 							<span class="vacimg-status-label"><?php esc_html_e( 'AVIF Support', 'vacuum-image-optimizer' ); ?></span>
-							<?php $this->render_badge( $status['avif_support'] ); ?>
+							<?php $this->render_support_badge( $status['avif_support'] ); ?>
 						</li>
 					</ul>
 				</div>
@@ -149,6 +169,8 @@ class SystemStatus {
 				$config_rows = [
 					__( 'Backups', 'vacuum-image-optimizer' )       => CompressionSettings::is_backups_enabled(),
 					__( 'Lazy Loading', 'vacuum-image-optimizer' )  => CompressionSettings::is_lazy_loading_enabled(),
+					__( 'Safe Mode', 'vacuum-image-optimizer' )     => CompressionSettings::is_safe_mode_enabled(),
+					__( 'WebP', 'vacuum-image-optimizer' )          => CompressionSettings::is_webp_enabled(),
 					__( 'GIF Exclusion', 'vacuum-image-optimizer' ) => CompressionSettings::is_gif_excluded(),
 					__( 'SVG Exclusion', 'vacuum-image-optimizer' ) => CompressionSettings::is_svg_excluded(),
 				];
@@ -208,7 +230,21 @@ class SystemStatus {
 	 */
 	private function render_badge( bool $pass ): void {
 		$class = $pass ? 'vacimg-badge--success' : 'vacimg-badge--error';
-		$text  = $pass ? __( 'Available', 'vacuum-image-optimizer' ) : __( 'Not Available', 'vacuum-image-optimizer' );
+		$text  = $pass ? __( 'Available', 'vacuum-image-optimizer' ) : __( 'Not available', 'vacuum-image-optimizer' );
+		?>
+		<span class="vacimg-badge <?php echo esc_attr( $class ); ?>"><?php echo esc_html( $text ); ?></span>
+		<?php
+	}
+
+	/**
+	 * Render a support badge.
+	 *
+	 * @param bool $supported Whether supported.
+	 * @return void
+	 */
+	private function render_support_badge( bool $supported ): void {
+		$class = $supported ? 'vacimg-badge--success' : 'vacimg-badge--error';
+		$text  = $supported ? __( 'Supported', 'vacuum-image-optimizer' ) : __( 'Not supported', 'vacuum-image-optimizer' );
 		?>
 		<span class="vacimg-badge <?php echo esc_attr( $class ); ?>"><?php echo esc_html( $text ); ?></span>
 		<?php
@@ -228,13 +264,19 @@ class SystemStatus {
 			'PHP Version:      ' . $status['php_version'],
 			'WordPress:        ' . $status['wp_version'],
 			'Memory Limit:     ' . $status['memory_limit'],
+			'Max Exec Time:    ' . $status['max_execution_time'],
+			'Disk Free Space:  ' . ( absint( $status['disk_free_space'] ) > 0 ? size_format( absint( $status['disk_free_space'] ), 2 ) : 'Not available' ),
 			'Upload Limit:     ' . $status['upload_limit'],
 			'Post Max Size:    ' . $status['post_max_size'],
 			'GD:               ' . ( $status['gd'] ? 'Yes' : 'No' ),
 			'Imagick:          ' . ( $status['imagick'] ? 'Yes' : 'No' ),
 			'WebP Support:     ' . ( $status['webp_support'] ? 'Yes' : 'No' ),
+			'WebP Read:        ' . ( $status['webp_read'] ? 'Yes' : 'No' ),
+			'WebP Write:       ' . ( $status['webp_write'] ? 'Yes' : 'No' ),
 			'WebP via Imagick: ' . ( $status['webp_imagick'] ? 'Yes' : 'No' ),
 			'WebP via GD:      ' . ( $status['webp_gd'] ? 'Yes' : 'No' ),
+			'AVIF Read:        ' . ( $status['avif_read'] ? 'Yes' : 'No' ),
+			'AVIF Write:       ' . ( $status['avif_write'] ? 'Yes' : 'No' ),
 			'AVIF via Imagick: ' . ( $status['avif_imagick'] ? 'Yes' : 'No' ),
 			'AVIF via GD:      ' . ( $status['avif_gd'] ? 'Yes' : 'No' ),
 			'AVIF Support:     ' . ( $status['avif_support'] ? 'Yes' : 'No' ),

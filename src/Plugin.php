@@ -9,6 +9,7 @@ namespace VacuumImageOptimizer;
 
 use VacuumImageOptimizer\Admin\Assets;
 use VacuumImageOptimizer\Admin\Menu;
+use VacuumImageOptimizer\Admin\Onboarding;
 use VacuumImageOptimizer\Admin\ReportExporter;
 use VacuumImageOptimizer\Backup\BackupCleanup;
 use VacuumImageOptimizer\Backup\BackupManager;
@@ -90,6 +91,13 @@ class Plugin {
 	 * @var ReportExporter|null
 	 */
 	private ?ReportExporter $report_exporter = null;
+
+	/**
+	 * Setup wizard service.
+	 *
+	 * @var Onboarding|null
+	 */
+	private ?Onboarding $onboarding = null;
 
 	/**
 	 * Upload automation service.
@@ -203,6 +211,8 @@ class Plugin {
 		$this->queue_ajax->register();
 		$this->report_exporter      = new ReportExporter();
 		$this->report_exporter->register();
+		$this->onboarding           = new Onboarding();
+		$this->onboarding->register();
 
 		add_action( 'admin_menu', [ $this->menu, 'register' ] );
 		add_action( 'admin_enqueue_scripts', [ $this->assets, 'enqueue' ] );

@@ -3,7 +3,7 @@
  * Plugin Name: Vacuum Image Optimizer
  * Plugin URI:  https://mcorucu.com/en/projects/vacuum-image-optimizer
  * Description: Modern image optimization toolkit for WordPress. Generate WebP and AVIF variants, automate optimization workflows, optimize media libraries in bulk, improve frontend delivery, and reduce image footprint with a streamlined optimization pipeline.
- * Version:     0.9.0
+ * Version:     1.0.1
  * Author:      Mehmet Can Orucu
  * Author URI:  https://mcorucu.com
  * License:     GPLv2 or later
@@ -19,7 +19,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Define plugin constants.
-define( 'VACIMG_VERSION', '0.9.0' );
+define( 'VACIMG_VERSION', '1.0.1' );
 define( 'VACIMG_PLUGIN_FILE', __FILE__ );
 define( 'VACIMG_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'VACIMG_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

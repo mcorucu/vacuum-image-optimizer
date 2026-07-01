@@ -11,20 +11,14 @@ use VacuumImageOptimizer\Engine\AVIFGenerator;
 use VacuumImageOptimizer\Engine\WebPGenerator;
 use VacuumImageOptimizer\Queue\QueueManager;
 use VacuumImageOptimizer\Settings\CompressionSettings;
+use VacuumImageOptimizer\Utils\ImageFormat;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Detects newly uploaded JPEG/PNG attachments and auto-processes them safely.
+ * Detects newly uploaded JPEG/PNG/WebP attachments and auto-processes them safely.
  */
 class UploadAutomation {
-
-	/**
-	 * Supported upload MIME types.
-	 *
-	 * @var array<int, string>
-	 */
-	private const SUPPORTED_MIME_TYPES = [ 'image/jpeg', 'image/png' ];
 
 	/**
 	 * Whether hooks have been registered.
@@ -175,9 +169,7 @@ class UploadAutomation {
 			return false;
 		}
 
-		$mime_type = (string) get_post_mime_type( $attachment_id );
-
-		return wp_attachment_is_image( $attachment_id ) && in_array( $mime_type, self::SUPPORTED_MIME_TYPES, true );
+		return ImageFormat::is_supported_source_attachment( $attachment_id );
 	}
 
 	/**
