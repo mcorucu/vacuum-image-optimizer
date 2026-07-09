@@ -49,6 +49,9 @@ class AjaxController {
 		add_action( 'wp_ajax_vacimg_process_batch', [ $this, 'process_batch' ] );
 		add_action( 'wp_ajax_vacimg_queue_status', [ $this, 'queue_status' ] );
 		add_action( 'wp_ajax_vacimg_retry_queue_job', [ $this, 'retry_queue_job' ] );
+		add_action( 'wp_ajax_vacimg_retry_failed_queue_jobs', [ $this, 'retry_failed_queue_jobs' ] );
+		add_action( 'wp_ajax_vacimg_clear_failed_queue_jobs', [ $this, 'clear_failed_queue_jobs' ] );
+		add_action( 'wp_ajax_vacimg_cancel_queue', [ $this, 'cancel_queue' ] );
 	}
 
 	/**
@@ -59,7 +62,8 @@ class AjaxController {
 	public function scan_library(): void {
 		$this->verify_request();
 
-		$result = $this->queue_manager->scan_library();
+		$scan_all = isset( $_POST['scan_all'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['scan_all'] ) );
+		$result = $this->queue_manager->scan_library( $scan_all );
 		wp_send_json_success(
 			[
 				'message' => sprintf(
@@ -82,7 +86,7 @@ class AjaxController {
 	public function start_queue(): void {
 		$this->verify_request();
 		$this->queue_manager->reset_processing_jobs();
-		$this->queue_manager->set_queue_state( 'running' );
+		$this->queue_manager->start_queue();
 		$this->queue_status();
 	}
 
@@ -105,7 +109,7 @@ class AjaxController {
 	public function resume_queue(): void {
 		$this->verify_request();
 		$this->queue_manager->reset_processing_jobs();
-		$this->queue_manager->set_queue_state( 'running' );
+		$this->queue_manager->start_queue();
 		$this->queue_status();
 	}
 
@@ -171,6 +175,39 @@ class AjaxController {
 				'failed' => $this->format_failed_jobs(),
 			]
 		);
+	}
+
+	/** Retry every failure that has not exhausted its retry budget. */
+	public function retry_failed_queue_jobs(): void {
+		$this->verify_request();
+		$requeued = $this->queue_manager->retry_failed_jobs();
+		wp_send_json_success( [
+			'message' => sprintf( __( '%d failed jobs requeued.', 'vacuum-image-optimizer' ), $requeued ),
+			'stats' => $this->queue_manager->get_statistics(),
+			'failed' => $this->format_failed_jobs(),
+		] );
+	}
+
+	/** Remove terminal queue failures without modifying attachments or files. */
+	public function clear_failed_queue_jobs(): void {
+		$this->verify_request();
+		$cleared = $this->queue_manager->clear_failed_jobs();
+		wp_send_json_success( [
+			'message' => sprintf( __( '%d failed jobs cleared.', 'vacuum-image-optimizer' ), $cleared ),
+			'stats' => $this->queue_manager->get_statistics(),
+			'failed' => [],
+		] );
+	}
+
+	/** Cancel unstarted queue work safely. */
+	public function cancel_queue(): void {
+		$this->verify_request();
+		$cancelled = $this->queue_manager->cancel_queue();
+		wp_send_json_success( [
+			'message' => sprintf( __( '%d pending jobs cancelled.', 'vacuum-image-optimizer' ), $cancelled ),
+			'stats' => $this->queue_manager->get_statistics(),
+			'failed' => $this->format_failed_jobs(),
+		] );
 	}
 
 	/**

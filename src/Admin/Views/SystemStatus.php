@@ -26,6 +26,16 @@ class SystemStatus {
 		$status = SystemCheck::get_status();
 		?>
 		<div class="vacimg-status">
+			<div class="vacimg-card">
+				<h2><?php esc_html_e( 'WordPress Compatibility', 'vacuum-image-optimizer' ); ?></h2>
+				<ul class="vacimg-status-list">
+					<li><span class="vacimg-status-label"><?php esc_html_e( 'Current WordPress', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( $status['wp_version'] ); ?></span><?php $this->render_compatibility_badge( version_compare( $status['wp_version'], '6.2', '>=' ) ); ?></li>
+					<li><span class="vacimg-status-label"><?php esc_html_e( 'Tested up to', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( $status['wp_tested_up_to'] ); ?></span></li>
+					<li><span class="vacimg-status-label"><?php esc_html_e( 'PHP Version', 'vacuum-image-optimizer' ); ?></span><span class="vacimg-status-value"><?php echo esc_html( $status['php_version'] ); ?></span><?php $this->render_compatibility_badge( (bool) $status['php_recommended'] ); ?></li>
+					<li><span class="vacimg-status-label"><?php esc_html_e( 'Filesystem Permissions', 'vacuum-image-optimizer' ); ?></span><?php $this->render_compatibility_badge( (bool) $status['upload_writable'] && (bool) $status['backups_writable'] ); ?></li>
+					<li><span class="vacimg-status-label"><?php esc_html_e( 'Debug Mode', 'vacuum-image-optimizer' ); ?></span><?php $this->render_debug_badge( (bool) $status['debug_enabled'] ); ?></li>
+				</ul>
+			</div>
 			<div class="vacimg-cards-row">
 				<div class="vacimg-card">
 					<h2><?php esc_html_e( 'Server Environment', 'vacuum-image-optimizer' ); ?></h2>
@@ -68,10 +78,12 @@ class SystemStatus {
 					<ul class="vacimg-status-list">
 						<li>
 							<span class="vacimg-status-label"><?php esc_html_e( 'GD Extension', 'vacuum-image-optimizer' ); ?></span>
+							<?php if ( '' !== $status['gd_version'] ) : ?><span class="vacimg-status-value"><?php echo esc_html( $status['gd_version'] ); ?></span><?php endif; ?>
 							<?php $this->render_badge( $status['gd'] ); ?>
 						</li>
 						<li>
 							<span class="vacimg-status-label"><?php esc_html_e( 'Imagick Extension', 'vacuum-image-optimizer' ); ?></span>
+							<?php if ( '' !== $status['imagick_version'] ) : ?><span class="vacimg-status-value"><?php echo esc_html( $status['imagick_version'] ); ?></span><?php endif; ?>
 							<?php $this->render_badge( $status['imagick'] ); ?>
 						</li>
 						<li>
@@ -137,6 +149,9 @@ class SystemStatus {
 						<span class="vacimg-status-label"><?php esc_html_e( 'AVIF Available', 'vacuum-image-optimizer' ); ?></span>
 						<?php $this->render_badge( (bool) $status['avif_support'] ); ?>
 					</li>
+					<li><span class="vacimg-status-label"><?php esc_html_e( 'WordPress Cron', 'vacuum-image-optimizer' ); ?></span><?php $this->render_badge( (bool) $status['cron_available'] ); ?></li>
+					<li><span class="vacimg-status-label"><?php esc_html_e( 'REST API', 'vacuum-image-optimizer' ); ?></span><?php $this->render_badge( (bool) $status['rest_available'] ); ?></li>
+					<li><span class="vacimg-status-label"><?php esc_html_e( 'Admin AJAX', 'vacuum-image-optimizer' ); ?></span><?php $this->render_badge( (bool) $status['ajax_available'] ); ?></li>
 				</ul>
 			</div>
 
@@ -214,7 +229,7 @@ class SystemStatus {
 				<textarea class="vacimg-debug-info" rows="10" readonly><?php echo esc_textarea( $this->format_debug_info( $status ) ); ?></textarea>
 				<p>
 					<button type="button" class="vacimg-button vacimg-button--secondary" id="vacimg-copy-debug">
-						<?php esc_html_e( 'Copy to Clipboard', 'vacuum-image-optimizer' ); ?>
+						<?php esc_html_e( 'Copy Diagnostics', 'vacuum-image-optimizer' ); ?>
 					</button>
 				</p>
 			</div>
@@ -250,6 +265,24 @@ class SystemStatus {
 		<?php
 	}
 
+	/** Render calm compatibility labels for administrators. */
+	private function render_compatibility_badge( bool $ok ): void {
+		$class = $ok ? 'vacimg-badge--success' : 'vacimg-badge--error';
+		$text  = $ok ? __( 'OK', 'vacuum-image-optimizer' ) : __( 'Recommended upgrade', 'vacuum-image-optimizer' );
+		?>
+		<span class="vacimg-badge <?php echo esc_attr( $class ); ?>"><?php echo esc_html( $text ); ?></span>
+		<?php
+	}
+
+	/** Debug is informational rather than an error condition. */
+	private function render_debug_badge( bool $enabled ): void {
+		$text = $enabled ? __( 'Warning', 'vacuum-image-optimizer' ) : __( 'OK', 'vacuum-image-optimizer' );
+		$class = $enabled ? 'vacimg-badge--warning' : 'vacimg-badge--success';
+		?>
+		<span class="vacimg-badge <?php echo esc_attr( $class ); ?>"><?php echo esc_html( $text ); ?></span>
+		<?php
+	}
+
 	/**
 	 * Format debug info as plain text.
 	 *
@@ -261,15 +294,19 @@ class SystemStatus {
 			'Vacuum Image Optimizer - System Report',
 			'=====================================',
 			'',
+			'Plugin Version:   ' . $status['plugin_version'],
 			'PHP Version:      ' . $status['php_version'],
 			'WordPress:        ' . $status['wp_version'],
+			'Tested up to:     ' . $status['wp_tested_up_to'],
 			'Memory Limit:     ' . $status['memory_limit'],
 			'Max Exec Time:    ' . $status['max_execution_time'],
 			'Disk Free Space:  ' . ( absint( $status['disk_free_space'] ) > 0 ? size_format( absint( $status['disk_free_space'] ), 2 ) : 'Not available' ),
 			'Upload Limit:     ' . $status['upload_limit'],
 			'Post Max Size:    ' . $status['post_max_size'],
 			'GD:               ' . ( $status['gd'] ? 'Yes' : 'No' ),
+			'GD Version:       ' . ( $status['gd_version'] ?: 'Not available' ),
 			'Imagick:          ' . ( $status['imagick'] ? 'Yes' : 'No' ),
+			'Imagick Version:  ' . ( $status['imagick_version'] ?: 'Not available' ),
 			'WebP Support:     ' . ( $status['webp_support'] ? 'Yes' : 'No' ),
 			'WebP Read:        ' . ( $status['webp_read'] ? 'Yes' : 'No' ),
 			'WebP Write:       ' . ( $status['webp_write'] ? 'Yes' : 'No' ),
@@ -281,6 +318,11 @@ class SystemStatus {
 			'AVIF via GD:      ' . ( $status['avif_gd'] ? 'Yes' : 'No' ),
 			'AVIF Support:     ' . ( $status['avif_support'] ? 'Yes' : 'No' ),
 			'Upload Writable:  ' . ( $status['upload_writable'] ? 'Yes' : 'No' ),
+			'Backup Writable:  ' . ( $status['backups_writable'] ? 'Yes' : 'No' ),
+			'WordPress Cron:   ' . ( $status['cron_available'] ? 'Yes' : 'No' ),
+			'REST API:         ' . ( $status['rest_available'] ? 'Yes' : 'No' ),
+			'Admin AJAX:       ' . ( $status['ajax_available'] ? 'Yes' : 'No' ),
+			'Debug Enabled:    ' . ( $status['debug_enabled'] ? 'Yes' : 'No' ),
 		];
 
 		return implode( "\n", $lines );

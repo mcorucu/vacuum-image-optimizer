@@ -72,33 +72,50 @@ class UploadAutomation {
 		}
 
 		$this->registered = true;
-		add_action( 'add_attachment', [ $this, 'handle_new_attachment' ], 20 );
+		// Attachment metadata is generated after WordPress has finalized the upload.
+		// This avoids racing image editors and keeps the upload request conservative.
+		add_filter( 'wp_generate_attachment_metadata', [ $this, 'handle_attachment_metadata' ], 20, 2 );
 	}
 
 	/**
-	 * Handle a newly created attachment.
+	 * Handle an attachment after WordPress has generated its metadata.
 	 *
+	 * @param array<string, mixed> $metadata Attachment metadata.
 	 * @param int $attachment_id Attachment ID.
-	 * @return void
+	 * @return array<string, mixed>
 	 */
-	public function handle_new_attachment( int $attachment_id ): void {
+	public function handle_attachment_metadata( array $metadata, int $attachment_id ): array {
 		$attachment_id = absint( $attachment_id );
 
 		try {
-			if ( ! CompressionSettings::is_auto_optimize_uploads_enabled() || ! $this->is_supported_upload( $attachment_id ) ) {
-				return;
+			if ( ! CompressionSettings::is_auto_optimize_uploads_enabled() ) {
+				return $metadata;
+			}
+
+			// Prevent repeat metadata generation from re-queuing or reprocessing a file.
+			if ( '' !== (string) get_post_meta( $attachment_id, '_vacimg_auto_status', true ) ) {
+				return $metadata;
+			}
+
+			if ( ! $this->is_supported_upload( $attachment_id ) ) {
+				$this->mark_auto_skipped( $attachment_id );
+				return $metadata;
 			}
 
 			$mode = CompressionSettings::get_auto_optimize_mode();
-			if ( 'immediate' === $mode ) {
+			// Safe Mode deliberately queues work, even when immediate mode was selected,
+			// so a large upload is never made slower by optimization work.
+			if ( 'immediate' === $mode && ! CompressionSettings::is_safe_mode_enabled() ) {
 				$this->process_immediately( $attachment_id );
-				return;
+				return $metadata;
 			}
 
 			$this->queue_attachment( $attachment_id );
 		} catch ( \Throwable $throwable ) {
 			$this->store_failure( $attachment_id, $throwable->getMessage() );
 		}
+
+		return $metadata;
 	}
 
 	/**
@@ -108,12 +125,13 @@ class UploadAutomation {
 	 * @return void
 	 */
 	private function queue_attachment( int $attachment_id ): void {
+		update_post_meta( $attachment_id, '_vacimg_status', 'pending' );
+		update_post_meta( $attachment_id, '_vacimg_auto_status', 'pending' );
+
 		if ( $this->queue_manager->add_attachment( $attachment_id ) ) {
-			$this->mark_auto_processed( $attachment_id, 'queue' );
+			update_post_meta( $attachment_id, '_vacimg_auto_processed', 'queue' );
 			return;
 		}
-
-		update_post_meta( $attachment_id, '_vacimg_status', 'pending' );
 	}
 
 	/**
@@ -127,7 +145,7 @@ class UploadAutomation {
 
 		if ( ! empty( $result['success'] ) ) {
 			$this->maybe_generate_avif( $attachment_id );
-			$this->mark_auto_processed( $attachment_id, 'immediate' );
+			$this->mark_auto_processed( $attachment_id, 'optimized' );
 			return;
 		}
 
@@ -183,6 +201,7 @@ class UploadAutomation {
 		$now = current_time( 'mysql' );
 
 		update_post_meta( $attachment_id, '_vacimg_auto_processed', sanitize_key( $mode ) );
+		update_post_meta( $attachment_id, '_vacimg_auto_status', sanitize_key( $mode ) );
 		update_post_meta( $attachment_id, '_vacimg_auto_processed_at', $now );
 		update_option( 'vacimg_last_auto_processed_at', $now );
 	}
@@ -200,6 +219,18 @@ class UploadAutomation {
 		}
 
 		update_post_meta( $attachment_id, '_vacimg_status', 'error' );
+		update_post_meta( $attachment_id, '_vacimg_auto_status', 'failed' );
 		update_post_meta( $attachment_id, '_vacimg_error_message', sanitize_text_field( $message ) );
+	}
+
+	/** Mark an ineligible automatic upload without interrupting its upload flow. */
+	private function mark_auto_skipped( int $attachment_id ): void {
+		if ( 0 === $attachment_id ) {
+			return;
+		}
+
+		update_post_meta( $attachment_id, '_vacimg_status', 'skipped' );
+		update_post_meta( $attachment_id, '_vacimg_auto_status', 'skipped' );
+		update_post_meta( $attachment_id, '_vacimg_error_message', ImageFormat::get_skip_reason( $attachment_id ) );
 	}
 }

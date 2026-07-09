@@ -100,6 +100,10 @@ class QueueProcessor {
 				if ( ! empty( $result['success'] ) ) {
 					// AVIF is a parallel format: an AVIF failure must not fail the job.
 					$this->maybe_generate_avif( $attachment_id );
+					if ( 'pending' === (string) get_post_meta( $attachment_id, '_vacimg_auto_status', true ) ) {
+						update_post_meta( $attachment_id, '_vacimg_auto_status', 'optimized' );
+						update_post_meta( $attachment_id, '_vacimg_auto_processed_at', current_time( 'mysql' ) );
+					}
 					$this->queue_manager->mark_completed( $queue_id );
 					$completed++;
 					continue;
@@ -107,9 +111,15 @@ class QueueProcessor {
 
 				$message = isset( $result['message'] ) ? (string) $result['message'] : __( 'WebP generation failed.', 'vacuum-image-optimizer' );
 				$this->queue_manager->mark_failed( $queue_id, $message );
+				if ( 'pending' === (string) get_post_meta( $attachment_id, '_vacimg_auto_status', true ) ) {
+					update_post_meta( $attachment_id, '_vacimg_auto_status', 'failed' );
+				}
 				$failed++;
 			} catch ( \Throwable $throwable ) {
 				$this->queue_manager->mark_failed( $queue_id, $throwable->getMessage() );
+				if ( 'pending' === (string) get_post_meta( $attachment_id, '_vacimg_auto_status', true ) ) {
+					update_post_meta( $attachment_id, '_vacimg_auto_status', 'failed' );
+				}
 				$failed++;
 			}
 		}

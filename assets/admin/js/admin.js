@@ -60,9 +60,13 @@
 		var processing = false;
 		var actions = {
 			scan: 'vacimg_scan_library',
+			'scan-all': 'vacimg_scan_library',
 			start: 'vacimg_start_queue',
 			pause: 'vacimg_pause_queue',
-			resume: 'vacimg_resume_queue'
+			resume: 'vacimg_resume_queue',
+			cancel: 'vacimg_cancel_queue',
+			'retry-failed': 'vacimg_retry_failed_queue_jobs',
+			'clear-failed': 'vacimg_clear_failed_queue_jobs'
 		};
 
 		root.addEventListener( 'click', function ( event ) {
@@ -86,7 +90,7 @@
 			}
 
 			setBusy( true );
-			request( actions[ action ] )
+			request( actions[ action ], 'scan-all' === action ? { scan_all: '1' } : {} )
 				.then( function ( payload ) {
 					updateUi( payload );
 					if ( payload.message ) {
@@ -172,7 +176,7 @@
 			var completed = parseInt( stats.completed || 0, 10 );
 			var percent = total > 0 ? Math.round( ( completed / total ) * 100 ) : 0;
 
-			[ 'total', 'pending', 'processing', 'completed', 'failed' ].forEach( function ( key ) {
+			[ 'total', 'pending', 'processing', 'completed', 'failed', 'remaining', 'scanned' ].forEach( function ( key ) {
 				var node = root.querySelector( '[data-vacimg-stat="' + key + '"]' );
 				if ( node ) {
 					node.textContent = formatNumber( stats[ key ] || 0 );

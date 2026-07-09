@@ -37,6 +37,15 @@ class QueueManager {
 	 */
 	private const OPTION_QUEUE_STATE = 'vacimg_queue_state';
 
+	/** Last attachment safely completed or failed in a batch. */
+	private const OPTION_LAST_PROCESSED_ID = 'vacimg_queue_last_processed_id';
+
+	/** Timestamp for the current or most recent queue run. */
+	private const OPTION_STARTED_AT = 'vacimg_queue_started_at';
+
+	/** Count from the latest library scan for clear bulk progress feedback. */
+	private const OPTION_LAST_SCAN_COUNT = 'vacimg_queue_last_scan_count';
+
 	/**
 	 * Fallback maximum retry attempts when no constant is defined.
 	 *
@@ -81,11 +90,11 @@ class QueueManager {
 	 * @param int $attachment_id Attachment ID.
 	 * @return bool
 	 */
-	public function add_attachment( int $attachment_id ): bool {
+	public function add_attachment( int $attachment_id, bool $allow_optimized = false ): bool {
 		global $wpdb;
 
 		$attachment_id = absint( $attachment_id );
-		if ( ! $this->is_valid_attachment( $attachment_id ) || $this->has_queue_entry( $attachment_id ) ) {
+		if ( ! $this->is_valid_attachment( $attachment_id, $allow_optimized ) || $this->has_queue_entry( $attachment_id ) ) {
 			return false;
 		}
 
@@ -190,6 +199,10 @@ class QueueManager {
 			'completed'  => 0,
 			'failed'     => 0,
 			'state'      => $this->get_queue_state(),
+			'last_processed_id' => absint( get_option( self::OPTION_LAST_PROCESSED_ID, 0 ) ),
+			'batch_size' => defined( 'VACIMG_QUEUE_BATCH_SIZE' ) ? absint( VACIMG_QUEUE_BATCH_SIZE ) : 10,
+			'elapsed'    => $this->get_elapsed_seconds(),
+			'scanned'    => absint( get_option( self::OPTION_LAST_SCAN_COUNT, 0 ) ),
 		];
 
 		$table = $this->get_escaped_table_name();
@@ -206,6 +219,7 @@ class QueueManager {
 		}
 
 		$stats['total'] = absint( $stats['pending'] ) + absint( $stats['processing'] ) + absint( $stats['completed'] ) + absint( $stats['failed'] );
+		$stats['remaining'] = absint( $stats['pending'] ) + absint( $stats['processing'] );
 
 		return $stats;
 	}
@@ -215,23 +229,16 @@ class QueueManager {
 	 *
 	 * @return array<string, int>
 	 */
-	public function scan_library(): array {
+	public function scan_library( bool $include_optimized = false ): array {
 		global $wpdb;
 
 		$ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT p.ID
-				FROM {$wpdb->posts} p
-				LEFT JOIN {$wpdb->postmeta} status_meta
-					ON p.ID = status_meta.post_id AND status_meta.meta_key = %s
-				WHERE p.post_type = %s
-				AND p.post_status != %s
-					AND p.post_mime_type IN ( 'image/jpeg', 'image/png', 'image/webp' )
-				AND ( status_meta.meta_value IS NULL OR status_meta.meta_value != %s )",
-				'_vacimg_status',
+				"SELECT ID FROM {$wpdb->posts}
+				WHERE post_type = %s AND post_status != %s
+				AND post_mime_type IN ( 'image/jpeg', 'image/png', 'image/webp' )",
 				'attachment',
-				'trash',
-				'optimized'
+				'trash'
 			)
 		);
 
@@ -240,6 +247,11 @@ class QueueManager {
 
 		foreach ( (array) $ids as $id ) {
 			$attachment_id = absint( $id );
+			$is_optimized  = 'optimized' === (string) get_post_meta( $attachment_id, '_vacimg_status', true );
+
+			if ( ! $include_optimized && $is_optimized ) {
+				continue;
+			}
 			if ( ! ImageFormat::is_supported_source_attachment( $attachment_id ) ) {
 				update_post_meta( $attachment_id, '_vacimg_status', 'skipped' );
 				update_post_meta( $attachment_id, '_vacimg_error_message', ImageFormat::get_skip_reason( $attachment_id ) );
@@ -247,18 +259,78 @@ class QueueManager {
 				continue;
 			}
 
-			if ( $this->add_attachment( $attachment_id ) ) {
+			if ( $include_optimized ) {
+				$this->remove_terminal_entry( $attachment_id );
+			}
+
+			if ( $this->add_attachment( $attachment_id, $include_optimized ) ) {
 				$added++;
 			} else {
 				$skipped++;
 			}
 		}
 
+		$scanned = count( (array) $ids );
+		update_option( self::OPTION_LAST_SCAN_COUNT, $scanned );
+
 		return [
 			'added'   => $added,
 			'skipped' => $skipped,
-			'scanned' => count( (array) $ids ),
+			'scanned' => $scanned,
 		];
+	}
+
+	/** Remove only terminal queue records before a deliberate all-images rescan. */
+	private function remove_terminal_entry( int $attachment_id ): void {
+		global $wpdb;
+
+		$table = $this->get_escaped_table_name();
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$table} WHERE attachment_id = %d AND status IN ( 'completed', 'failed' )",
+				absint( $attachment_id )
+			)
+		);
+	}
+
+	/** Requeue failed jobs that still have attempts remaining. */
+	public function retry_failed_jobs(): int {
+		global $wpdb;
+
+		$table = $this->get_escaped_table_name();
+		$updated = $wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$table} SET status = %s, started_at = NULL, completed_at = NULL, error_message = NULL
+				WHERE status = %s AND attempts < %d",
+				'pending',
+				'failed',
+				$this->get_max_attempts()
+			)
+		);
+
+		return is_int( $updated ) ? max( 0, $updated ) : 0;
+	}
+
+	/** Clear terminal failure records without changing attachment metadata or files. */
+	public function clear_failed_jobs(): int {
+		global $wpdb;
+
+		$table = $this->get_escaped_table_name();
+		$deleted = $wpdb->query( "DELETE FROM {$table} WHERE status = 'failed'" );
+
+		return is_int( $deleted ) ? max( 0, $deleted ) : 0;
+	}
+
+	/** Stop the run and remove only work that has not started yet. */
+	public function cancel_queue(): int {
+		global $wpdb;
+
+		$this->reset_processing_jobs();
+		$table = $this->get_escaped_table_name();
+		$deleted = $wpdb->query( "DELETE FROM {$table} WHERE status = 'pending'" );
+		$this->set_queue_state( 'idle' );
+
+		return is_int( $deleted ) ? max( 0, $deleted ) : 0;
 	}
 
 	/**
@@ -387,6 +459,10 @@ class QueueManager {
 			[ '%d' ]
 		);
 
+		if ( false !== $updated ) {
+			$this->store_last_processed_id( $queue_id );
+		}
+
 		return false !== $updated;
 	}
 
@@ -412,6 +488,10 @@ class QueueManager {
 				absint( $queue_id )
 			)
 		);
+
+		if ( false !== $updated ) {
+			$this->store_last_processed_id( $queue_id );
+		}
 
 		return false !== $updated;
 	}
@@ -462,13 +542,22 @@ class QueueManager {
 		return update_option( self::OPTION_QUEUE_STATE, $state );
 	}
 
+	/** Start or resume the queue while keeping an elapsed-time reference. */
+	public function start_queue(): void {
+		if ( 0 === absint( get_option( self::OPTION_STARTED_AT, 0 ) ) || 'idle' === $this->get_queue_state() ) {
+			update_option( self::OPTION_STARTED_AT, time() );
+		}
+
+		$this->set_queue_state( 'running' );
+	}
+
 	/**
 	 * Check whether an attachment is valid and queue-eligible.
 	 *
 	 * @param int $attachment_id Attachment ID.
 	 * @return bool
 	 */
-	public function is_valid_attachment( int $attachment_id ): bool {
+	public function is_valid_attachment( int $attachment_id, bool $allow_optimized = false ): bool {
 		$attachment_id = absint( $attachment_id );
 		if ( 0 === $attachment_id ) {
 			return false;
@@ -483,7 +572,7 @@ class QueueManager {
 			return false;
 		}
 
-		return 'optimized' !== (string) get_post_meta( $attachment_id, '_vacimg_status', true );
+		return $allow_optimized || 'optimized' !== (string) get_post_meta( $attachment_id, '_vacimg_status', true );
 	}
 
 	/**
@@ -533,5 +622,22 @@ class QueueManager {
 		);
 
 		return is_array( $jobs ) ? $jobs : [];
+	}
+
+	/** Store the attachment ID associated with a completed terminal job. */
+	private function store_last_processed_id( int $queue_id ): void {
+		global $wpdb;
+
+		$table = $this->get_escaped_table_name();
+		$id = $wpdb->get_var( $wpdb->prepare( "SELECT attachment_id FROM {$table} WHERE id = %d", absint( $queue_id ) ) );
+		if ( is_numeric( $id ) ) {
+			update_option( self::OPTION_LAST_PROCESSED_ID, absint( $id ) );
+		}
+	}
+
+	/** Get elapsed queue run time without exposing server timestamps. */
+	private function get_elapsed_seconds(): int {
+		$started_at = absint( get_option( self::OPTION_STARTED_AT, 0 ) );
+		return $started_at > 0 ? max( 0, time() - $started_at ) : 0;
 	}
 }

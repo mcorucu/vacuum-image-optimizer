@@ -171,6 +171,7 @@ class LibraryIntegration {
 	private function get_column_data( int $attachment_id ): array {
 		$status = (string) get_post_meta( $attachment_id, '_vacimg_status', true );
 		$status = '' === $status ? 'pending' : sanitize_key( $status );
+		$auto_status = sanitize_key( (string) get_post_meta( $attachment_id, '_vacimg_auto_status', true ) );
 		$mime   = ImageFormat::get_attachment_mime_type( $attachment_id );
 
 		if ( 'pending' === $status && CompressionSettings::is_mime_excluded( $mime ) ) {
@@ -190,7 +191,9 @@ class LibraryIntegration {
 		];
 
 		if ( 'optimized' === $status ) {
-			$data['status_label']  = __( 'Optimized', 'vacuum-image-optimizer' );
+			$data['status_label']  = 'optimized' === $auto_status
+				? __( 'Optimized automatically', 'vacuum-image-optimizer' )
+				: __( 'Optimized', 'vacuum-image-optimizer' );
 			$data['original_size'] = $this->format_meta_size( $attachment_id, '_vacimg_source_size', $data['original_size'] );
 			$data['webp_size']     = $this->format_meta_size( $attachment_id, '_vacimg_webp_size', $this->get_placeholder() );
 			$data['saved_percent'] = $this->get_saved_percent_label( $attachment_id );
@@ -200,7 +203,9 @@ class LibraryIntegration {
 		}
 
 		if ( 'excluded' === $status ) {
-			$data['status_label'] = __( 'Excluded', 'vacuum-image-optimizer' );
+			$data['status_label'] = 'skipped' === $auto_status
+				? __( 'Skipped by exclusion', 'vacuum-image-optimizer' )
+				: __( 'Excluded', 'vacuum-image-optimizer' );
 			$data['message']      = ImageFormat::get_skip_reason( $attachment_id );
 
 			return $data;
@@ -214,10 +219,16 @@ class LibraryIntegration {
 		}
 
 		if ( 'error' === $status ) {
-			$data['status_label'] = __( 'Error', 'vacuum-image-optimizer' );
+			$data['status_label'] = 'failed' === $auto_status
+				? __( 'Failed, retry available', 'vacuum-image-optimizer' )
+				: __( 'Error', 'vacuum-image-optimizer' );
 			$data['message']      = $this->get_short_error_message( $attachment_id );
 
 			return $data;
+		}
+
+		if ( 'pending' === $status && 'pending' === $auto_status ) {
+			$data['status_label'] = __( 'Pending automatic optimization', 'vacuum-image-optimizer' );
 		}
 
 		return $data;

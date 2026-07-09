@@ -6,11 +6,11 @@ Tags: image optimization, webp, avif, compression, lazy load
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Local WebP and AVIF image optimization with bulk processing, backups, restore tools, reports, and no external API.
+Local WebP and AVIF image optimization with safe bulk processing, backup and restore tools, diagnostics, CSV reports, and no external API.
 
 == Description ==
 
@@ -25,8 +25,8 @@ Unlike optimizers that rewrite originals or depend on a remote API, Vacuum write
 * **WebP generation and source optimization** — Create optimized WebP copies of JPEG/PNG images and safely recompress uploaded WebP source files when the result is smaller.
 * **AVIF generation** — Optionally generate AVIF, a newer format that is often even smaller than WebP, as a parallel format when the server supports it.
 * **Bulk optimization** — Scan your media library and process eligible images in safe, batched background steps.
-* **Queue processing** — A reliable queue runs work in small WordPress AJAX batches you can start, pause, and resume.
-* **Upload automation** — Automatically optimize new JPEG, PNG, and WebP uploads, either by queueing them or processing them immediately.
+* **Queue processing** — A reliable queue runs work in small WordPress AJAX batches with pause, resume, safe cancellation, retry, and scan-all controls.
+* **Upload automation** — Automatically optimize new JPEG, PNG, and WebP uploads after WordPress creates metadata; Safe Mode queues work conservatively.
 * **Frontend delivery** — Serve generated WebP/AVIF on the frontend with automatic, safe fallback to the original image — your media URLs in the database are never changed.
 * **Reports** — See storage savings, recent activity, top savings, format distribution, and automation stats, with one-click CSV export.
 * **Localization** — Fully translatable, shipping with 9 bundled languages plus an in-plugin interface-language selector.
@@ -36,14 +36,18 @@ Unlike optimizers that rewrite originals or depend on a remote API, Vacuum write
 
 Vacuum never modifies or deletes your original images. Optimized formats are written alongside the originals, optional backups can be kept, and a one-click restore brings originals back at any time.
 
+**Privacy and data handling**
+
+Images are optimized locally on your own WordPress server. Vacuum does not use an external API and does not send image data to third-party services. Optimization metadata and optional backups stay in your local WordPress installation.
+
 == Features ==
 
 * WebP image generation (Imagick or GD)
 * WebP source-file recompression with backup-first safety
 * AVIF image generation as a parallel format
 * Optional setup wizard with Safe Mode defaults
-* Bulk optimization with a start/pause/resume queue
-* Automatic optimization of new uploads (queue or immediate mode)
+* Bulk optimization with scan, scan-all, start, pause, resume, safe cancellation, retry, and clear-failed controls
+* Automatic optimization of new uploads after attachment metadata generation
 * Non-destructive frontend delivery with original fallback
 * Native browser lazy loading (no JavaScript)
 * Per-image WebP/AVIF actions in the Media Library
@@ -53,8 +57,8 @@ Vacuum never modifies or deletes your original images. Optimized formats are wri
 * Local processing with no external API dependency
 * Compression profiles and adjustable quality
 * GIF and SVG eligibility exclusions
-* Reports dashboard with CSV export
-* System status and production-readiness checks
+* Reports dashboard with detailed CSV export
+* WordPress 7.0 compatibility, PHP 8.3 readiness, and copyable System Status diagnostics
 * Interface language selector with 9 bundled translations
 * Clean, accessible, mobile-responsive admin UI
 
@@ -108,6 +112,15 @@ WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD ext
 
 == Changelog ==
 
+= 1.1.0 =
+* Confirmed compatibility with WordPress 7.0 and improved PHP 8.3 runtime readiness.
+* Expanded System Status with WordPress compatibility, image engine versions, debug, cron, REST, AJAX, and safe filesystem diagnostics plus Copy Diagnostics.
+* Improved automatic upload optimization to wait for attachment metadata and preserve Safe Mode queue behavior.
+* Added scan-all, safe cancel-pending, retry-failed, clear-failed, resume state, remaining, batch-size, and elapsed-time bulk controls.
+* Expanded CSV reports with attachment metadata, status, generated WebP/AVIF filenames and state, dates, and safe failure reasons.
+* Improved Media Library status for automatic pending, optimized, skipped, and retry states.
+* Updated privacy and local-data handling notes.
+
 = 1.0.1 =
 * Added optional setup wizard with skip/complete flow and settings relaunch.
 * Added WebP source optimization for uploaded WebP files with backup-first replacement only when smaller.
@@ -133,6 +146,9 @@ WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD ext
 * Full internationalization with 9 bundled languages and an interface-language selector.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Adds WordPress 7.0 compatibility, PHP 8.3 readiness, improved diagnostics, safer upload automation, resilient bulk queue controls, and expanded CSV reports.
 
 = 1.0.1 =
 Adds optional setup, WebP source optimization, expanded format handling, improved server checks, safer defaults, and Media Library/bulk workflow improvements.

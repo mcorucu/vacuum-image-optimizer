@@ -7,8 +7,6 @@
 
 namespace VacuumImageOptimizer\Admin;
 
-use VacuumImageOptimizer\Stats\StatsService;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -82,8 +80,6 @@ class ReportExporter {
 
 		check_admin_referer( self::NONCE );
 
-		$stats = new StatsService();
-
 		nocache_headers();
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename="vacuum-image-optimizer-report-' . gmdate( 'Y-m-d' ) . '.csv"' );
@@ -97,35 +93,65 @@ class ReportExporter {
 			$output,
 			[
 				'attachment_id',
-				'title',
+				'file_name',
+				'mime_type',
 				'status',
 				'original_size',
-				'webp_size',
-				'avif_size',
+				'optimized_size',
 				'savings_bytes',
 				'savings_percent',
-				'optimized_at',
+				'webp_file',
+				'webp_status',
+				'avif_file',
+				'avif_status',
+				'last_optimized_date',
+				'reason',
 			]
 		);
 
 		// Stream the report one page at a time so memory stays flat regardless of size.
 		$offset = 0;
 		do {
-			$rows = $stats->get_optimization_rows_page( 'recent', $offset, self::EXPORT_PAGE_SIZE );
+			$rows = $this->get_report_attachment_ids( $offset );
 
-			foreach ( $rows as $row ) {
+			foreach ( $rows as $attachment_id ) {
+				$attachment_id = absint( $attachment_id );
+				if ( $attachment_id <= 0 || '' !== (string) get_post_meta( $attachment_id, '_vacimg_generated_by', true ) ) {
+					continue;
+				}
+
+				$file_path = get_attached_file( $attachment_id );
+				$file_path = is_string( $file_path ) ? $file_path : '';
+				$source_size = absint( get_post_meta( $attachment_id, '_vacimg_source_size', true ) );
+				if ( $source_size <= 0 && '' !== $file_path && file_exists( $file_path ) ) {
+					$file_size = filesize( $file_path );
+					$source_size = false === $file_size ? 0 : absint( $file_size );
+				}
+
+				$webp_path = (string) get_post_meta( $attachment_id, '_vacimg_webp_path', true );
+				$avif_path = (string) get_post_meta( $attachment_id, '_vacimg_avif_path', true );
+				$webp_size = absint( get_post_meta( $attachment_id, '_vacimg_webp_size', true ) );
+				$avif_size = absint( get_post_meta( $attachment_id, '_vacimg_avif_size', true ) );
+				$status = sanitize_key( (string) get_post_meta( $attachment_id, '_vacimg_status', true ) );
+				$status = '' === $status ? 'pending' : $status;
+
 				fputcsv(
 					$output,
 					[
-						absint( $row->ID ?? 0 ),
-						(string) ( $row->post_title ?? '' ),
-						'optimized',
-						absint( $row->source_size ?? 0 ),
-						absint( $row->webp_size ?? 0 ),
-						absint( $row->avif_size ?? 0 ),
-						absint( $row->savings_bytes ?? 0 ),
-						(float) ( $row->savings_percent ?? 0 ),
-						(string) ( $row->optimized_at ?? '' ),
+						$attachment_id,
+						'' !== $file_path ? wp_basename( $file_path ) : sanitize_file_name( (string) get_the_title( $attachment_id ) ),
+						(string) get_post_mime_type( $attachment_id ),
+						$status,
+						$source_size,
+						$webp_size > 0 ? $webp_size : $avif_size,
+						absint( get_post_meta( $attachment_id, '_vacimg_savings_bytes', true ) ),
+						(float) get_post_meta( $attachment_id, '_vacimg_savings_percent', true ),
+						'' !== $webp_path ? wp_basename( $webp_path ) : '',
+						'' !== $webp_path && file_exists( $webp_path ) ? 'generated' : 'not_generated',
+						'' !== $avif_path ? wp_basename( $avif_path ) : '',
+						'' !== $avif_path && file_exists( $avif_path ) ? 'generated' : 'not_generated',
+						(string) get_post_meta( $attachment_id, '_vacimg_optimized_at', true ),
+						sanitize_text_field( (string) get_post_meta( $attachment_id, '_vacimg_error_message', true ) ),
 					]
 				);
 			}
@@ -141,5 +167,24 @@ class ReportExporter {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $output );
 		exit;
+	}
+
+	/** Fetch source image attachment IDs in bounded pages for a memory-safe export. */
+	private function get_report_attachment_ids( int $offset ): array {
+		$query = new \WP_Query(
+			[
+				'post_type'      => 'attachment',
+				'post_status'    => 'any',
+				'post_mime_type' => [ 'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml' ],
+				'posts_per_page' => self::EXPORT_PAGE_SIZE,
+				'offset'         => max( 0, $offset ),
+				'fields'         => 'ids',
+				'orderby'        => 'ID',
+				'order'          => 'ASC',
+				'no_found_rows'  => true,
+			]
+		);
+
+		return is_array( $query->posts ) ? array_map( 'absint', $query->posts ) : [];
 	}
 }

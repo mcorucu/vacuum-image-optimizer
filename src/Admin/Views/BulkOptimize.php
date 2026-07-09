@@ -37,9 +37,11 @@ class BulkOptimize {
 				<p><?php esc_html_e( 'Scan eligible JPEG, PNG, and WebP images, then process the queue in safe WordPress AJAX batches.', 'vacuum-image-optimizer' ); ?></p>
 				<div class="vacimg-button-row">
 					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="scan"><?php esc_html_e( 'Optimize all unoptimized images', 'vacuum-image-optimizer' ); ?></button>
+					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="scan-all"><?php esc_html_e( 'Scan all images', 'vacuum-image-optimizer' ); ?></button>
 					<button type="button" class="vacimg-button vacimg-button--primary" data-vacimg-queue-action="start"><?php esc_html_e( 'Start Queue', 'vacuum-image-optimizer' ); ?></button>
 					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="pause"><?php esc_html_e( 'Pause Queue', 'vacuum-image-optimizer' ); ?></button>
 					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="resume"><?php esc_html_e( 'Resume Queue', 'vacuum-image-optimizer' ); ?></button>
+					<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-queue-action="cancel"><?php esc_html_e( 'Cancel Pending Work', 'vacuum-image-optimizer' ); ?></button>
 				</div>
 			</div>
 
@@ -52,8 +54,12 @@ class BulkOptimize {
 					<?php $this->render_stat( 'total', __( 'Total', 'vacuum-image-optimizer' ), $stats['total'] ); ?>
 					<?php $this->render_stat( 'pending', __( 'Pending', 'vacuum-image-optimizer' ), $stats['pending'] ); ?>
 					<?php $this->render_stat( 'processing', __( 'Processing', 'vacuum-image-optimizer' ), $stats['processing'] ); ?>
-					<?php $this->render_stat( 'completed', __( 'Completed', 'vacuum-image-optimizer' ), $stats['completed'] ); ?>
+					<?php $this->render_stat( 'completed', __( 'Optimized', 'vacuum-image-optimizer' ), $stats['completed'] ); ?>
 					<?php $this->render_stat( 'failed', __( 'Failed', 'vacuum-image-optimizer' ), $stats['failed'] ); ?>
+					<?php $this->render_stat( 'remaining', __( 'Remaining', 'vacuum-image-optimizer' ), $stats['remaining'] ?? 0 ); ?>
+					<?php $this->render_stat( 'scanned', __( 'Scanned', 'vacuum-image-optimizer' ), $stats['scanned'] ?? 0 ); ?>
+					<?php $this->render_static_stat( __( 'Batch Size', 'vacuum-image-optimizer' ), $stats['batch_size'] ?? 0 ); ?>
+					<?php $this->render_static_stat( __( 'Elapsed', 'vacuum-image-optimizer' ), $this->format_elapsed( absint( $stats['elapsed'] ?? 0 ) ) ); ?>
 					<?php $this->render_static_stat( __( 'Skipped', 'vacuum-image-optimizer' ), $stats_service->get_skipped_images() ); ?>
 					<?php $this->render_static_stat( __( 'Total Saved', 'vacuum-image-optimizer' ), size_format( $stats_service->get_space_saved(), 2 ) ); ?>
 				</div>
@@ -64,7 +70,13 @@ class BulkOptimize {
 			</div>
 
 			<div class="vacimg-card">
-				<h2><?php esc_html_e( 'Failed Jobs', 'vacuum-image-optimizer' ); ?></h2>
+				<div class="vacimg-card-header-inline">
+					<h2><?php esc_html_e( 'Failed Jobs', 'vacuum-image-optimizer' ); ?></h2>
+					<div class="vacimg-button-row">
+						<button type="button" class="vacimg-button vacimg-button--secondary vacimg-button--small" data-vacimg-queue-action="retry-failed"><?php esc_html_e( 'Retry Failed', 'vacuum-image-optimizer' ); ?></button>
+						<button type="button" class="vacimg-button vacimg-button--secondary vacimg-button--small" data-vacimg-queue-action="clear-failed"><?php esc_html_e( 'Clear Failed', 'vacuum-image-optimizer' ); ?></button>
+					</div>
+				</div>
 				<div class="vacimg-table-wrap">
 					<table class="widefat striped vacimg-failed-jobs">
 						<thead>
@@ -166,5 +178,10 @@ class BulkOptimize {
 		}
 
 		return min( 100, (int) round( ( absint( $stats['completed'] ?? 0 ) / $total ) * 100 ) );
+	}
+
+	/** Format a bounded elapsed time label for the queue UI. */
+	private function format_elapsed( int $seconds ): string {
+		return human_time_diff( time() - max( 0, $seconds ), time() );
 	}
 }

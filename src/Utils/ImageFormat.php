@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 class ImageFormat {
 
 	/**
-	 * Source formats that Vacuum can safely process in 1.0.1.
+	 * Source formats that Vacuum can safely process in 1.1.0.
 	 *
 	 * @var array<int, string>
 	 */

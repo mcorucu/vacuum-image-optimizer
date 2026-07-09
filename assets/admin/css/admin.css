@@ -595,6 +595,11 @@
 	color: var(--vacimg-error);
 }
 
+.vacimg-badge--warning {
+	background: rgba(234, 179, 8, 0.14);
+	color: #854d0e;
+}
+
 .vacimg-debug-info {
 	box-sizing: border-box;
 	width: 100%;

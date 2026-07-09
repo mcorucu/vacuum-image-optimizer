@@ -23,15 +23,20 @@ class SystemCheck {
 	 */
 	public static function get_status(): array {
 		return [
+			'plugin_version' => defined( 'VACIMG_VERSION' ) ? VACIMG_VERSION : '',
 			'php_version'    => PHP_VERSION,
 			'wp_version'     => get_bloginfo( 'version' ),
+			'wp_tested_up_to' => '7.0',
+			'php_recommended' => version_compare( PHP_VERSION, '8.1', '>=' ),
 			'memory_limit'   => ini_get( 'memory_limit' ),
 			'upload_limit'   => ini_get( 'upload_max_filesize' ),
 			'post_max_size'  => ini_get( 'post_max_size' ),
 			'max_execution_time' => ini_get( 'max_execution_time' ),
 			'disk_free_space' => self::get_disk_free_space(),
 			'gd'             => self::has_gd(),
+			'gd_version'     => self::get_gd_version(),
 			'imagick'        => self::has_imagick(),
+			'imagick_version' => self::get_imagick_version(),
 			'webp_imagick'   => self::has_imagick_webp_write_support(),
 			'webp_gd'        => self::has_gd_webp_write_support(),
 			'webp_read'      => self::has_webp_read_support(),
@@ -45,7 +50,45 @@ class SystemCheck {
 			'upload_writable' => self::is_upload_dir_writable(),
 			'queue_table'    => self::has_queue_table(),
 			'backups_writable' => self::is_backups_writable(),
+			'debug_enabled'  => self::is_debug_enabled(),
+			'cron_available' => self::is_cron_available(),
+			'rest_available' => function_exists( 'rest_get_server' ),
+			'ajax_available' => function_exists( 'wp_doing_ajax' ),
 		];
+	}
+
+	/** Return a display-safe Imagick version without throwing on incomplete builds. */
+	public static function get_imagick_version(): string {
+		if ( ! self::has_imagick() || ! class_exists( '\\Imagick' ) ) {
+			return '';
+		}
+
+		try {
+			$version = \Imagick::getVersion();
+			return is_array( $version ) && isset( $version['versionString'] ) ? sanitize_text_field( (string) $version['versionString'] ) : '';
+		} catch ( \Throwable $throwable ) {
+			return '';
+		}
+	}
+
+	/** Return a display-safe GD version. */
+	public static function get_gd_version(): string {
+		if ( ! self::has_gd() || ! function_exists( 'gd_info' ) ) {
+			return '';
+		}
+
+		$info = gd_info();
+		return isset( $info['GD Version'] ) ? sanitize_text_field( (string) $info['GD Version'] ) : '';
+	}
+
+	/** Whether WordPress debugging is enabled. */
+	public static function is_debug_enabled(): bool {
+		return defined( 'WP_DEBUG' ) && WP_DEBUG;
+	}
+
+	/** Whether WordPress cron is available to schedule plugin housekeeping. */
+	public static function is_cron_available(): bool {
+		return function_exists( 'wp_schedule_event' ) && ( ! defined( 'DISABLE_WP_CRON' ) || ! DISABLE_WP_CRON );
 	}
 
 	/**

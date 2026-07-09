@@ -1,7 +1,7 @@
 # Vacuum Image Optimizer
 
 [![WordPress plugin](https://img.shields.io/badge/WordPress.org-published-21759B)](https://wordpress.org/plugins/vacuum-image-optimizer/)
-[![Version](https://img.shields.io/badge/version-1.0.1-059669)](https://github.com/mcorucu/vacuum-image-optimizer/releases/tag/v1.0.1)
+[![Version](https://img.shields.io/badge/version-1.1.0-059669)](https://github.com/mcorucu/vacuum-image-optimizer/releases/tag/v1.1.0)
 [![Requires PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4)](https://www.php.net/)
 [![License](https://img.shields.io/badge/license-GPLv2%20or%20later-111827)](https://www.gnu.org/licenses/gpl-2.0.html)
 
@@ -22,12 +22,11 @@ Key docs:
 - [Backup & Restore](https://docs.mcorucu.com/vacuum-image-optimizer/backup-restore/)
 - [Troubleshooting](https://docs.mcorucu.com/vacuum-image-optimizer/troubleshooting/)
 
-## Current Release
+## Prepared Release
 
-- Current version: `1.0.1`
-- WordPress.org status: published
-- Latest WordPress.org SVN revision: `3593067`
-- Stable tag: `1.0.1`
+- Prepared version: `1.1.0`
+- WordPress.org status: prepared locally, not yet deployed
+- Stable tag: `1.1.0`
 - Tested up to: WordPress `7.0`
 - Requires at least: WordPress `6.2`
 - Requires PHP: `8.1`
@@ -39,17 +38,17 @@ Key docs:
 - Generate WebP files for JPEG and PNG sources using local Imagick or GD support.
 - Safely recompress uploaded WebP source files with backup-first replacement only when smaller.
 - Optionally generate AVIF files when the server supports AVIF.
-- Bulk optimize existing Media Library images with start, pause, resume, batch processing, and retry flows.
-- Automatically process new uploads in queue or immediate mode.
+- Bulk optimize existing Media Library images with scan-unoptimized, scan-all, pause, resume, safe cancellation, and retry/clear-failure controls.
+- Automatically process new uploads after WordPress generates attachment metadata; Safe Mode queues work conservatively.
 - Preserve originals and optionally keep restorable backups.
 - Restore original files from backups when available.
 - Serve generated WebP/AVIF on the frontend with safe fallback to original images.
 - Apply native lazy loading through WordPress image output filters.
 - Show per-image status, savings, skipped reasons, and actions in the Media Library.
-- View storage savings, recent activity, top savings, and CSV exports.
+- View storage savings, recent activity, top savings, and CSV exports with source status and generated-format details.
 - Use a multilingual admin interface with bundled translations and an interface-language selector.
 - Exclude risky sources by MIME type, file size, filename pattern, path pattern, SVG, or GIF.
-- Run local server compatibility checks for Imagick, GD, WebP, AVIF, uploads, backups, memory, execution time, and disk space.
+- Run local WordPress 7.0 and PHP 8.3 readiness checks for image engines, uploads, backups, memory, execution time, disk space, cron, REST, AJAX, and debug mode.
 
 ## Screenshots
 
@@ -83,7 +82,7 @@ For a release ZIP:
 1. Download the ZIP from WordPress.org or GitHub Releases.
 2. Go to **Plugins -> Add New -> Upload Plugin**.
 3. Upload and activate the ZIP.
-4. Confirm the plugin version is `1.0.1`.
+4. Confirm the plugin version is `1.1.0`.
 
 For local development, clone this repository into:
 
@@ -115,6 +114,7 @@ Useful docs:
 See:
 
 - [Documentation changelog](https://docs.mcorucu.com/vacuum-image-optimizer/changelog/)
+- [Release notes for 1.1.0](docs/RELEASE_NOTES_1_1_0.md)
 - [Release notes for 1.0.1](docs/RELEASE_NOTES_1_0_1.md)
 - [WordPress.org changelog](https://wordpress.org/plugins/vacuum-image-optimizer/#developers)
 
@@ -152,3 +152,7 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for longer-term ideas. Near-term prioriti
 ## License
 
 GPLv2 or later. See the [GNU General Public License v2.0](https://www.gnu.org/licenses/gpl-2.0.html).
+
+## Privacy and Data Handling
+
+Vacuum Image Optimizer processes images locally on the WordPress server. It does not use an external API and does not send image data to third-party services. Optimization metadata remains in WordPress; optional backups remain in the local uploads/plugin backup directory.
