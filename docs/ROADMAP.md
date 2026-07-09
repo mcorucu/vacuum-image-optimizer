@@ -1,7 +1,7 @@
 # Vacuum Image Optimizer Roadmap
 
-**Current public version:** 1.0.1
-**Next prepared version:** 1.1.0 (local only; not deployed)
+**Current public version:** 1.1.0
+**Status:** Released on WordPress.org
 **Official documentation:** <https://docs.mcorucu.com/vacuum-image-optimizer/>
 
 This roadmap is intentionally conservative. Vacuum Image Optimizer handles user media, so future work should preserve backup-first behavior, clear compatibility checks, and WordPress.org review expectations.
@@ -29,7 +29,7 @@ This roadmap is intentionally conservative. Vacuum Image Optimizer handles user 
 - Continue validating SVG, GIF, unreadable file, and exclusion handling.
 - Review upload automation behavior on large media uploads.
 
-### 1.1.0 Prepared Scope
+### 1.1.0 Release Coverage
 
 - WordPress 7.0 compatibility and PHP 8.3 readiness.
 - Expanded copyable System Status diagnostics.

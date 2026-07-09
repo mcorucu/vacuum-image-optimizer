@@ -2,7 +2,7 @@
 
 **Release type:** Compatibility and workflow update  
 **Version:** 1.1.0  
-**Status:** Prepared locally; not deployed
+**Status:** Released on WordPress.org, GitHub, docs.mcorucu.com, and mcorucu.com
 
 ## Summary
 

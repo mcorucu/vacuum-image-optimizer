@@ -22,10 +22,11 @@ Key docs:
 - [Backup & Restore](https://docs.mcorucu.com/vacuum-image-optimizer/backup-restore/)
 - [Troubleshooting](https://docs.mcorucu.com/vacuum-image-optimizer/troubleshooting/)
 
-## Prepared Release
+## Current Release
 
-- Prepared version: `1.1.0`
-- WordPress.org status: prepared locally, not yet deployed
+- Current version: `1.1.0`
+- WordPress.org status: published
+- Latest WordPress.org SVN revision: `3601945`
 - Stable tag: `1.1.0`
 - Tested up to: WordPress `7.0`
 - Requires at least: WordPress `6.2`
