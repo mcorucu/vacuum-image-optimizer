@@ -26,7 +26,7 @@ Key docs:
 
 - Current version: `1.2.0`
 - WordPress.org status: published
-- Latest WordPress.org SVN revision: pending 1.2.0 publication
+- Latest WordPress.org SVN revision: `3623840`
 - Stable tag: `1.2.0`
 - Tested up to: WordPress `7.0`
 - Requires at least: WordPress `6.2`
