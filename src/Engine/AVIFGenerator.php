@@ -9,6 +9,7 @@ namespace VacuumImageOptimizer\Engine;
 
 use VacuumImageOptimizer\Backup\BackupManager;
 use VacuumImageOptimizer\Media\DerivativeLibrary;
+use VacuumImageOptimizer\Frontend\DerivativeResolver;
 use VacuumImageOptimizer\Settings\CompressionSettings;
 use VacuumImageOptimizer\Utils\ImageFormat;
 
@@ -289,6 +290,7 @@ class AVIFGenerator {
 		update_post_meta( $attachment_id, '_vacimg_avif_engine_used', sanitize_key( (string) $result['engine_used'] ) );
 		update_post_meta( $attachment_id, '_vacimg_avif_generated_at', current_time( 'mysql' ) );
 		delete_post_meta( $attachment_id, '_vacimg_avif_error_message' );
+		DerivativeResolver::record( $attachment_id, (string) $result['source_path'], 'avif', (string) $result['avif_path'] );
 
 		// Register (or reuse) a Media Library item for the generated AVIF file.
 		( new DerivativeLibrary() )->ensure_attachment( $attachment_id, (string) $result['avif_path'], 'avif' );

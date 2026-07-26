@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- Added automatic frontend delivery with AVIF -> WebP -> original fallback.
+- Added source-aware derivative registry and responsive registered-size generation.
+- Added cache-aware `Accept` negotiation, fallback diagnostics, and reversible delivery settings.
+
 ## 1.1.0
 
 - Added WordPress 7.0 compatibility metadata and PHP 8.3 readiness hardening.

@@ -165,6 +165,9 @@ class CompressionSettings {
 			'avif_quality'          => self::DEFAULT_AVIF_QUALITY,
 			'enable_frontend_delivery' => false,
 			'preferred_format'      => self::DEFAULT_PREFERRED_FORMAT,
+			'generate_registered_derivatives' => true,
+			'queue_missing_derivatives' => true,
+			'debug_delivery'        => false,
 			'enable_backups'        => true,
 			'backup_retention_days' => self::DEFAULT_BACKUP_RETENTION_DAYS,
 			'enable_lazy_loading'   => true,
@@ -303,6 +306,18 @@ class CompressionSettings {
 	 */
 	public static function get_preferred_formats(): array {
 		return self::PREFERRED_FORMATS;
+	}
+
+	public static function should_generate_registered_derivatives(): bool {
+		return ! empty( self::get()['generate_registered_derivatives'] );
+	}
+
+	public static function should_queue_missing_derivatives(): bool {
+		return ! empty( self::get()['queue_missing_derivatives'] );
+	}
+
+	public static function is_delivery_debug_enabled(): bool {
+		return ! empty( self::get()['debug_delivery'] );
 	}
 
 	/**
@@ -629,6 +644,12 @@ class CompressionSettings {
 			$settings['preferred_format'] = in_array( $pf, self::PREFERRED_FORMATS, true ) ? $pf : $current['preferred_format'];
 		}
 
+		foreach ( [ 'generate_registered_derivatives', 'queue_missing_derivatives', 'debug_delivery' ] as $delivery_key ) {
+			if ( array_key_exists( $delivery_key, $input ) ) {
+				$settings[ $delivery_key ] = ! empty( $input[ $delivery_key ] );
+			}
+		}
+
 		if ( array_key_exists( 'enable_backups', $input ) ) {
 			$settings['enable_backups'] = ! empty( $input['enable_backups'] );
 		}
@@ -726,6 +747,9 @@ class CompressionSettings {
 
 		$enable_frontend_delivery = ! empty( $settings['enable_frontend_delivery'] );
 		$preferred_format         = isset( $settings['preferred_format'] ) ? sanitize_key( (string) $settings['preferred_format'] ) : self::DEFAULT_PREFERRED_FORMAT;
+		$generate_registered_derivatives = array_key_exists( 'generate_registered_derivatives', $settings ) ? ! empty( $settings['generate_registered_derivatives'] ) : true;
+		$queue_missing_derivatives = array_key_exists( 'queue_missing_derivatives', $settings ) ? ! empty( $settings['queue_missing_derivatives'] ) : true;
+		$debug_delivery            = ! empty( $settings['debug_delivery'] );
 
 		if ( ! in_array( $preferred_format, self::PREFERRED_FORMATS, true ) ) {
 			$preferred_format = self::DEFAULT_PREFERRED_FORMAT;
@@ -767,6 +791,9 @@ class CompressionSettings {
 			'avif_quality'          => self::clamp_avif_quality( $avif_quality ),
 			'enable_frontend_delivery' => $enable_frontend_delivery,
 			'preferred_format'      => $preferred_format,
+			'generate_registered_derivatives' => $generate_registered_derivatives,
+			'queue_missing_derivatives' => $queue_missing_derivatives,
+			'debug_delivery'        => $debug_delivery,
 				'enable_backups'        => $enable_backups,
 				'backup_retention_days' => $backup_retention_days,
 				'enable_lazy_loading'   => $enable_lazy_loading,

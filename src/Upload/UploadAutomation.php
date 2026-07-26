@@ -9,6 +9,7 @@ namespace VacuumImageOptimizer\Upload;
 
 use VacuumImageOptimizer\Engine\AVIFGenerator;
 use VacuumImageOptimizer\Engine\WebPGenerator;
+use VacuumImageOptimizer\Frontend\ResponsiveDerivativeGenerator;
 use VacuumImageOptimizer\Queue\QueueManager;
 use VacuumImageOptimizer\Settings\CompressionSettings;
 use VacuumImageOptimizer\Utils\ImageFormat;
@@ -48,6 +49,8 @@ class UploadAutomation {
 	 */
 	private AVIFGenerator $avif_generator;
 
+	private ResponsiveDerivativeGenerator $responsive_generator;
+
 	/**
 	 * Constructor.
 	 *
@@ -59,6 +62,7 @@ class UploadAutomation {
 		$this->queue_manager  = $queue_manager ?? new QueueManager();
 		$this->webp_generator = $webp_generator ?? new WebPGenerator();
 		$this->avif_generator = $avif_generator ?? new AVIFGenerator();
+		$this->responsive_generator = new ResponsiveDerivativeGenerator();
 	}
 
 	/**
@@ -145,6 +149,7 @@ class UploadAutomation {
 
 		if ( ! empty( $result['success'] ) ) {
 			$this->maybe_generate_avif( $attachment_id );
+			$this->responsive_generator->generate( $attachment_id );
 			$this->mark_auto_processed( $attachment_id, 'optimized' );
 			return;
 		}

@@ -6,7 +6,7 @@ Tags: image optimization, webp, avif, compression, lazy load
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,6 +112,12 @@ WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD ext
 
 == Changelog ==
 
+= 1.2.0 =
+* Added attachment-aware automatic frontend delivery for AVIF and WebP with original fallback.
+* Added size-specific derivatives for registered WordPress image sizes and responsive srcset candidates.
+* Added source-hash validation, cache negotiation, missing-file fallback, and delivery diagnostics.
+* Added safe upgrade-preserving delivery settings and documented rollback/cache behavior.
+
 = 1.1.0 =
 * Confirmed compatibility with WordPress 7.0 and improved PHP 8.3 runtime readiness.
 * Expanded System Status with WordPress compatibility, image engine versions, debug, cron, REST, AJAX, and safe filesystem diagnostics plus Copy Diagnostics.
@@ -146,6 +152,9 @@ WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD ext
 * Full internationalization with 9 bundled languages and an interface-language selector.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Adds automatic modern image delivery with responsive-size mapping, safe original fallback, cache-aware negotiation, and delivery diagnostics. Existing settings and originals are preserved; enable delivery from Compression settings.
 
 = 1.1.0 =
 Adds WordPress 7.0 compatibility, PHP 8.3 readiness, improved diagnostics, safer upload automation, resilient bulk queue controls, and expanded CSV reports.

@@ -11,6 +11,7 @@ use VacuumImageOptimizer\Engine\WebPGenerator;
 use VacuumImageOptimizer\Engine\AVIFGenerator;
 use VacuumImageOptimizer\Engine\RestoreEngine;
 use VacuumImageOptimizer\Settings\CompressionSettings;
+use VacuumImageOptimizer\Frontend\ResponsiveDerivativeGenerator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -148,6 +149,7 @@ class AttachmentActions {
 			$avif_result    = $avif_generator->generate( $attachment_id );
 
 			if ( ! empty( $avif_result['success'] ) ) {
+				( new ResponsiveDerivativeGenerator() )->generate( $attachment_id );
 				$this->redirect_with_notice( 'avif_success', (string) $avif_result['message'], 'success' );
 			}
 
@@ -165,6 +167,7 @@ class AttachmentActions {
 		$result    = $generator->generate( $attachment_id );
 
 		if ( ! empty( $result['success'] ) ) {
+			( new ResponsiveDerivativeGenerator() )->generate( $attachment_id );
 			$this->redirect_with_notice( 'webp_success', (string) $result['message'], 'success' );
 		}
 

@@ -8,6 +8,7 @@
 namespace VacuumImageOptimizer;
 
 use VacuumImageOptimizer\Admin\Assets;
+use VacuumImageOptimizer\Admin\DeliveryMigrationAjax;
 use VacuumImageOptimizer\Admin\Menu;
 use VacuumImageOptimizer\Admin\Onboarding;
 use VacuumImageOptimizer\Admin\ReportExporter;
@@ -85,6 +86,9 @@ class Plugin {
 	 */
 	private ?AjaxController $queue_ajax = null;
 
+	/** Existing-media delivery migration endpoints. */
+	private ?DeliveryMigrationAjax $delivery_migration_ajax = null;
+
 	/**
 	 * Report CSV exporter.
 	 *
@@ -137,7 +141,8 @@ class Plugin {
 			$this->register_admin_hooks();
 		} else {
 			$this->delivery_engine = new DeliveryEngine();
-			add_action( 'wp', [ $this->delivery_engine, 'register' ] );
+			// Register before send_headers so cache negotiation is visible to page/CDN layers.
+			add_action( 'init', [ $this->delivery_engine, 'register' ] );
 
 			$this->lazy_load = new LazyLoad();
 			add_action( 'wp', [ $this->lazy_load, 'register' ] );
@@ -209,6 +214,8 @@ class Plugin {
 		$this->compression_settings = new CompressionSettings();
 		$this->queue_ajax           = new AjaxController();
 		$this->queue_ajax->register();
+		$this->delivery_migration_ajax = new DeliveryMigrationAjax();
+		$this->delivery_migration_ajax->register();
 		$this->report_exporter      = new ReportExporter();
 		$this->report_exporter->register();
 		$this->onboarding           = new Onboarding();

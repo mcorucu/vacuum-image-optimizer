@@ -9,6 +9,7 @@ namespace VacuumImageOptimizer\Queue;
 
 use VacuumImageOptimizer\Engine\AVIFGenerator;
 use VacuumImageOptimizer\Engine\WebPGenerator;
+use VacuumImageOptimizer\Frontend\ResponsiveDerivativeGenerator;
 use VacuumImageOptimizer\Settings\CompressionSettings;
 
 defined( 'ABSPATH' ) || exit;
@@ -39,6 +40,8 @@ class QueueProcessor {
 	 */
 	private AVIFGenerator $avif_generator;
 
+	private ResponsiveDerivativeGenerator $responsive_generator;
+
 	/**
 	 * Constructor.
 	 *
@@ -50,6 +53,7 @@ class QueueProcessor {
 		$this->queue_manager = $queue_manager ?? new QueueManager();
 		$this->webp_generator = $webp_generator ?? new WebPGenerator();
 		$this->avif_generator = $avif_generator ?? new AVIFGenerator();
+		$this->responsive_generator = new ResponsiveDerivativeGenerator();
 	}
 
 	/**
@@ -100,6 +104,7 @@ class QueueProcessor {
 				if ( ! empty( $result['success'] ) ) {
 					// AVIF is a parallel format: an AVIF failure must not fail the job.
 					$this->maybe_generate_avif( $attachment_id );
+					$this->responsive_generator->generate( $attachment_id );
 					if ( 'pending' === (string) get_post_meta( $attachment_id, '_vacimg_auto_status', true ) ) {
 						update_post_meta( $attachment_id, '_vacimg_auto_status', 'optimized' );
 						update_post_meta( $attachment_id, '_vacimg_auto_processed_at', current_time( 'mysql' ) );

@@ -185,6 +185,9 @@ class RestoreEngine {
 		delete_post_meta( $attachment_id, '_vacimg_avif_engine_used' );
 		delete_post_meta( $attachment_id, '_vacimg_avif_generated_at' );
 		delete_post_meta( $attachment_id, '_vacimg_avif_error_message' );
+		delete_post_meta( $attachment_id, '_vacimg_derivatives' );
+		delete_post_meta( $attachment_id, '_vacimg_delivery_state' );
+		delete_post_meta( $attachment_id, '_vacimg_delivery_generated_at' );
 	}
 
 	/**

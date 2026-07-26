@@ -1,7 +1,7 @@
 # Vacuum Image Optimizer
 
 [![WordPress plugin](https://img.shields.io/badge/WordPress.org-published-21759B)](https://wordpress.org/plugins/vacuum-image-optimizer/)
-[![Version](https://img.shields.io/badge/version-1.1.0-059669)](https://github.com/mcorucu/vacuum-image-optimizer/releases/tag/v1.1.0)
+[![Version](https://img.shields.io/badge/version-1.2.0-059669)](https://github.com/mcorucu/vacuum-image-optimizer/releases/tag/v1.2.0)
 [![Requires PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4)](https://www.php.net/)
 [![License](https://img.shields.io/badge/license-GPLv2%20or%20later-111827)](https://www.gnu.org/licenses/gpl-2.0.html)
 
@@ -24,10 +24,10 @@ Key docs:
 
 ## Current Release
 
-- Current version: `1.1.0`
+- Current version: `1.2.0`
 - WordPress.org status: published
-- Latest WordPress.org SVN revision: `3601945`
-- Stable tag: `1.1.0`
+- Latest WordPress.org SVN revision: pending 1.2.0 publication
+- Stable tag: `1.2.0`
 - Tested up to: WordPress `7.0`
 - Requires at least: WordPress `6.2`
 - Requires PHP: `8.1`
@@ -40,10 +40,13 @@ Key docs:
 - Safely recompress uploaded WebP source files with backup-first replacement only when smaller.
 - Optionally generate AVIF files when the server supports AVIF.
 - Bulk optimize existing Media Library images with scan-unoptimized, scan-all, pause, resume, safe cancellation, and retry/clear-failure controls.
+- Generate missing modern formats for existing Media Library attachments with a readiness scan and resumable migration controls.
 - Automatically process new uploads after WordPress generates attachment metadata; Safe Mode queues work conservatively.
 - Preserve originals and optionally keep restorable backups.
 - Restore original files from backups when available.
 - Serve generated WebP/AVIF on the frontend with safe fallback to original images.
+- Map responsive `srcset` candidates to matching per-size derivatives without rewriting stored post content.
+- Inspect per-attachment delivery diagnostics, selected candidates, fallback state, queue state, and stale metadata.
 - Apply native lazy loading through WordPress image output filters.
 - Show per-image status, savings, skipped reasons, and actions in the Media Library.
 - View storage savings, recent activity, top savings, and CSV exports with source status and generated-format details.
@@ -83,7 +86,7 @@ For a release ZIP:
 1. Download the ZIP from WordPress.org or GitHub Releases.
 2. Go to **Plugins -> Add New -> Upload Plugin**.
 3. Upload and activate the ZIP.
-4. Confirm the plugin version is `1.1.0`.
+4. Confirm the plugin version is `1.2.0`.
 
 For local development, clone this repository into:
 
@@ -112,9 +115,19 @@ Useful docs:
 
 ## Changelog
 
+### 1.2.0
+
+- Automatic attachment-aware AVIF/WebP delivery with original fallback.
+- Registered-size derivative generation for responsive `srcset` output.
+- Existing-media migration with readiness scan, resumable controls, and idempotent reruns.
+- Per-attachment Delivery Diagnostics using the same resolver as frontend delivery.
+- Source-hash validation, cache-aware negotiation, and delivery diagnostics.
+- Delivery remains reversible and never rewrites stored post content.
+
 See:
 
 - [Documentation changelog](https://docs.mcorucu.com/vacuum-image-optimizer/changelog/)
+- [Release notes for 1.2.0](docs/RELEASE_NOTES_1_2_0.md)
 - [Release notes for 1.1.0](docs/RELEASE_NOTES_1_1_0.md)
 - [Release notes for 1.0.1](docs/RELEASE_NOTES_1_0_1.md)
 - [WordPress.org changelog](https://wordpress.org/plugins/vacuum-image-optimizer/#developers)

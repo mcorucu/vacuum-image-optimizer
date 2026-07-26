@@ -9,6 +9,7 @@ namespace VacuumImageOptimizer\Engine;
 
 use VacuumImageOptimizer\Backup\BackupManager;
 use VacuumImageOptimizer\Media\DerivativeLibrary;
+use VacuumImageOptimizer\Frontend\DerivativeResolver;
 use VacuumImageOptimizer\Settings\CompressionSettings;
 use VacuumImageOptimizer\Utils\ImageFormat;
 
@@ -310,6 +311,7 @@ class WebPGenerator {
 		update_post_meta( $attachment_id, '_vacimg_optimized_at', current_time( 'mysql' ) );
 		update_post_meta( $attachment_id, '_vacimg_status', 'optimized' );
 		delete_post_meta( $attachment_id, '_vacimg_error_message' );
+		DerivativeResolver::record( $attachment_id, (string) $result['source_path'], 'webp', (string) $result['webp_path'] );
 
 		if ( $is_source_optimization ) {
 			update_post_meta( $attachment_id, '_vacimg_webp_source_optimized', absint( $result['savings_bytes'] ) > 0 ? 1 : 0 );

@@ -8,6 +8,8 @@
 		var qualityValue = document.querySelector( '[data-vacimg-quality-value]' );
 		var profileCards = document.querySelectorAll( '[data-vacimg-profile-cards] .vacimg-profile-card' );
 		var queueRoot = document.querySelector( '[data-vacimg-queue]' );
+		var migrationRoot = document.querySelector( '[data-vacimg-migration]' );
+		var diagnosticsRoot = document.querySelector( '[data-vacimg-diagnostics]' );
 
 		if ( qualityInput && qualityValue ) {
 			qualityInput.addEventListener( 'input', function () {
@@ -38,6 +40,14 @@
 
 		if ( queueRoot && window.vacimgQueue ) {
 			initQueue( queueRoot );
+		}
+
+		if ( migrationRoot && window.vacimgQueue ) {
+			initMigration( migrationRoot );
+		}
+
+		if ( diagnosticsRoot && window.vacimgQueue ) {
+			initDiagnostics( diagnosticsRoot );
 		}
 
 		if ( ! copyButton || ! debugInfo || ! navigator.clipboard ) {
@@ -245,6 +255,44 @@
 		function showError( error ) {
 			showNotice( error && error.message ? error.message : window.vacimgQueue.i18n.error, 'error' );
 		}
+	}
+
+	function initMigration( root ) {
+		var actions = { scan: 'vacimg_migration_scan', start: 'vacimg_migration_start', pause: 'vacimg_migration_pause', resume: 'vacimg_migration_resume', cancel: 'vacimg_migration_cancel', retry: 'vacimg_migration_retry' };
+		root.addEventListener( 'click', function ( event ) {
+			var button = event.target.closest( '[data-vacimg-migration-action]' );
+			if ( ! button || ! actions[ button.getAttribute( 'data-vacimg-migration-action' ) ] ) { return; }
+			var action = button.getAttribute( 'data-vacimg-migration-action' );
+			requestAction( actions[ action ] ).then( updateMigration ).then( function () { if ( 'start' === action || 'resume' === action || 'retry' === action ) { processMigration(); } } ).catch( function ( error ) { showMigrationNotice( error.message, 'error' ); } );
+		} );
+		requestAction( 'vacimg_migration_status' ).then( updateMigration ).catch( function () {} );
+		function processMigration() {
+			requestAction( 'vacimg_migration_process' ).then( function ( payload ) { updateMigration( payload ); if ( payload.state === 'running' ) { window.setTimeout( processMigration, 350 ); } } ).catch( function ( error ) { showMigrationNotice( error.message, 'error' ); } );
+		}
+		function requestAction( action ) { return migrationRequest( action ); }
+		function updateMigration( payload ) {
+			var summary = payload.summary || {};
+			[ 'scanned', 'ready', 'partial', 'missing', 'stale', 'estimated_operations' ].forEach( function ( key ) { var node = root.querySelector( '[data-vacimg-migration-stat="' + key + '"]' ); if ( node ) { node.textContent = formatNumber( summary[ key ] || 0 ); } } );
+			if ( payload.state ) { showMigrationNotice( capitalize( payload.state ), 'info' ); }
+			return payload;
+		}
+		function showMigrationNotice( message, type ) { var node = root.querySelector( '[data-vacimg-migration-notice]' ); if ( node ) { node.hidden = false; node.className = 'vacimg-notice vacimg-notice--' + ( type || 'info' ); node.textContent = message || ''; } }
+	}
+
+	function initDiagnostics( root ) {
+		root.addEventListener( 'click', function ( event ) {
+			if ( ! event.target.closest( '[data-vacimg-diagnostics-action]' ) ) { return; }
+			var input = root.querySelector( '[data-vacimg-diagnostics-id]' );
+			migrationRequest( 'vacimg_migration_diagnostics', { attachment_id: input ? input.value : '' } ).then( function ( payload ) { var output = root.querySelector( '[data-vacimg-diagnostics-output]' ); if ( output ) { output.hidden = false; output.textContent = JSON.stringify( payload, null, 2 ); } } ).catch( function ( error ) { var output = root.querySelector( '[data-vacimg-diagnostics-output]' ); if ( output ) { output.hidden = false; output.textContent = error.message; } } );
+		} );
+	}
+
+	function migrationRequest( action, data ) {
+		var formData = new window.FormData();
+		formData.append( 'action', action );
+		formData.append( 'nonce', window.vacimgQueue.nonce );
+		Object.keys( data || {} ).forEach( function ( key ) { formData.append( key, data[ key ] ); } );
+		return window.fetch( window.vacimgQueue.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: formData } ).then( function ( response ) { return response.json(); } ).then( function ( response ) { if ( ! response || ! response.success ) { throw new Error( response && response.data && response.data.message ? response.data.message : window.vacimgQueue.i18n.migrationError ); } return response.data || {}; } );
 	}
 
 	function escapeHtml( value ) {

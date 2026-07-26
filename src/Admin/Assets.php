@@ -115,6 +115,7 @@ class Assets {
 					'scanning'   => __( 'Scanning library…', 'vacuum-image-optimizer' ),
 					'processing' => __( 'Processing queue…', 'vacuum-image-optimizer' ),
 					'error'      => __( 'The queue request could not be completed.', 'vacuum-image-optimizer' ),
+					'migrationError' => __( 'The migration request could not be completed.', 'vacuum-image-optimizer' ),
 				],
 			]
 		);

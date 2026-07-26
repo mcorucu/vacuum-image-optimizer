@@ -1,10 +1,6 @@
 <?php
 /**
- * Frontend delivery engine.
- *
- * Serves generated WebP/AVIF derivatives on the frontend without modifying the
- * original media, the database attachment URLs, or the uploads directory. It is
- * fully reversible: disabling the setting removes all rewriting on the next load.
+ * WordPress-native automatic modern image delivery.
  *
  * @package VacuumImageOptimizer\Frontend
  */
@@ -16,315 +12,159 @@ use VacuumImageOptimizer\Settings\CompressionSettings;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Rewrites image URLs to validated, browser-supported derivatives via core filters.
+ * Resolves attachment-aware WebP/AVIF URLs without rewriting stored content.
  */
 class DeliveryEngine {
 
-	/**
-	 * Whether hooks have been registered.
-	 *
-	 * @var bool
-	 */
 	private bool $registered = false;
-
-	/**
-	 * Source MIME extensions eligible for rewriting.
-	 *
-	 * @var array<int, string>
-	 */
-	private const SOURCE_EXTENSIONS = [ 'jpg', 'jpeg', 'png' ];
-
-	/**
-	 * Ordered list of formats acceptable for the current request.
-	 *
-	 * Each entry is [ 'format' => 'avif'|'webp', 'ext' => 'avif'|'webp' ].
-	 *
-	 * @var array<int, array<string, string>>|null
-	 */
 	private ?array $accepted = null;
 
-	/**
-	 * Cached upload directory base path.
-	 *
-	 * @var string
-	 */
-	private string $upload_basedir = '';
-
-	/**
-	 * Cached upload directory base URL.
-	 *
-	 * @var string
-	 */
-	private string $upload_baseurl = '';
-
-	/**
-	 * Register frontend delivery hooks when appropriate.
-	 *
-	 * @return void
-	 */
 	public function register(): void {
 		if ( $this->registered || ! $this->should_run() ) {
 			return;
 		}
-
 		$this->registered = true;
-
-		add_filter( 'wp_get_attachment_image_attributes', [ $this, 'filter_image_attributes' ], 20 );
-		add_filter( 'wp_calculate_image_srcset', [ $this, 'filter_image_srcset' ], 20 );
-		add_filter( 'wp_content_img_tag', [ $this, 'filter_content_img_tag' ], 20 );
+		add_filter( 'wp_get_attachment_image_attributes', [ $this, 'filter_image_attributes' ], 20, 3 );
+		add_filter( 'wp_calculate_image_srcset', [ $this, 'filter_image_srcset' ], 20, 5 );
+		add_filter( 'wp_content_img_tag', [ $this, 'filter_content_img_tag' ], 20, 3 );
+		add_action( 'send_headers', [ $this, 'send_cache_header' ] );
 	}
 
-	/**
-	 * Determine whether frontend delivery should run for this request.
-	 *
-	 * @return bool
-	 */
-	private function should_run(): bool {
-		if ( is_admin() ) {
-			return false;
-		}
-
-		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-			return false;
-		}
-
-		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			return false;
-		}
-
-		if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
-			return false;
-		}
-
-		if ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) {
-			return false;
-		}
-
-		if ( wp_doing_ajax() ) {
-			return false;
-		}
-
-		return CompressionSettings::is_frontend_delivery_enabled();
-	}
-
-	/**
-	 * Rewrite the src (and any srcset) of attachment image attributes.
-	 *
-	 * @param array<string, string> $attr Image attributes.
-	 * @return array<string, string>
-	 */
-	public function filter_image_attributes( $attr ) {
-		if ( ! is_array( $attr ) || $this->is_excluded_context() ) {
+	public function filter_image_attributes( $attr, $attachment = null, $size = 'full' ) {
+		if ( ! is_array( $attr ) || $this->is_excluded_context() || ! $attachment instanceof \WP_Post ) {
 			return $attr;
 		}
-
+		$attachment_id = absint( $attachment->ID );
+		$source_path    = $this->source_path_for_size( $attachment_id, $size );
 		if ( isset( $attr['src'] ) && is_string( $attr['src'] ) ) {
-			$attr['src'] = $this->swap_url( $attr['src'] );
+			$attr['src'] = $this->resolve_url( $attachment_id, $source_path, $attr['src'] );
 		}
-
-		if ( ! empty( $attr['srcset'] ) && is_string( $attr['srcset'] ) ) {
-			$attr['srcset'] = $this->swap_srcset_string( $attr['srcset'] );
-		}
-
 		return $attr;
 	}
 
-	/**
-	 * Rewrite srcset candidate URLs to derivatives when available.
-	 *
-	 * @param array<int|string, array<string, string|int>> $sources Srcset sources.
-	 * @return array<int|string, array<string, string|int>>
-	 */
-	public function filter_image_srcset( $sources ) {
-		if ( ! is_array( $sources ) || $this->is_excluded_context() ) {
+	public function filter_image_srcset( $sources, $size_array = [], $image_src = [], $image_meta = [], $attachment_id = 0 ) {
+		if ( ! is_array( $sources ) || $this->is_excluded_context() || 0 === absint( $attachment_id ) ) {
 			return $sources;
 		}
-
 		foreach ( $sources as $key => $source ) {
 			if ( isset( $source['url'] ) && is_string( $source['url'] ) ) {
-				$sources[ $key ]['url'] = $this->swap_url( $source['url'] );
+				$path = $this->url_to_upload_path( $source['url'] );
+				$sources[ $key ]['url'] = $this->resolve_url( absint( $attachment_id ), $path, $source['url'] );
 			}
 		}
-
 		return $sources;
 	}
 
 	/**
-	 * Rewrite the base src attribute of a content image tag.
-	 *
-	 * @param string $filtered_image The image tag HTML.
-	 * @return string
+	 * Narrow fallback for classic content saved by older WordPress versions.
 	 */
-	public function filter_content_img_tag( $filtered_image ) {
-		if ( ! is_string( $filtered_image ) || '' === $filtered_image || $this->is_excluded_context() ) {
-			return $filtered_image;
+	public function filter_content_img_tag( $image, $context = '', $attachment_id = 0 ) {
+		if ( ! is_string( $image ) || '' === $image || $this->is_excluded_context() ) {
+			return $image;
 		}
-
-		if ( ! preg_match( '/\ssrc=("|\')(.*?)\1/i', $filtered_image, $matches ) ) {
-			return $filtered_image;
+		if ( 0 === absint( $attachment_id ) && preg_match( '/\ssrc=["\']([^"\']+)["\']/i', $image, $match ) ) {
+			$attachment_id = $this->find_attachment_by_url( $match[1] );
 		}
-
-		$original_url = $matches[2];
-		$new_url      = $this->swap_url( $original_url );
-
-		if ( $new_url === $original_url ) {
-			return $filtered_image;
+		if ( 0 === absint( $attachment_id ) || ! preg_match( '/\ssrc=(["\'])(.*?)\1/i', $image, $match ) ) {
+			return $image;
 		}
-
-		$quote       = $matches[1];
-		$replacement = ' src=' . $quote . $new_url . $quote;
-
-		return str_replace( $matches[0], $replacement, $filtered_image );
+		$url = $this->resolve_url( absint( $attachment_id ), $this->url_to_upload_path( $match[2] ), $match[2] );
+		if ( $url === $match[2] ) {
+			return $image;
+		}
+		return str_replace( $match[0], ' src=' . $match[1] . esc_url( $url ) . $match[1], $image );
 	}
 
-	/**
-	 * Rewrite each URL inside a srcset attribute string.
-	 *
-	 * @param string $srcset Srcset attribute value.
-	 * @return string
-	 */
-	private function swap_srcset_string( string $srcset ): string {
-		$candidates = explode( ',', $srcset );
-
-		foreach ( $candidates as $index => $candidate ) {
-			$candidate = trim( $candidate );
-			if ( '' === $candidate ) {
-				continue;
-			}
-
-			$parts             = preg_split( '/\s+/', $candidate, 2 );
-			$url               = isset( $parts[0] ) ? $parts[0] : '';
-			$descriptor        = isset( $parts[1] ) ? ' ' . $parts[1] : '';
-			$candidates[ $index ] = $this->swap_url( $url ) . $descriptor;
+	public function send_cache_header(): void {
+		if ( $this->should_run() ) {
+			header( 'Vary: Accept', false );
 		}
-
-		return implode( ', ', $candidates );
 	}
 
-	/**
-	 * Swap a single image URL for the best available, browser-supported derivative.
-	 *
-	 * Only rewrites when the derivative file physically exists next to the source,
-	 * guaranteeing dimensions match and no broken URLs are ever emitted.
-	 *
-	 * @param string $url Original image URL.
-	 * @return string
-	 */
-	private function swap_url( string $url ): string {
-		$accepted = $this->get_accepted_formats();
-		if ( empty( $accepted ) || '' === $url ) {
-			return $url;
+	/** Return the same candidate selection used by frontend filters for diagnostics. */
+	public function diagnostic_candidate( int $attachment_id, string $source_path, string $original_url ): string {
+		return $this->resolve_url( $attachment_id, $source_path, $original_url );
+	}
+
+	private function resolve_url( int $attachment_id, string $source_path, string $original_url ): string {
+		if ( '' === $source_path || empty( $this->get_accepted_formats() ) ) {
+			return $original_url;
 		}
-
-		$this->prime_upload_paths();
-		if ( '' === $this->upload_basedir || '' === $this->upload_baseurl ) {
-			return $url;
-		}
-
-		// Strip any query string / fragment for path resolution.
-		$clean_url = preg_replace( '/[?#].*$/', '', $url );
-		$clean_url = is_string( $clean_url ) ? $clean_url : $url;
-
-		$normalized_url = $this->normalize_scheme( $clean_url );
-		$base_url       = $this->normalize_scheme( $this->upload_baseurl );
-
-		if ( 0 !== strpos( $normalized_url, trailingslashit( $base_url ) ) ) {
-			return $url;
-		}
-
-		$relative  = ltrim( substr( $normalized_url, strlen( trailingslashit( $base_url ) ) ), '/' );
-		$extension = strtolower( (string) pathinfo( $relative, PATHINFO_EXTENSION ) );
-
-		if ( '' === $relative || ! in_array( $extension, self::SOURCE_EXTENSIONS, true ) ) {
-			return $url;
-		}
-
-		$relative_no_ext = substr( $relative, 0, - ( strlen( $extension ) + 1 ) );
-
-		foreach ( $accepted as $candidate ) {
-			$candidate_relative = $relative_no_ext . '.' . $candidate['ext'];
-			$candidate_path     = trailingslashit( $this->upload_basedir ) . $candidate_relative;
-
-			if ( file_exists( $candidate_path ) && is_file( $candidate_path ) ) {
-				return trailingslashit( $this->upload_baseurl ) . $candidate_relative;
+		foreach ( $this->get_accepted_formats() as $format ) {
+			$url = DerivativeResolver::resolve( $attachment_id, $source_path, $format );
+			if ( '' !== $url ) {
+				return $url;
 			}
 		}
-
-		return $url;
+		if ( CompressionSettings::is_delivery_debug_enabled() ) {
+			do_action( 'vacimg_delivery_fallback', $attachment_id, $source_path, 'missing_or_stale_derivative' );
+		}
+		return $original_url;
 	}
 
-	/**
-	 * Resolve the ordered list of formats acceptable for this request.
-	 *
-	 * @return array<int, array<string, string>>
-	 */
+	private function source_path_for_size( int $attachment_id, $size ): string {
+		$attached = get_attached_file( $attachment_id );
+		if ( ! is_string( $attached ) || '' === $attached ) {
+			return '';
+		}
+		if ( is_array( $size ) && isset( $size['file'] ) ) {
+			return trailingslashit( wp_normalize_path( dirname( $attached ) ) ) . sanitize_file_name( (string) $size['file'] );
+		}
+		if ( is_string( $size ) && 'full' !== $size ) {
+			$meta = wp_get_attachment_metadata( $attachment_id );
+			$file = is_array( $meta ) && isset( $meta['sizes'][ $size ]['file'] ) ? (string) $meta['sizes'][ $size ]['file'] : '';
+			if ( '' !== $file ) {
+				return trailingslashit( wp_normalize_path( dirname( $attached ) ) ) . sanitize_file_name( $file );
+			}
+		}
+		return wp_normalize_path( $attached );
+	}
+
+	private function url_to_upload_path( string $url ): string {
+		$uploads = wp_get_upload_dir();
+		$baseurl = isset( $uploads['baseurl'] ) ? untrailingslashit( (string) $uploads['baseurl'] ) : '';
+		$basedir = isset( $uploads['basedir'] ) ? wp_normalize_path( (string) $uploads['basedir'] ) : '';
+		$clean   = (string) preg_replace( '/[?#].*$/', '', $url );
+		if ( '' === $baseurl || '' === $basedir || 0 !== strpos( $this->normalize_scheme( $clean ), trailingslashit( $this->normalize_scheme( $baseurl ) ) ) ) {
+			return '';
+		}
+		$relative = ltrim( substr( $this->normalize_scheme( $clean ), strlen( trailingslashit( $this->normalize_scheme( $baseurl ) ) ) ), '/' );
+		return trailingslashit( $basedir ) . rawurldecode( $relative );
+	}
+
+	private function find_attachment_by_url( string $url ): int {
+		$path = DerivativeResolver::relative_path( $this->url_to_upload_path( $url ) );
+		if ( '' === $path ) {
+			return 0;
+		}
+		global $wpdb;
+		return absint( $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s LIMIT 1", '_wp_attached_file', $path ) ) );
+	}
+
 	private function get_accepted_formats(): array {
 		if ( null !== $this->accepted ) {
 			return $this->accepted;
 		}
-
-		$preferred      = CompressionSettings::get_preferred_format();
-		$accept_header  = isset( $_SERVER['HTTP_ACCEPT'] ) ? (string) wp_unslash( $_SERVER['HTTP_ACCEPT'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-		$supports_avif  = false !== strpos( $accept_header, 'image/avif' );
-		$supports_webp  = false !== strpos( $accept_header, 'image/webp' );
-
-		$order = [];
-
-		if ( 'avif' === $preferred ) {
-			if ( $supports_avif ) {
-				$order[] = [ 'format' => 'avif', 'ext' => 'avif' ];
-			}
-		} elseif ( 'webp' === $preferred ) {
-			if ( $supports_webp ) {
-				$order[] = [ 'format' => 'webp', 'ext' => 'webp' ];
-			}
-		} else {
-			// auto: AVIF first, then WebP, based on browser support.
-			if ( $supports_avif ) {
-				$order[] = [ 'format' => 'avif', 'ext' => 'avif' ];
-			}
-			if ( $supports_webp ) {
-				$order[] = [ 'format' => 'webp', 'ext' => 'webp' ];
-			}
-		}
-
-		$this->accepted = $order;
-
+		$accept = isset( $_SERVER['HTTP_ACCEPT'] ) ? (string) wp_unslash( $_SERVER['HTTP_ACCEPT'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$avif  = false !== strpos( $accept, 'image/avif' );
+		$webp  = false !== strpos( $accept, 'image/webp' );
+		$preferred = CompressionSettings::get_preferred_format();
+		$order = 'webp' === $preferred ? [ 'webp' ] : ( 'avif' === $preferred ? [ 'avif', 'webp' ] : [ 'avif', 'webp' ] );
+		$this->accepted = array_values( array_filter( $order, static function ( $format ) use ( $avif, $webp ) {
+			return ( 'avif' === $format && $avif ) || ( 'webp' === $format && $webp );
+		} ) );
 		return $this->accepted;
 	}
 
-	/**
-	 * Cache the upload directory base path and URL.
-	 *
-	 * @return void
-	 */
-	private function prime_upload_paths(): void {
-		if ( '' !== $this->upload_basedir ) {
-			return;
-		}
-
-		$uploads = wp_get_upload_dir();
-
-		$this->upload_basedir = isset( $uploads['basedir'] ) ? wp_normalize_path( (string) $uploads['basedir'] ) : '';
-		$this->upload_baseurl = isset( $uploads['baseurl'] ) ? untrailingslashit( (string) $uploads['baseurl'] ) : '';
+	private function should_run(): bool {
+		return ! is_admin() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) && ! ( defined( 'WP_CLI' ) && WP_CLI ) && ! ( defined( 'DOING_CRON' ) && DOING_CRON ) && ! ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) && ! wp_doing_ajax() && CompressionSettings::is_frontend_delivery_enabled();
 	}
 
-	/**
-	 * Normalize a URL scheme so http/https comparisons succeed.
-	 *
-	 * @param string $url URL to normalize.
-	 * @return string
-	 */
-	private function normalize_scheme( string $url ): string {
-		return preg_replace( '#^https?://#i', '//', $url ) ?? $url;
-	}
-
-	/**
-	 * Skip rewriting in contexts where the original must be preserved.
-	 *
-	 * @return bool
-	 */
 	private function is_excluded_context(): bool {
 		return is_feed() || is_embed();
+	}
+
+	private function normalize_scheme( string $url ): string {
+		return preg_replace( '#^https?://#i', '//', $url ) ?? $url;
 	}
 }

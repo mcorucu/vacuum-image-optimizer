@@ -220,6 +220,26 @@ class Compression {
 								<p class="description"><?php esc_html_e( 'Auto: Serve AVIF when available, otherwise WebP, otherwise the original image.', 'vacuum-image-optimizer' ); ?></p>
 								<p class="description"><?php esc_html_e( 'AVIF: Prefer AVIF and fall back to the original image.', 'vacuum-image-optimizer' ); ?></p>
 								<p class="description"><?php esc_html_e( 'WebP: Prefer WebP and fall back to the original image.', 'vacuum-image-optimizer' ); ?></p>
+
+								<label>
+									<input type="hidden" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[generate_registered_derivatives]" value="0">
+									<input type="checkbox" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[generate_registered_derivatives]" value="1" <?php checked( ! empty( $settings['generate_registered_derivatives'] ) ); ?>>
+									<?php esc_html_e( 'Generate formats for registered image sizes', 'vacuum-image-optimizer' ); ?>
+								</label>
+								<p class="description"><?php esc_html_e( 'Create size-specific derivatives so responsive srcset candidates map to the matching image size.', 'vacuum-image-optimizer' ); ?></p>
+
+								<label>
+									<input type="hidden" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[queue_missing_derivatives]" value="0">
+									<input type="checkbox" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[queue_missing_derivatives]" value="1" <?php checked( ! empty( $settings['queue_missing_derivatives'] ) ); ?>>
+									<?php esc_html_e( 'Queue missing derivatives for safe regeneration', 'vacuum-image-optimizer' ); ?>
+								</label>
+								<p class="description"><?php esc_html_e( 'Missing files fall back immediately and can be regenerated through the existing queue.', 'vacuum-image-optimizer' ); ?></p>
+
+								<label>
+									<input type="hidden" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[debug_delivery]" value="0">
+									<input type="checkbox" name="<?php echo esc_attr( CompressionSettings::OPTION_NAME ); ?>[debug_delivery]" value="1" <?php checked( ! empty( $settings['debug_delivery'] ) ); ?>>
+									<?php esc_html_e( 'Enable delivery diagnostics', 'vacuum-image-optimizer' ); ?>
+								</label>
 							</td>
 						</tr>
 						<tr>

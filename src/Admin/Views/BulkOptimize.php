@@ -94,6 +94,33 @@ class BulkOptimize {
 				</div>
 			</div>
 		</div>
+
+		<div class="vacimg-card" data-vacimg-migration>
+			<h2><?php esc_html_e( 'Generate Missing Modern Formats', 'vacuum-image-optimizer' ); ?></h2>
+			<p><?php esc_html_e( 'Prepare existing local image attachments for automatic AVIF/WebP delivery. The scan is read-only and repeated runs preserve valid derivatives.', 'vacuum-image-optimizer' ); ?></p>
+			<div class="vacimg-button-row">
+				<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-migration-action="scan"><?php esc_html_e( 'Run Readiness Scan', 'vacuum-image-optimizer' ); ?></button>
+				<button type="button" class="vacimg-button vacimg-button--primary" data-vacimg-migration-action="start"><?php esc_html_e( 'Start Migration', 'vacuum-image-optimizer' ); ?></button>
+				<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-migration-action="pause"><?php esc_html_e( 'Pause', 'vacuum-image-optimizer' ); ?></button>
+				<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-migration-action="resume"><?php esc_html_e( 'Resume', 'vacuum-image-optimizer' ); ?></button>
+				<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-migration-action="cancel"><?php esc_html_e( 'Cancel', 'vacuum-image-optimizer' ); ?></button>
+				<button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-migration-action="retry"><?php esc_html_e( 'Retry Failed', 'vacuum-image-optimizer' ); ?></button>
+			</div>
+			<div class="vacimg-notice" data-vacimg-migration-notice hidden></div>
+			<div class="vacimg-queue-stats">
+				<?php foreach ( [ 'scanned' => __( 'Attachments scanned', 'vacuum-image-optimizer' ), 'ready' => __( 'Delivery-ready', 'vacuum-image-optimizer' ), 'partial' => __( 'Partially ready', 'vacuum-image-optimizer' ), 'missing' => __( 'No modern derivatives', 'vacuum-image-optimizer' ), 'stale' => __( 'Stale records', 'vacuum-image-optimizer' ), 'estimated_operations' => __( 'Estimated operations', 'vacuum-image-optimizer' ) ] as $key => $label ) : ?>
+					<div class="vacimg-queue-stat"><span class="vacimg-queue-stat__number" data-vacimg-migration-stat="<?php echo esc_attr( $key ); ?>">0</span><span class="vacimg-queue-stat__label"><?php echo esc_html( $label ); ?></span></div>
+				<?php endforeach; ?>
+			</div>
+			<p><?php esc_html_e( 'Migration never converts during anonymous frontend requests and never overwrites the original image.', 'vacuum-image-optimizer' ); ?></p>
+		</div>
+
+		<div class="vacimg-card" data-vacimg-diagnostics>
+			<h2><?php esc_html_e( 'Delivery Diagnostics', 'vacuum-image-optimizer' ); ?></h2>
+			<p><?php esc_html_e( 'Inspect the exact derivative registry used by frontend delivery for one Media Library attachment.', 'vacuum-image-optimizer' ); ?></p>
+			<div class="vacimg-button-row"><input type="number" min="1" class="small-text" data-vacimg-diagnostics-id placeholder="<?php esc_attr_e( 'Attachment ID', 'vacuum-image-optimizer' ); ?>"><button type="button" class="vacimg-button vacimg-button--secondary" data-vacimg-diagnostics-action="inspect"><?php esc_html_e( 'View delivery diagnostics', 'vacuum-image-optimizer' ); ?></button></div>
+			<pre class="vacimg-debug-info" data-vacimg-diagnostics-output hidden></pre>
+		</div>
 		<?php
 	}
 
