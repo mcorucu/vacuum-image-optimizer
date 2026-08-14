@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1
+
+- Added compatibility with WordPress 7.1 client-side media processing.
+- Hardened automatic upload processing for create/update attachment metadata passes.
+- Reconciled client-generated registered sizes without duplicate optimization, backups, queue jobs, or modern derivatives.
+- Added physical-file ownership, MIME, dimension, and concurrency checks for responsive derivatives.
+
 ## 1.2.0
 
 - Added automatic frontend delivery with AVIF -> WebP -> original fallback.

@@ -21,6 +21,9 @@ defined( 'ABSPATH' ) || exit;
  */
 class UploadAutomation {
 
+	/** Deferred hook used after WordPress has persisted finalized attachment metadata. */
+	private const DEFERRED_QUEUE_HOOK = 'vacimg_enqueue_deferred_attachment';
+
 	/**
 	 * Whether hooks have been registered.
 	 *
@@ -76,9 +79,10 @@ class UploadAutomation {
 		}
 
 		$this->registered = true;
-		// Attachment metadata is generated after WordPress has finalized the upload.
-		// This avoids racing image editors and keeps the upload request conservative.
-		add_filter( 'wp_generate_attachment_metadata', [ $this, 'handle_attachment_metadata' ], 20, 2 );
+		// WordPress 7.1 passes a third create/update context. The update pass is the
+		// completion signal for client-side sub-size sideloads.
+		add_filter( 'wp_generate_attachment_metadata', [ $this, 'handle_attachment_metadata' ], 20, 3 );
+		add_action( self::DEFERRED_QUEUE_HOOK, [ $this, 'enqueue_deferred_attachment' ] );
 	}
 
 	/**
@@ -86,18 +90,15 @@ class UploadAutomation {
 	 *
 	 * @param array<string, mixed> $metadata Attachment metadata.
 	 * @param int $attachment_id Attachment ID.
+	 * @param string $context Metadata lifecycle context: create or update.
 	 * @return array<string, mixed>
 	 */
-	public function handle_attachment_metadata( array $metadata, int $attachment_id ): array {
+	public function handle_attachment_metadata( array $metadata, int $attachment_id, string $context = 'create' ): array {
 		$attachment_id = absint( $attachment_id );
+		$context       = in_array( $context, [ 'create', 'update' ], true ) ? $context : 'create';
 
 		try {
 			if ( ! CompressionSettings::is_auto_optimize_uploads_enabled() ) {
-				return $metadata;
-			}
-
-			// Prevent repeat metadata generation from re-queuing or reprocessing a file.
-			if ( '' !== (string) get_post_meta( $attachment_id, '_vacimg_auto_status', true ) ) {
 				return $metadata;
 			}
 
@@ -106,20 +107,100 @@ class UploadAutomation {
 				return $metadata;
 			}
 
+			$auto_status = sanitize_key( (string) get_post_meta( $attachment_id, '_vacimg_auto_status', true ) );
+			$processed   = sanitize_key( (string) get_post_meta( $attachment_id, '_vacimg_auto_processed', true ) );
+
+			// On the client-side path, the create pass intentionally has no complete
+			// sizes map. Do not optimize or mark delivery ready until finalize/update.
+			if ( 'create' === $context && ! $this->has_finalized_sizes( $metadata ) ) {
+				if ( ! in_array( $auto_status, [ 'optimized', 'skipped', 'failed' ], true ) ) {
+					$this->defer_until_metadata_is_saved( $attachment_id );
+				}
+				return $metadata;
+			}
+
+			// A second pass reconciles newly sideloaded physical sizes only. It must
+			// never recompress a source or create another backup/queue job.
+			if ( 'optimized' === $auto_status ) {
+				$this->responsive_generator->generate( $attachment_id, $metadata );
+				return $metadata;
+			}
+
+			// A deferred queue job owns the upload. The update pass only confirms that
+			// final metadata exists; it must not race the queued processor.
+			if ( 'queue' === $processed || 'failed' === $auto_status || 'skipped' === $auto_status ) {
+				return $metadata;
+			}
+
 			$mode = CompressionSettings::get_auto_optimize_mode();
 			// Safe Mode deliberately queues work, even when immediate mode was selected,
 			// so a large upload is never made slower by optimization work.
 			if ( 'immediate' === $mode && ! CompressionSettings::is_safe_mode_enabled() ) {
-				$this->process_immediately( $attachment_id );
+				$this->process_immediately( $attachment_id, $metadata );
 				return $metadata;
 			}
 
-			$this->queue_attachment( $attachment_id );
+			$this->defer_until_metadata_is_saved( $attachment_id );
 		} catch ( \Throwable $throwable ) {
 			$this->store_failure( $attachment_id, $throwable->getMessage() );
 		}
 
 		return $metadata;
+	}
+
+	/**
+	 * Enqueue or process a deferred upload after its metadata has been saved.
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 * @return void
+	 */
+	public function enqueue_deferred_attachment( int $attachment_id ): void {
+		$attachment_id = absint( $attachment_id );
+		if ( 0 === $attachment_id || ! CompressionSettings::is_auto_optimize_uploads_enabled() ) {
+			return;
+		}
+
+		$auto_status = sanitize_key( (string) get_post_meta( $attachment_id, '_vacimg_auto_status', true ) );
+		if ( ! in_array( $auto_status, [ 'awaiting_metadata', 'pending' ], true ) || ! $this->is_supported_upload( $attachment_id ) ) {
+			return;
+		}
+
+		$mode = CompressionSettings::get_auto_optimize_mode();
+		if ( 'immediate' === $mode && ! CompressionSettings::is_safe_mode_enabled() ) {
+			$this->process_immediately( $attachment_id, (array) wp_get_attachment_metadata( $attachment_id ) );
+			return;
+		}
+
+		$this->queue_attachment( $attachment_id );
+	}
+
+	/**
+	 * Check whether the metadata contains the finalized registered-size map.
+	 *
+	 * @param array<string, mixed> $metadata Attachment metadata.
+	 * @return bool
+	 */
+	private function has_finalized_sizes( array $metadata ): bool {
+		return isset( $metadata['file'], $metadata['width'], $metadata['height'] )
+			&& ! empty( $metadata['sizes'] )
+			&& is_array( $metadata['sizes'] );
+	}
+
+	/**
+	 * Defer work until the current request has persisted attachment metadata.
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 * @return void
+	 */
+	private function defer_until_metadata_is_saved( int $attachment_id ): void {
+		update_post_meta( $attachment_id, '_vacimg_status', 'pending' );
+		update_post_meta( $attachment_id, '_vacimg_auto_status', 'awaiting_metadata' );
+		update_post_meta( $attachment_id, '_vacimg_auto_processed', 'deferred' );
+		update_post_meta( $attachment_id, '_vacimg_delivery_state', 'pending' );
+
+		if ( ! wp_next_scheduled( self::DEFERRED_QUEUE_HOOK, [ $attachment_id ] ) ) {
+			wp_schedule_single_event( time() + 1, self::DEFERRED_QUEUE_HOOK, [ $attachment_id ] );
+		}
 	}
 
 	/**
@@ -141,15 +222,16 @@ class UploadAutomation {
 	/**
 	 * Generate WebP immediately for a supported upload.
 	 *
-	 * @param int $attachment_id Attachment ID.
+	 * @param int                 $attachment_id Attachment ID.
+	 * @param array<string,mixed> $metadata Finalized attachment metadata.
 	 * @return void
 	 */
-	private function process_immediately( int $attachment_id ): void {
+	private function process_immediately( int $attachment_id, array $metadata = [] ): void {
 		$result = $this->webp_generator->generate( $attachment_id );
 
 		if ( ! empty( $result['success'] ) ) {
 			$this->maybe_generate_avif( $attachment_id );
-			$this->responsive_generator->generate( $attachment_id );
+			$this->responsive_generator->generate( $attachment_id, $metadata );
 			$this->mark_auto_processed( $attachment_id, 'optimized' );
 			return;
 		}

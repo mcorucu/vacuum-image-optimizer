@@ -1,7 +1,7 @@
 # Vacuum Image Optimizer
 
 [![WordPress plugin](https://img.shields.io/badge/WordPress.org-published-21759B)](https://wordpress.org/plugins/vacuum-image-optimizer/)
-[![Version](https://img.shields.io/badge/version-1.2.0-059669)](https://github.com/mcorucu/vacuum-image-optimizer/releases/tag/v1.2.0)
+[![Version](https://img.shields.io/badge/version-1.2.1-059669)](https://github.com/mcorucu/vacuum-image-optimizer/releases/tag/v1.2.1)
 [![Requires PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4)](https://www.php.net/)
 [![License](https://img.shields.io/badge/license-GPLv2%20or%20later-111827)](https://www.gnu.org/licenses/gpl-2.0.html)
 
@@ -24,11 +24,11 @@ Key docs:
 
 ## Current Release
 
-- Current version: `1.2.0`
-- WordPress.org status: published
-- Latest WordPress.org SVN revision: `3623840`
-- Stable tag: `1.2.0`
-- Tested up to: WordPress `7.0`
+- Current version: `1.2.1`
+- WordPress.org status: 1.2.0 published; 1.2.1 qualification pending
+- Latest WordPress.org SVN revision: `3623840` (1.2.0)
+- Stable tag: `1.2.1`
+- Tested up to: WordPress `7.1`
 - Requires at least: WordPress `6.2`
 - Requires PHP: `8.1`
 
@@ -52,7 +52,7 @@ Key docs:
 - View storage savings, recent activity, top savings, and CSV exports with source status and generated-format details.
 - Use a multilingual admin interface with bundled translations and an interface-language selector.
 - Exclude risky sources by MIME type, file size, filename pattern, path pattern, SVG, or GIF.
-- Run local WordPress 7.0 and PHP 8.3 readiness checks for image engines, uploads, backups, memory, execution time, disk space, cron, REST, AJAX, and debug mode.
+- Run local WordPress 7.1 and PHP 8.3 readiness checks for image engines, uploads, backups, memory, execution time, disk space, cron, REST, AJAX, and debug mode.
 
 ## Screenshots
 
@@ -86,7 +86,7 @@ For a release ZIP:
 1. Download the ZIP from WordPress.org or GitHub Releases.
 2. Go to **Plugins -> Add New -> Upload Plugin**.
 3. Upload and activate the ZIP.
-4. Confirm the plugin version is `1.2.0`.
+4. Confirm the plugin version is `1.2.1`.
 
 For local development, clone this repository into:
 
@@ -115,6 +115,13 @@ Useful docs:
 
 ## Changelog
 
+### 1.2.1
+
+- Added compatibility with WordPress 7.1 client-side media processing.
+- Hardened automatic upload processing for create/update attachment metadata passes.
+- Reconciled client-generated registered sizes without duplicate optimization, backups, queue jobs, or modern derivatives.
+- Added physical-file ownership, MIME, dimension, and concurrency checks for responsive derivatives.
+
 ### 1.2.0
 
 - Automatic attachment-aware AVIF/WebP delivery with original fallback.
@@ -128,6 +135,7 @@ See:
 
 - [Documentation changelog](https://docs.mcorucu.com/vacuum-image-optimizer/changelog/)
 - [Release notes for 1.2.0](docs/RELEASE_NOTES_1_2_0.md)
+- [Release notes for 1.2.1](docs/RELEASE_NOTES_1_2_1.md)
 - [Release notes for 1.1.0](docs/RELEASE_NOTES_1_1_0.md)
 - [Release notes for 1.0.1](docs/RELEASE_NOTES_1_0_1.md)
 - [WordPress.org changelog](https://wordpress.org/plugins/vacuum-image-optimizer/#developers)

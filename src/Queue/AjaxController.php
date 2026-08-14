@@ -182,6 +182,7 @@ class AjaxController {
 		$this->verify_request();
 		$requeued = $this->queue_manager->retry_failed_jobs();
 		wp_send_json_success( [
+			// translators: %d is the number of failed queue jobs requeued.
 			'message' => sprintf( __( '%d failed jobs requeued.', 'vacuum-image-optimizer' ), $requeued ),
 			'stats' => $this->queue_manager->get_statistics(),
 			'failed' => $this->format_failed_jobs(),
@@ -193,6 +194,7 @@ class AjaxController {
 		$this->verify_request();
 		$cleared = $this->queue_manager->clear_failed_jobs();
 		wp_send_json_success( [
+			// translators: %d is the number of terminal queue failures cleared.
 			'message' => sprintf( __( '%d failed jobs cleared.', 'vacuum-image-optimizer' ), $cleared ),
 			'stats' => $this->queue_manager->get_statistics(),
 			'failed' => [],
@@ -204,6 +206,7 @@ class AjaxController {
 		$this->verify_request();
 		$cancelled = $this->queue_manager->cancel_queue();
 		wp_send_json_success( [
+			// translators: %d is the number of pending queue jobs cancelled.
 			'message' => sprintf( __( '%d pending jobs cancelled.', 'vacuum-image-optimizer' ), $cancelled ),
 			'stats' => $this->queue_manager->get_statistics(),
 			'failed' => $this->format_failed_jobs(),

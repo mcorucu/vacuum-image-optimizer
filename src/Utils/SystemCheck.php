@@ -26,7 +26,7 @@ class SystemCheck {
 			'plugin_version' => defined( 'VACIMG_VERSION' ) ? VACIMG_VERSION : '',
 			'php_version'    => PHP_VERSION,
 			'wp_version'     => get_bloginfo( 'version' ),
-			'wp_tested_up_to' => '7.0',
+			'wp_tested_up_to' => '7.1',
 			'php_recommended' => version_compare( PHP_VERSION, '8.1', '>=' ),
 			'memory_limit'   => ini_get( 'memory_limit' ),
 			'upload_limit'   => ini_get( 'upload_max_filesize' ),

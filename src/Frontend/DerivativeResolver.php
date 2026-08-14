@@ -41,11 +41,22 @@ class DerivativeResolver {
 		}
 
 		$registry = self::get_registry( $attachment_id );
+		$path     = wp_normalize_path( $derivative_path );
+		$bytes    = absint( filesize( $derivative_path ) );
+		$existing = $registry[ $source_key ][ $format ] ?? null;
+		if ( is_array( $existing )
+			&& wp_normalize_path( (string) ( $existing['path'] ?? '' ) ) === $path
+			&& (string) ( $existing['relative'] ?? '' ) === $relative
+			&& (string) ( $existing['source_hash'] ?? '' ) === $source_hash
+			&& absint( $existing['bytes'] ?? 0 ) === $bytes ) {
+			return;
+		}
+
 		$registry[ $source_key ][ $format ] = [
-			'path'        => wp_normalize_path( $derivative_path ),
+			'path'        => $path,
 			'relative'    => $relative,
 			'source_hash' => $source_hash,
-			'bytes'       => absint( filesize( $derivative_path ) ),
+			'bytes'       => $bytes,
 			'updated_at'  => time(),
 		];
 
@@ -81,7 +92,7 @@ class DerivativeResolver {
 			}
 		}
 
-		if ( ! is_array( $entry ) || ! self::is_valid_entry( $entry, $source_path ) ) {
+		if ( ! is_array( $entry ) || ! self::is_valid_entry( $entry, $source_path, $format ) ) {
 			return '';
 		}
 
@@ -106,7 +117,7 @@ class DerivativeResolver {
 			return [ 'status' => 'missing', 'entry' => [] ];
 		}
 
-		if ( self::is_valid_entry( $entry, $source_path ) ) {
+		if ( self::is_valid_entry( $entry, $source_path, $format ) ) {
 			return [ 'status' => 'ready', 'entry' => $entry ];
 		}
 
@@ -155,7 +166,7 @@ class DerivativeResolver {
 	}
 
 	/** @param array<string, mixed> $entry */
-	private static function is_valid_entry( array $entry, string $source_path ): bool {
+	private static function is_valid_entry( array $entry, string $source_path, string $format = '' ): bool {
 		$path = isset( $entry['path'] ) ? wp_normalize_path( (string) $entry['path'] ) : '';
 		if ( '' === $path || ! is_file( $path ) || ! is_readable( $path ) || ! is_readable( $source_path ) ) {
 			return false;
@@ -168,7 +179,10 @@ class DerivativeResolver {
 		}
 
 		$dimensions = @getimagesize( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		return is_array( $dimensions ) && self::file_hash( $source_path ) === (string) ( $entry['source_hash'] ?? '' );
+		$mime       = '' !== $format ? wp_get_image_mime( $path ) : '';
+		return is_array( $dimensions )
+			&& ( '' === $format || 'image/' . $format === $mime )
+			&& self::file_hash( $source_path ) === (string) ( $entry['source_hash'] ?? '' );
 	}
 
 	private static function file_hash( string $path ): string {

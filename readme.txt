@@ -4,9 +4,9 @@ Author URI: https://mcorucu.com
 Plugin URI: https://mcorucu.com/en/projects/vacuum-image-optimizer
 Tags: image optimization, webp, avif, compression, lazy load
 Requires at least: 6.2
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,7 +58,7 @@ Images are optimized locally on your own WordPress server. Vacuum does not use a
 * Compression profiles and adjustable quality
 * GIF and SVG eligibility exclusions
 * Reports dashboard with detailed CSV export
-* WordPress 7.0 compatibility, PHP 8.3 readiness, and copyable System Status diagnostics
+* WordPress 7.1 compatibility, PHP 8.3 readiness, and copyable System Status diagnostics
 * Interface language selector with 9 bundled translations
 * Clean, accessible, mobile-responsive admin UI
 
@@ -112,6 +112,12 @@ WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD ext
 
 == Changelog ==
 
+= 1.2.1 =
+* Added compatibility with WordPress 7.1 client-side media processing.
+* Hardened automatic upload processing for create/update attachment metadata passes.
+* Reconciled client-generated registered sizes without duplicate optimization, backups, queue jobs, or modern derivatives.
+* Added physical-file ownership, MIME, dimension, and concurrency checks for responsive derivatives.
+
 = 1.2.0 =
 * Added attachment-aware automatic frontend delivery for AVIF and WebP with original fallback.
 * Added size-specific derivatives for registered WordPress image sizes and responsive srcset candidates.
@@ -152,6 +158,9 @@ WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD ext
 * Full internationalization with 9 bundled languages and an interface-language selector.
 
 == Upgrade Notice ==
+
+= 1.2.1 =
+WordPress 7.1 compatibility and media pipeline hardening. Existing settings, metadata, backups, and originals are preserved.
 
 = 1.2.0 =
 Adds automatic modern image delivery with responsive-size mapping, safe original fallback, cache-aware negotiation, and delivery diagnostics. Existing settings and originals are preserved; enable delivery from Compression settings.

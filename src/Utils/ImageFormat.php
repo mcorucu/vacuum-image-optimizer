@@ -115,6 +115,7 @@ class ImageFormat {
 			return false;
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- animated GIF detection requires bounded binary reads.
 		$handle = fopen( $file_path, 'rb' );
 		if ( false === $handle ) {
 			return false;
@@ -122,6 +123,7 @@ class ImageFormat {
 
 		$count = 0;
 		while ( ! feof( $handle ) && $count < 2 ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread -- animated GIF detection requires bounded binary reads.
 			$chunk = fread( $handle, 1024 * 100 );
 			if ( ! is_string( $chunk ) ) {
 				break;
@@ -130,6 +132,7 @@ class ImageFormat {
 			$count += preg_match_all( '#\x00\x21\xF9\x04.{4}\x00[\x2C\x21]#s', $chunk );
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- closes the native handle used for bounded binary reads.
 		fclose( $handle );
 
 		return $count > 1;
