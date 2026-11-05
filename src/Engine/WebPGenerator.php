@@ -63,24 +63,24 @@ class WebPGenerator {
 	 * @return bool
 	 */
 	public function delete_existing_webp( int $attachment_id ): bool {
-		if ( ImageFormat::is_webp_mime( ImageFormat::get_attachment_mime_type( $attachment_id ) ) ) {
+		$source_path = get_attached_file( $attachment_id );
+		$source_path = is_string( $source_path ) ? wp_normalize_path( $source_path ) : '';
+		if ( '' === $source_path || ! is_file( $source_path ) || ! ImageFormat::is_supported_source_attachment( $attachment_id ) ) {
+			return false;
+		}
+
+		$expected_path = $this->build_webp_path( $source_path );
+		$stored_path   = get_post_meta( $attachment_id, '_vacimg_webp_path', true );
+		$stored_path   = is_string( $stored_path ) ? wp_normalize_path( $stored_path ) : '';
+		if ( '' !== $stored_path && $stored_path !== wp_normalize_path( $expected_path ) ) {
+			return false;
+		}
+		if ( '' === $expected_path || wp_normalize_path( $expected_path ) === $source_path ) {
 			return true;
 		}
 
-		$webp_path = get_post_meta( $attachment_id, '_vacimg_webp_path', true );
-		$webp_path = is_string( $webp_path ) ? wp_normalize_path( $webp_path ) : '';
-
-		if ( '' === $webp_path ) {
-			$source_path = get_attached_file( $attachment_id );
-			$source_path = is_string( $source_path ) ? wp_normalize_path( $source_path ) : '';
-
-			if ( '' !== $source_path ) {
-				$webp_path = $this->build_webp_path( $source_path );
-			}
-		}
-
-		if ( '' !== $webp_path && file_exists( $webp_path ) && is_file( $webp_path ) ) {
-			return wp_delete_file( $webp_path );
+		if ( file_exists( $expected_path ) && is_file( $expected_path ) ) {
+			return wp_delete_file( $expected_path );
 		}
 
 		return true;
@@ -315,6 +315,10 @@ class WebPGenerator {
 
 		if ( $is_source_optimization ) {
 			update_post_meta( $attachment_id, '_vacimg_webp_source_optimized', absint( $result['savings_bytes'] ) > 0 ? 1 : 0 );
+			$source_hash = is_file( (string) $result['source_path'] ) ? hash_file( 'sha256', (string) $result['source_path'] ) : false;
+			if ( is_string( $source_hash ) ) {
+				update_post_meta( $attachment_id, '_vacimg_source_optimized_hash', $source_hash );
+			}
 			return;
 		}
 
@@ -395,12 +399,17 @@ class WebPGenerator {
 			return $result;
 		}
 
-		if ( ! copy( $temp_path, $source_path ) ) {
+		if ( 'image/webp' !== wp_get_image_mime( $temp_path ) ) {
 			$this->delete_temp_file( $temp_path );
-			return $this->fail( $result, __( 'The optimized WebP file could not replace the source image.', 'vacuum-image-optimizer' ) );
+			return $this->fail( $result, __( 'The optimized WebP file failed MIME validation.', 'vacuum-image-optimizer' ) );
 		}
-
-		$this->delete_temp_file( $temp_path );
+		// WP_Filesystem::move(..., true) unlinks the destination first, so use same-directory native rename for atomic source replacement.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions, WordPress.PHP.NoSilencedErrors.Discouraged -- Preserve the current source until the smaller WebP is ready.
+		if ( ! @rename( $temp_path, $source_path ) ) {
+			$this->delete_temp_file( $temp_path );
+			return $this->fail( $result, __( 'The optimized WebP file could not replace the source image safely.', 'vacuum-image-optimizer' ) );
+		}
+		clearstatcache( true, $source_path );
 
 		$result = $this->complete_result( $result, (int) $temp_size, $engine_used, __( 'WebP source image optimized successfully.', 'vacuum-image-optimizer' ) );
 		$this->save_success_metadata( $result );
@@ -433,9 +442,39 @@ class WebPGenerator {
 	 * @return string
 	 */
 	private function ensure_backup_copy( int $attachment_id, string $source_path ): string {
+		$source_hash = is_readable( $source_path ) ? hash_file( 'sha256', $source_path ) : false;
+		if ( ! is_string( $source_hash ) || '' === $source_hash ) {
+			return '';
+		}
+
 		$existing_backup = get_post_meta( $attachment_id, '_vacimg_backup_path', true );
-		if ( is_string( $existing_backup ) && '' !== $existing_backup && file_exists( $existing_backup ) && is_readable( $existing_backup ) ) {
-			return wp_normalize_path( $existing_backup );
+		if ( is_string( $existing_backup )
+			&& '' !== $existing_backup
+			&& $this->backup_manager->is_valid_backup_path( $existing_backup )
+			&& is_file( $existing_backup )
+			&& is_readable( $existing_backup ) ) {
+			$existing_backup = wp_normalize_path( $existing_backup );
+			$backup_hash          = hash_file( 'sha256', $existing_backup );
+			$recorded_backup_hash = (string) get_post_meta( $attachment_id, '_vacimg_backup_source_hash', true );
+			$optimized_hash       = (string) get_post_meta( $attachment_id, '_vacimg_source_optimized_hash', true );
+			$backup_is_valid      = is_string( $backup_hash ) && '' !== $backup_hash && ( '' === $recorded_backup_hash || hash_equals( $recorded_backup_hash, $backup_hash ) );
+
+			if ( $backup_is_valid && hash_equals( $backup_hash, $source_hash ) ) {
+				update_post_meta( $attachment_id, '_vacimg_backup_source_hash', $backup_hash );
+				delete_post_meta( $attachment_id, '_vacimg_source_optimized_hash' );
+				return $existing_backup;
+			}
+
+			if ( $backup_is_valid && '' !== $optimized_hash && hash_equals( $optimized_hash, $source_hash ) ) {
+				return $existing_backup;
+			}
+
+			// Migrate existing 1.2.1 WebP-source backups, which predate the stored optimized-source hash.
+			if ( $backup_is_valid && '' === $optimized_hash && 1 === absint( get_post_meta( $attachment_id, '_vacimg_webp_source_optimized', true ) ) ) {
+				update_post_meta( $attachment_id, '_vacimg_backup_source_hash', $backup_hash );
+				update_post_meta( $attachment_id, '_vacimg_source_optimized_hash', $source_hash );
+				return $existing_backup;
+			}
 		}
 
 		$backup_path = $this->build_backup_path( $attachment_id, $source_path );
@@ -450,11 +489,21 @@ class WebPGenerator {
 			return '';
 		}
 
-		if ( ! $this->backup_manager->is_valid_backup_path( $backup_path ) ) {
+		if ( ! $this->backup_manager->is_valid_backup_path( $backup_path ) || ! copy( $source_path, $backup_path ) ) {
+			if ( is_file( $backup_path ) ) {
+				wp_delete_file( $backup_path );
+			}
 			return '';
 		}
 
-		return copy( $source_path, $backup_path ) ? wp_normalize_path( $backup_path ) : '';
+		$backup_hash = hash_file( 'sha256', $backup_path );
+		if ( ! is_string( $backup_hash ) || ! hash_equals( $source_hash, $backup_hash ) ) {
+			wp_delete_file( $backup_path );
+			return '';
+		}
+		update_post_meta( $attachment_id, '_vacimg_backup_source_hash', $backup_hash );
+		delete_post_meta( $attachment_id, '_vacimg_source_optimized_hash' );
+		return wp_normalize_path( $backup_path );
 	}
 
 	/**

@@ -333,7 +333,7 @@ class LibraryIntegration {
 	 * @return void
 	 */
 	private function render_inline_actions( int $attachment_id, array $data ): void {
-		if ( ! current_user_can( 'upload_files' ) || ! ImageFormat::is_supported_source_attachment( $attachment_id ) ) {
+		if ( ! current_user_can( 'upload_files' ) || ! current_user_can( 'edit_post', $attachment_id ) || ! ImageFormat::is_supported_source_attachment( $attachment_id ) ) {
 			return;
 		}
 

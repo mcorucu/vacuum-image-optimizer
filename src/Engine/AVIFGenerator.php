@@ -66,20 +66,24 @@ class AVIFGenerator {
 	 * @return bool
 	 */
 	public function delete_existing_avif( int $attachment_id ): bool {
-		$avif_path = get_post_meta( $attachment_id, '_vacimg_avif_path', true );
-		$avif_path = is_string( $avif_path ) ? wp_normalize_path( $avif_path ) : '';
-
-		if ( '' === $avif_path ) {
-			$source_path = get_attached_file( $attachment_id );
-			$source_path = is_string( $source_path ) ? wp_normalize_path( $source_path ) : '';
-
-			if ( '' !== $source_path ) {
-				$avif_path = $this->build_avif_path( $source_path );
-			}
+		$source_path = get_attached_file( $attachment_id );
+		$source_path = is_string( $source_path ) ? wp_normalize_path( $source_path ) : '';
+		if ( '' === $source_path || ! is_file( $source_path ) || ! ImageFormat::is_supported_source_attachment( $attachment_id ) ) {
+			return false;
 		}
 
-		if ( '' !== $avif_path && file_exists( $avif_path ) && is_file( $avif_path ) ) {
-			return wp_delete_file( $avif_path );
+		$expected_path = $this->build_avif_path( $source_path );
+		$stored_path   = get_post_meta( $attachment_id, '_vacimg_avif_path', true );
+		$stored_path   = is_string( $stored_path ) ? wp_normalize_path( $stored_path ) : '';
+		if ( '' !== $stored_path && $stored_path !== wp_normalize_path( $expected_path ) ) {
+			return false;
+		}
+		if ( '' === $expected_path || wp_normalize_path( $expected_path ) === $source_path ) {
+			return true;
+		}
+
+		if ( file_exists( $expected_path ) && is_file( $expected_path ) ) {
+			return wp_delete_file( $expected_path );
 		}
 
 		return true;

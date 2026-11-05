@@ -102,13 +102,37 @@ class BackupManager {
 	 * @return bool
 	 */
 	public function is_valid_backup_path( string $path ): bool {
-		if ( '' === $path || '' === $this->get_backup_directory() ) {
+		$backup_directory = wp_normalize_path( untrailingslashit( $this->get_backup_directory() ) );
+		$path             = wp_normalize_path( $path );
+		if ( '' === $backup_directory || '' === $path || 0 !== strpos( $path, trailingslashit( $backup_directory ) ) || is_link( $path ) ) {
 			return false;
 		}
 
-		$backup_directory = wp_normalize_path( trailingslashit( $this->get_backup_directory() ) );
-		$path             = wp_normalize_path( $path );
+		$relative = substr( $path, strlen( trailingslashit( $backup_directory ) ) );
+		if ( '' === $relative || preg_match( '#(^|/)\.{1,2}(/|$)#', $relative ) ) {
+			return false;
+		}
 
-		return 0 === strpos( $path, $backup_directory );
+		$real_root   = realpath( $backup_directory );
+		$real_parent = realpath( dirname( $path ) );
+		if ( ! is_string( $real_root ) || ! is_string( $real_parent ) ) {
+			return false;
+		}
+
+		$real_root   = trailingslashit( wp_normalize_path( $real_root ) );
+		$real_parent = trailingslashit( wp_normalize_path( $real_parent ) );
+		if ( 0 !== strpos( $real_parent, $real_root ) ) {
+			return false;
+		}
+
+		if ( file_exists( $path ) ) {
+			$real_file = realpath( $path );
+			if ( ! is_string( $real_file ) || 0 !== strpos( wp_normalize_path( $real_file ), $real_root ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
+
 }

@@ -36,23 +36,12 @@ class ImageFormat {
 	public static function get_attachment_mime_type( int $attachment_id ): string {
 		$file_path = get_attached_file( $attachment_id );
 		$file_path = is_string( $file_path ) ? wp_normalize_path( $file_path ) : '';
-		$mime_type = (string) get_post_mime_type( $attachment_id );
-
-		if ( '' !== $file_path && file_exists( $file_path ) ) {
-			$checked = wp_check_filetype_and_ext( $file_path, basename( $file_path ) );
-			if ( ! empty( $checked['type'] ) ) {
-				$mime_type = (string) $checked['type'];
-			}
-
-			if ( function_exists( 'getimagesize' ) ) {
-				$size = @getimagesize( $file_path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-				if ( is_array( $size ) && ! empty( $size['mime'] ) ) {
-					$mime_type = (string) $size['mime'];
-				}
-			}
+		if ( '' !== $file_path && is_file( $file_path ) && is_readable( $file_path ) ) {
+			$physical_mime = wp_get_image_mime( $file_path );
+			return sanitize_mime_type( is_string( $physical_mime ) ? $physical_mime : '' );
 		}
 
-		return sanitize_mime_type( $mime_type );
+		return sanitize_mime_type( (string) get_post_mime_type( $attachment_id ) );
 	}
 
 	/**
@@ -83,7 +72,7 @@ class ImageFormat {
 			return false;
 		}
 
-		if ( '' === $file_path || ! file_exists( $file_path ) || ! is_readable( $file_path ) ) {
+		if ( '' === $file_path || ! is_file( $file_path ) || ! is_readable( $file_path ) || ! self::is_inside_uploads( $file_path ) ) {
 			return false;
 		}
 
@@ -92,6 +81,25 @@ class ImageFormat {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check that a physical source resolves beneath this site's uploads directory.
+	 *
+	 * @param string $path Source file path.
+	 * @return bool
+	 */
+	private static function is_inside_uploads( string $path ): bool {
+		$uploads = wp_get_upload_dir();
+		$base    = isset( $uploads['basedir'] ) ? realpath( (string) $uploads['basedir'] ) : false;
+		$real    = realpath( $path );
+		if ( ! is_string( $base ) || ! is_string( $real ) ) {
+			return false;
+		}
+
+		$base = trailingslashit( wp_normalize_path( $base ) );
+		$real = wp_normalize_path( $real );
+		return 0 === strpos( $real, $base );
 	}
 
 	/**

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.2
+
+- Revalidates derivative byte sizes and atomically regenerates stale responsive derivatives after source changes.
+- Parses Accept format tokens and q-values and preserves source fallback for unsupported or invalid candidates.
+- Verifies backup content, preserves old backups when a source changes, and constrains restore paths to the owned backup directory.
+- Cleans registered responsive derivatives on restore and source attachment deletion without deleting backups.
+- Requires per-attachment edit permission, neutralizes formula-leading CSV text, validates physical image MIME, and serializes duplicate queue insertion.
+
 ## 1.2.1
 
 - Added compatibility with WordPress 7.1 client-side media processing.

@@ -94,25 +94,39 @@ class QueueManager {
 		global $wpdb;
 
 		$attachment_id = absint( $attachment_id );
-		if ( ! $this->is_valid_attachment( $attachment_id, $allow_optimized ) || $this->has_queue_entry( $attachment_id ) ) {
+		if ( ! $this->is_valid_attachment( $attachment_id, $allow_optimized ) ) {
 			return false;
 		}
 
-		$inserted = $wpdb->insert(
-			$this->get_escaped_table_name(),
-			[
-				'attachment_id'  => $attachment_id,
-				'status'         => 'pending',
-				'created_at'     => current_time( 'mysql' ),
-				'started_at'     => null,
-				'completed_at'   => null,
-				'attempts'       => 0,
-				'error_message'  => null,
-			],
-			[ '%d', '%s', '%s', '%s', '%s', '%d', '%s' ]
-		);
+		$lock_name = 'vacimg_queue_' . md5( $wpdb->prefix . ':' . $attachment_id );
+		$locked    = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK( %s, %d )', $lock_name, 5 ) );
+		if ( '1' !== (string) $locked ) {
+			return false;
+		}
 
-		return false !== $inserted;
+		try {
+			if ( $this->has_queue_entry( $attachment_id ) ) {
+				return false;
+			}
+
+			$inserted = $wpdb->insert(
+				$this->get_escaped_table_name(),
+				[
+					'attachment_id' => $attachment_id,
+					'status'        => 'pending',
+					'created_at'    => current_time( 'mysql' ),
+					'started_at'    => null,
+					'completed_at'  => null,
+					'attempts'      => 0,
+					'error_message' => null,
+				],
+				[ '%d', '%s', '%s', '%s', '%s', '%d', '%s' ]
+			);
+
+			return false !== $inserted;
+		} finally {
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK( %s )', $lock_name ) );
+		}
 	}
 
 	/**
@@ -298,15 +312,31 @@ class QueueManager {
 		global $wpdb;
 
 		$table = $this->get_escaped_table_name();
+		$max_attempts = $this->get_max_attempts();
+		// This custom queue table has no WordPress object-cache layer; its table name is escaped and values are bound.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$attachment_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				// The table name comes from get_escaped_table_name(); data values use placeholders.
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT attachment_id FROM {$table} WHERE status = %s AND attempts < %d",
+				'failed',
+				$max_attempts
+			)
+		);
 		$updated = $wpdb->query(
 			$wpdb->prepare(
 				"UPDATE {$table} SET status = %s, started_at = NULL, completed_at = NULL, error_message = NULL
 				WHERE status = %s AND attempts < %d",
 				'pending',
 				'failed',
-				$this->get_max_attempts()
+				$max_attempts
 			)
 		);
+
+		if ( is_int( $updated ) && $updated > 0 ) {
+			$this->reset_auto_status_for_retry( is_array( $attachment_ids ) ? $attachment_ids : [] );
+		}
 
 		return is_int( $updated ) ? max( 0, $updated ) : 0;
 	}
@@ -344,7 +374,22 @@ class QueueManager {
 
 		// Conditional reset: only failed jobs that have not exhausted their retry
 		// budget become pending again. Jobs at the limit stay failed.
-		$table    = $this->get_escaped_table_name();
+		$table = $this->get_escaped_table_name();
+		$max_attempts = $this->get_max_attempts();
+		$attachment_id = absint(
+			// The custom queue table is uncached; the table name is escaped and data values are bound.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+			$wpdb->get_var(
+				$wpdb->prepare(
+					// The table name comes from get_escaped_table_name(); data values use placeholders.
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					"SELECT attachment_id FROM {$table} WHERE id = %d AND status = %s AND attempts < %d",
+					absint( $queue_id ),
+					'failed',
+					$max_attempts
+				)
+			)
+		);
 		$affected = $wpdb->query(
 			$wpdb->prepare(
 				"UPDATE {$table}
@@ -353,11 +398,25 @@ class QueueManager {
 				'pending',
 				absint( $queue_id ),
 				'failed',
-				$this->get_max_attempts()
+				$max_attempts
 			)
 		);
 
-		return is_int( $affected ) && $affected > 0;
+		if ( is_int( $affected ) && $affected > 0 ) {
+			$this->reset_auto_status_for_retry( [ $attachment_id ] );
+			return true;
+		}
+
+		return false;
+	}
+
+	/** Reset failed automatic-upload state when a retry is accepted. */
+	private function reset_auto_status_for_retry( array $attachment_ids ): void {
+		foreach ( array_unique( array_map( 'absint', $attachment_ids ) ) as $attachment_id ) {
+			if ( $attachment_id > 0 && 'failed' === (string) get_post_meta( $attachment_id, '_vacimg_auto_status', true ) ) {
+				update_post_meta( $attachment_id, '_vacimg_auto_status', 'pending' );
+			}
+		}
 	}
 
 	/**

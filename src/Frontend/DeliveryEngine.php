@@ -145,14 +145,43 @@ class DeliveryEngine {
 		if ( null !== $this->accepted ) {
 			return $this->accepted;
 		}
+
 		$accept = isset( $_SERVER['HTTP_ACCEPT'] ) ? (string) wp_unslash( $_SERVER['HTTP_ACCEPT'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-		$avif  = false !== strpos( $accept, 'image/avif' );
-		$webp  = false !== strpos( $accept, 'image/webp' );
+		$quality = [];
+		foreach ( explode( ',', strtolower( $accept ) ) as $item ) {
+			$parts = array_map( 'trim', explode( ';', $item ) );
+			if ( ! preg_match( '#^image/(avif|webp)$#', (string) array_shift( $parts ), $match ) ) {
+				continue;
+			}
+
+			$q = 1.0;
+			foreach ( $parts as $parameter ) {
+				if ( preg_match( '/^q\s*=\s*(.*)$/', $parameter, $q_match ) ) {
+					$q = is_numeric( $q_match[1] ) && (float) $q_match[1] >= 0 && (float) $q_match[1] <= 1 ? (float) $q_match[1] : 0.0;
+				}
+			}
+			$format = $match[1];
+			$quality[ $format ] = max( $quality[ $format ] ?? 0.0, $q );
+		}
+
 		$preferred = CompressionSettings::get_preferred_format();
-		$order = 'webp' === $preferred ? [ 'webp' ] : ( 'avif' === $preferred ? [ 'avif', 'webp' ] : [ 'avif', 'webp' ] );
-		$this->accepted = array_values( array_filter( $order, static function ( $format ) use ( $avif, $webp ) {
-			return ( 'avif' === $format && $avif ) || ( 'webp' === $format && $webp );
-		} ) );
+		$order = 'webp' === $preferred ? [ 'webp' ] : [ 'avif', 'webp' ];
+		$rank  = array_flip( $order );
+		$this->accepted = array_values(
+			array_filter(
+				$order,
+				static function ( $format ) use ( $quality ) {
+					return isset( $quality[ $format ] ) && $quality[ $format ] > 0;
+				}
+			)
+		);
+		usort(
+			$this->accepted,
+			static function ( $left, $right ) use ( $quality, $rank ) {
+				$by_quality = ( $quality[ $right ] ?? 0.0 ) <=> ( $quality[ $left ] ?? 0.0 );
+				return 0 !== $by_quality ? $by_quality : ( $rank[ $left ] <=> $rank[ $right ] );
+			}
+		);
 		return $this->accepted;
 	}
 

@@ -172,9 +172,14 @@ class DerivativeResolver {
 			return false;
 		}
 
-		$source_size = filesize( $source_path );
+		$source_size    = filesize( $source_path );
 		$derivative_size = filesize( $path );
 		if ( false === $source_size || false === $derivative_size || $derivative_size > $source_size ) {
+			return false;
+		}
+
+		// A previously recorded derivative must still have the exact size written to its registry entry.
+		if ( isset( $entry['bytes'] ) && absint( $entry['bytes'] ) !== (int) $derivative_size ) {
 			return false;
 		}
 

@@ -73,7 +73,7 @@ class AttachmentActions {
 			return $row_actions;
 		}
 
-		if ( ! current_user_can( 'upload_files' ) ) {
+		if ( ! current_user_can( 'upload_files' ) || ! current_user_can( 'edit_post', $post->ID ) ) {
 			return $row_actions;
 		}
 
@@ -117,6 +117,10 @@ class AttachmentActions {
 		$post = get_post( $attachment_id );
 		if ( ! $post instanceof \WP_Post || 'attachment' !== $post->post_type ) {
 			$this->redirect_with_notice( 'invalid', '', 'error' );
+		}
+
+		if ( ! current_user_can( 'edit_post', $attachment_id ) ) {
+			wp_die( esc_html__( 'Sorry, you are not allowed to manage this attachment.', 'vacuum-image-optimizer' ) );
 		}
 
 		if ( ! wp_attachment_is_image( $attachment_id ) ) {

@@ -1,7 +1,7 @@
 # Vacuum Image Optimizer
 
 [![WordPress plugin](https://img.shields.io/badge/WordPress.org-published-21759B)](https://wordpress.org/plugins/vacuum-image-optimizer/)
-[![Version](https://img.shields.io/badge/version-1.2.1-059669)](https://github.com/mcorucu/vacuum-image-optimizer/releases/tag/v1.2.1)
+[![Version](https://img.shields.io/badge/version-1.2.2-059669)](https://github.com/mcorucu/vacuum-image-optimizer/releases/tag/v1.2.2)
 [![Requires PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4)](https://www.php.net/)
 [![License](https://img.shields.io/badge/license-GPLv2%20or%20later-111827)](https://www.gnu.org/licenses/gpl-2.0.html)
 
@@ -24,11 +24,11 @@ Key docs:
 
 ## Current Release
 
-- Current version: `1.2.1`
-- WordPress.org status: 1.2.0 published; 1.2.1 qualification pending
-- Latest WordPress.org SVN revision: `3623840` (1.2.0)
-- Stable tag: `1.2.1`
-- Tested up to: WordPress `7.1`
+- Target release: `1.2.2` (public baseline: `1.2.1`)
+- WordPress.org public baseline: `1.2.1`
+- Last recorded WordPress.org SVN revision: `3623840` (1.2.0)
+- Target stable tag: `1.2.2`
+- Qualification target: WordPress `7.1.4`
 - Requires at least: WordPress `6.2`
 - Requires PHP: `8.1`
 
@@ -42,9 +42,9 @@ Key docs:
 - Bulk optimize existing Media Library images with scan-unoptimized, scan-all, pause, resume, safe cancellation, and retry/clear-failure controls.
 - Generate missing modern formats for existing Media Library attachments with a readiness scan and resumable migration controls.
 - Automatically process new uploads after WordPress generates attachment metadata; Safe Mode queues work conservatively.
-- Preserve originals and optionally keep restorable backups.
+- Preserve JPEG/PNG sources while generating derivatives; recompress WebP sources only after a verified backup and only when the result is smaller.
 - Restore original files from backups when available.
-- Serve generated WebP/AVIF on the frontend with safe fallback to original images.
+- Serve validated WebP/AVIF derivatives according to the request Accept header, with source fallback and Vary: Accept for cache separation.
 - Map responsive `srcset` candidates to matching per-size derivatives without rewriting stored post content.
 - Inspect per-attachment delivery diagnostics, selected candidates, fallback state, queue state, and stale metadata.
 - Apply native lazy loading through WordPress image output filters.
@@ -52,7 +52,10 @@ Key docs:
 - View storage savings, recent activity, top savings, and CSV exports with source status and generated-format details.
 - Use a multilingual admin interface with bundled translations and an interface-language selector.
 - Exclude risky sources by MIME type, file size, filename pattern, path pattern, SVG, or GIF.
-- Run local WordPress 7.1 and PHP 8.3 readiness checks for image engines, uploads, backups, memory, execution time, disk space, cron, REST, AJAX, and debug mode.
+- Run local WordPress 7.1.4 and PHP 8.1–8.3 readiness checks for image engines, uploads, backups, memory, execution time, disk space, cron, REST, AJAX, and debug mode.
+
+
+- For CDN and page-cache use, honor `Vary: Accept` or vary the cache key by `Accept`; otherwise cache one browser format per URL.
 
 ## Screenshots
 
@@ -86,7 +89,7 @@ For a release ZIP:
 1. Download the ZIP from WordPress.org or GitHub Releases.
 2. Go to **Plugins -> Add New -> Upload Plugin**.
 3. Upload and activate the ZIP.
-4. Confirm the plugin version is `1.2.1`.
+4. Confirm the plugin version is `1.2.2`.
 
 For local development, clone this repository into:
 
@@ -114,6 +117,14 @@ Useful docs:
 - [Developer Notes](https://docs.mcorucu.com/vacuum-image-optimizer/developer-notes/)
 
 ## Changelog
+
+### 1.2.2
+
+- Revalidates derivative size and source ownership and atomically regenerates stale outputs after source replacement.
+- Honors Accept format tokens and q-values while preserving a safe source fallback.
+- Verifies backup contents, creates a fresh backup when the source changes, and constrains restore paths.
+- Removes registered responsive derivatives on restore and source deletion while retaining backups.
+- Adds attachment-specific authorization, CSV formula neutralization, physical MIME checks, and duplicate queue locking.
 
 ### 1.2.1
 

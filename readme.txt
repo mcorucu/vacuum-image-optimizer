@@ -6,7 +6,7 @@ Tags: image optimization, webp, avif, compression, lazy load
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,11 +14,11 @@ Local WebP and AVIF image optimization with safe bulk processing, backup and res
 
 == Description ==
 
-Vacuum Image Optimizer is a modern, lightweight image optimization toolkit for WordPress. It shrinks your image footprint by generating next-generation WebP and optional AVIF files locally, while always keeping your original files safe and untouched.
+Vacuum Image Optimizer generates WebP and optional AVIF images locally on your WordPress server. JPEG and PNG source files remain unchanged during derivative generation. Uploaded WebP sources can be recompressed in place only after a verified backup has been created, and only when the result is smaller.
 
 Everything happens inside a clean, friendly admin interface — no command line, no external services, and no account required.
 
-Unlike optimizers that rewrite originals or depend on a remote API, Vacuum writes generated formats alongside the source image, can keep restorable backups, and serves WebP/AVIF on the frontend without changing stored media URLs.
+Vacuum writes generated formats alongside source files and serves them on the frontend without changing stored media URLs. WebP source recompression is the exception to derivative-only processing: Vacuum first keeps a restorable copy, then replaces that WebP source only when recompression reduces its size.
 
 **What it does**
 
@@ -34,7 +34,7 @@ Unlike optimizers that rewrite originals or depend on a remote API, Vacuum write
 
 **Safe by design**
 
-Vacuum never modifies or deletes your original images. Optimized formats are written alongside the originals, optional backups can be kept, and a one-click restore brings originals back at any time.
+JPEG and PNG originals are preserved while WebP and AVIF derivatives are generated. When an uploaded WebP source is recompressed, Vacuum verifies a backup before it can replace the source, and only publishes a smaller result. Restore copies the saved source back and removes plugin-owned derivatives while keeping backup files. Safe Mode uses conservative upload processing and keeps originals available for fallback.
 
 **Privacy and data handling**
 
@@ -58,7 +58,7 @@ Images are optimized locally on your own WordPress server. Vacuum does not use a
 * Compression profiles and adjustable quality
 * GIF and SVG eligibility exclusions
 * Reports dashboard with detailed CSV export
-* WordPress 7.1 compatibility, PHP 8.3 readiness, and copyable System Status diagnostics
+* WordPress 7.1.4 compatibility, PHP 8.1–8.3 readiness, and copyable System Status diagnostics
 * Interface language selector with 9 bundled translations
 * Clean, accessible, mobile-responsive admin UI
 
@@ -74,7 +74,7 @@ Images are optimized locally on your own WordPress server. Vacuum does not use a
 == Frequently Asked Questions ==
 
 = Does Vacuum replace my original images? =
-No. Your original files are never modified or deleted. Optimized WebP/AVIF copies are created alongside the originals, and the frontend always falls back to the original when needed.
+JPEG and PNG files are left unchanged while derivatives are generated. Uploaded WebP sources may be recompressed in place only after a backup is created and verified, and only if the result is smaller. Frontend delivery uses a generated derivative when the browser accepts it and otherwise falls back to the source image.
 
 = Does it support AVIF? =
 Yes. AVIF generation is available as a parallel format when your server supports it (via Imagick or a GD build with AVIF). If AVIF is unavailable, WebP and originals continue to work normally.
@@ -95,7 +95,7 @@ Yes. Frontend delivery hooks into the standard WordPress image functions used by
 The admin interface is fully translatable and ships with 9 languages. You can also pick a specific interface language in the Compression settings, independent of the site language.
 
 = Will it change my image URLs in the database? =
-No. Frontend delivery swaps URLs only at render time based on browser support and file availability. Your stored attachment URLs are never altered, so the feature is fully reversible.
+No. Frontend delivery selects a validated WebP or AVIF derivative at render time based on the request's Accept header. Vacuum sends `Vary: Accept`; configure page caches and CDNs to respect that header or to vary their cache key by Accept, so one browser's image response is not served to another. Stored attachment URLs are not rewritten.
 
 = What are the requirements? =
 WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD extension with the relevant format support, which you can verify on the System Status tab.
@@ -111,6 +111,14 @@ WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD ext
 7. Localization — built-in interface-language selector.
 
 == Changelog ==
+
+= 1.2.2 =
+* Revalidates registered derivative byte sizes and regenerates stale derivatives atomically after source changes.
+* Honors Accept media tokens and quality values and keeps original fallback for missing or corrupt files.
+* Verifies backup content, creates a new backup when a source changes, and restores only from the owned backup directory.
+* Removes registered responsive derivatives when restoring or deleting source attachments while preserving backup files.
+* Requires attachment-specific edit capability for Media Library actions and neutralizes spreadsheet formulas in CSV text cells.
+* Validates physical image MIME and serializes duplicate queue insertion.
 
 = 1.2.1 =
 * Added compatibility with WordPress 7.1 client-side media processing.
@@ -159,8 +167,8 @@ WordPress 6.2+ and PHP 8.1+. WebP/AVIF generation requires the Imagick or GD ext
 
 == Upgrade Notice ==
 
-= 1.2.1 =
-WordPress 7.1 compatibility and media pipeline hardening. Existing settings, metadata, backups, and originals are preserved.
+= 1.2.2 =
+Hardens derivative validation and regeneration, backup/restore behavior, Accept negotiation, CSV exports, queue insertion, and per-attachment authorization.
 
 = 1.2.0 =
 Adds automatic modern image delivery with responsive-size mapping, safe original fallback, cache-aware negotiation, and delivery diagnostics. Existing settings and originals are preserved; enable delivery from Compression settings.
@@ -172,4 +180,4 @@ Adds WordPress 7.0 compatibility, PHP 8.3 readiness, improved diagnostics, safer
 Adds optional setup, WebP source optimization, expanded format handling, improved server checks, safer defaults, and Media Library/bulk workflow improvements.
 
 = 0.9.0 =
-First public release candidate of Vacuum Image Optimizer. Generate WebP/AVIF, bulk-optimize, automate uploads, and deliver modern formats safely — originals are never modified.
+First public release candidate of Vacuum Image Optimizer. Generate WebP/AVIF, bulk-optimize, automate uploads, and deliver modern formats locally. JPEG/PNG sources remain unchanged during derivative generation; WebP sources can be recompressed after backup.

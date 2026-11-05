@@ -134,51 +134,39 @@ class ResponsiveDerivativeGenerator {
 			DerivativeResolver::record( $attachment_id, $source_path, $format, $source_path );
 			return 'skipped';
 		}
-		$output = trailingslashit( dirname( $source_path ) ) . pathinfo( $source_path, PATHINFO_FILENAME ) . '.' . $format;
-		if ( is_readable( $output ) ) {
-			if ( 'image/' . $format === wp_get_image_mime( $output ) && DerivativeResolver::is_valid_derivative( $attachment_id, $source_path, $format, $output ) ) {
-				DerivativeResolver::record( $attachment_id, $source_path, $format, $output );
-				return 'skipped';
-			}
 
-			// Preserve any valid pre-existing file and repair only its registry entry.
-			$output_size = filesize( $output );
-			$output_info = @getimagesize( $output ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-			if ( false !== $output_size && $output_size <= (int) filesize( $source_path ) && is_array( $output_info ) && 'image/' . $format === wp_get_image_mime( $output ) ) {
-				DerivativeResolver::record( $attachment_id, $source_path, $format, $output );
-				return 'skipped';
-			}
-
-			// Never delete an untracked file merely because it has the expected name.
-			$inspection = DerivativeResolver::inspect( $attachment_id, $source_path, $format );
-			$tracked_path = wp_normalize_path( (string) ( $inspection['entry']['path'] ?? '' ) );
-			if ( 'stale' !== $inspection['status'] || $tracked_path !== wp_normalize_path( $output ) ) {
-				return 'skipped';
-			}
-
-			wp_delete_file( $output );
-		}
-
+		$output    = trailingslashit( dirname( $source_path ) ) . pathinfo( $source_path, PATHINFO_FILENAME ) . '.' . $format;
 		$lock_path = $output . '.vacimg-lock';
+		// Keep the lock inode in place. Unlinking it after flock() can let another process lock a new inode concurrently.
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.PHP.NoSilencedErrors.Discouraged -- flock() requires a native file handle for an atomic lock.
-		$lock      = @fopen( $lock_path, 'c' );
+		$lock = @fopen( $lock_path, 'c' );
 		if ( false === $lock ) {
 			return 'failed';
 		}
 
+		$temp_path = '';
 		try {
 			if ( ! flock( $lock, LOCK_EX ) ) {
 				return 'failed';
 			}
 
-			// Re-check after claiming the lock: another request may have completed it.
-			if ( is_readable( $output ) ) {
-				$output_size = filesize( $output );
-				$output_info = @getimagesize( $output ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-				if ( false !== $output_size && $output_size <= (int) filesize( $source_path ) && is_array( $output_info ) && 'image/' . $format === wp_get_image_mime( $output ) ) {
-					DerivativeResolver::record( $attachment_id, $source_path, $format, $output );
+			$inspection  = DerivativeResolver::inspect( $attachment_id, $source_path, $format );
+			$tracked_path = wp_normalize_path( (string) ( $inspection['entry']['path'] ?? '' ) );
+			if ( 'ready' === $inspection['status'] && $tracked_path === wp_normalize_path( $output ) ) {
+				return 'skipped';
+			}
+
+			if ( is_file( $output ) ) {
+				// Do not claim or replace an unrelated pre-existing file. Only regenerate a file the registry
+				// already identifies as this attachment's stale derivative.
+				if ( 'stale' !== $inspection['status'] || $tracked_path !== wp_normalize_path( $output ) ) {
 					return 'skipped';
 				}
+			}
+
+			$temp_path = trailingslashit( dirname( $output ) ) . '.vacimg-' . wp_generate_password( 20, false, false ) . '.' . $format;
+			if ( file_exists( $temp_path ) ) {
+				return 'failed';
 			}
 
 			$editor = wp_get_image_editor( $source_path );
@@ -186,23 +174,36 @@ class ResponsiveDerivativeGenerator {
 				return 'failed';
 			}
 			$editor->set_quality( 'webp' === $format ? CompressionSettings::get_quality() : CompressionSettings::get_avif_quality() );
-			$saved = $editor->save( $output, 'image/' . $format );
-			if ( is_wp_error( $saved ) || ! is_readable( $output ) ) {
+			$saved = $editor->save( $temp_path, 'image/' . $format );
+			if ( is_wp_error( $saved ) || ! is_array( $saved ) || wp_normalize_path( (string) ( $saved['path'] ?? '' ) ) !== wp_normalize_path( $temp_path ) || ! is_readable( $temp_path ) ) {
 				return 'failed';
 			}
+
 			$source_size = filesize( $source_path );
-			$output_size = filesize( $output );
-			if ( false === $source_size || false === $output_size || $output_size > $source_size || ! is_array( @getimagesize( $output ) ) || 'image/' . $format !== wp_get_image_mime( $output ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-				wp_delete_file( $output );
+			$output_size = filesize( $temp_path );
+			$output_info = @getimagesize( $temp_path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			if ( false === $source_size || false === $output_size || $output_size > $source_size || ! is_array( $output_info ) || 'image/' . $format !== wp_get_image_mime( $temp_path ) ) {
 				return 'skipped';
 			}
+
+			// WP_Filesystem::move(..., true) deletes an existing destination first; native same-directory rename atomically replaces this tracked derivative.
+			// phpcs:ignore WordPress.WP.AlternativeFunctions, WordPress.PHP.NoSilencedErrors.Discouraged -- Keep the previous complete derivative until the replacement is ready.
+			if ( ! @rename( $temp_path, $output ) ) {
+				return 'failed';
+			}
+			$temp_path = '';
+			clearstatcache( true, $output );
 			DerivativeResolver::record( $attachment_id, $source_path, $format, $output );
 			return 'generated';
 		} finally {
-			flock( $lock, LOCK_UN );
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- closes the native handle used by flock().
-			fclose( $lock );
-			wp_delete_file( $lock_path );
+			if ( '' !== $temp_path && is_file( $temp_path ) ) {
+				wp_delete_file( $temp_path );
+			}
+			if ( is_resource( $lock ) ) {
+				flock( $lock, LOCK_UN );
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- closes the native handle used by flock().
+				fclose( $lock );
+			}
 		}
 	}
 }

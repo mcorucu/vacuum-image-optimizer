@@ -135,9 +135,7 @@ class ReportExporter {
 				$status = sanitize_key( (string) get_post_meta( $attachment_id, '_vacimg_status', true ) );
 				$status = '' === $status ? 'pending' : $status;
 
-				fputcsv(
-					$output,
-					[
+				$row = [
 						$attachment_id,
 						'' !== $file_path ? wp_basename( $file_path ) : sanitize_file_name( (string) get_the_title( $attachment_id ) ),
 						(string) get_post_mime_type( $attachment_id ),
@@ -152,8 +150,8 @@ class ReportExporter {
 						'' !== $avif_path && file_exists( $avif_path ) ? 'generated' : 'not_generated',
 						(string) get_post_meta( $attachment_id, '_vacimg_optimized_at', true ),
 						sanitize_text_field( (string) get_post_meta( $attachment_id, '_vacimg_error_message', true ) ),
-					]
-				);
+				];
+				fputcsv( $output, array_map( [ self::class, 'escape_csv_cell' ], $row ) );
 			}
 
 			// Flush each page to the client and release it from memory.
@@ -167,6 +165,26 @@ class ReportExporter {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $output );
 		exit;
+	}
+
+
+	/**
+	 * Prefix spreadsheet formula-leading text with an apostrophe before CSV export.
+	 *
+	 * @param mixed $value Cell value.
+	 * @return mixed
+	 */
+	public static function escape_csv_cell( $value ) {
+		if ( ! is_string( $value ) || '' === $value ) {
+			return $value;
+		}
+
+		$leading = ltrim( $value, " \t\n\r\0\x0B\f" );
+		if ( '' !== $leading && in_array( $leading[0], [ '=', '+', '-', '@' ], true ) ) {
+			return "'" . $value;
+		}
+
+		return $value;
 	}
 
 	/** Fetch source image attachment IDs in bounded pages for a memory-safe export. */

@@ -154,6 +154,17 @@ class Plugin {
 		// Cron runs outside the admin context, so register the handler everywhere.
 		$this->backup_cleanup = new BackupCleanup();
 		$this->backup_cleanup->register();
+		add_action( 'delete_attachment', [ $this, 'cleanup_deleted_attachment' ], 10, 1 );
+	}
+
+	/**
+	 * Remove plugin-owned derivatives before WordPress deletes the source file.
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 * @return void
+	 */
+	public function cleanup_deleted_attachment( int $attachment_id ): void {
+		( new \VacuumImageOptimizer\Engine\RestoreEngine() )->cleanup_deleted_attachment( $attachment_id );
 	}
 
 	/**
