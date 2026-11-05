@@ -24,11 +24,11 @@ Key docs:
 
 ## Current Release
 
-- Target release: `1.2.2` (public baseline: `1.2.1`)
-- WordPress.org public baseline: `1.2.1`
-- Last recorded WordPress.org SVN revision: `3623840` (1.2.0)
-- Target stable tag: `1.2.2`
-- Qualification target: WordPress `7.1.4`
+- Current release: `1.2.2` (WordPress.org and GitHub)
+- WordPress.org stable tag: `1.2.2`
+- WordPress.org SVN revision: `3786101`
+- WordPress.org readme field `Tested up to`: `7.1` (the directory currently reports `7.1.4`)
+- Qualification: WordPress `7.1.4` with PHP `8.1`–`8.3`
 - Requires at least: WordPress `6.2`
 - Requires PHP: `8.1`
 
